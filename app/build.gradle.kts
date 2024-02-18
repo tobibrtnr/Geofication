@@ -71,6 +71,10 @@ dependencies {
   // Geofencing
   implementation("com.google.android.gms:play-services-location:21.1.0")
 
+  // Nav - From Cupcake
+  implementation("androidx.compose.material3:material3")
+  implementation("androidx.navigation:navigation-compose:2.7.7")
+
   // Room - Data Storage
   val roomVersion = "2.6.1"
   implementation("androidx.room:room-runtime:$roomVersion")

@@ -36,7 +36,7 @@ import de.tobibrtnr.geofication.util.GeofenceUtil
 import kotlinx.coroutines.tasks.await
 
 @Composable
-fun GeoMap(
+fun MapScreen(
   modifier: Modifier = Modifier,
   locationClient: FusedLocationProviderClient,
   geofencingClient: GeofencingClient,
@@ -48,7 +48,7 @@ fun GeoMap(
   }
 
   val properties by remember {
-    mutableStateOf(MapProperties(isMyLocationEnabled = true))
+    mutableStateOf(MapProperties(isMyLocationEnabled = true, isBuildingEnabled = true))
   }
 
   val cameraPositionState = rememberCameraPositionState {
@@ -93,7 +93,7 @@ fun GeoMap(
       onMapLongClick = {
         println("Long Click! $it")
       },
-      modifier = Modifier.fillMaxWidth(),
+      modifier = Modifier.fillMaxSize(),
       cameraPositionState = cameraPositionState
     ) {
 

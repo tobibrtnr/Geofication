@@ -3,21 +3,17 @@ package de.tobibrtnr.geofication
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.ui.Modifier
+import androidx.activity.enableEdgeToEdge
 import androidx.room.Room
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.GeofencingClient
 import com.google.android.gms.location.LocationServices
-import de.tobibrtnr.geofication.ui.GeoMap
+import de.tobibrtnr.geofication.ui.GeoficationApp
 import de.tobibrtnr.geofication.ui.theme.GeoficationTheme
 import de.tobibrtnr.geofication.util.AppDatabase
 import de.tobibrtnr.geofication.util.GeofenceUtil
 
 class MainActivity : ComponentActivity() {
-
   // Room storage object
   private lateinit var db: AppDatabase
 
@@ -27,6 +23,7 @@ class MainActivity : ComponentActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    enableEdgeToEdge()
 
     db = Room.databaseBuilder(
       this,
@@ -59,13 +56,11 @@ class MainActivity : ComponentActivity() {
 
     setContent {
       GeoficationTheme {
-        // A surface container using the 'background' color from the theme
-        Surface(
-          modifier = Modifier.fillMaxSize(),
-          color = MaterialTheme.colorScheme.background
-        ) {
-          GeoMap(locationClient = locationClient, geofencingClient = geofencingClient, db = db)
-        }
+        GeoficationApp(
+          db = db,
+          geofencingClient = geofencingClient,
+          locationClient = locationClient
+        )
       }
     }
   }
