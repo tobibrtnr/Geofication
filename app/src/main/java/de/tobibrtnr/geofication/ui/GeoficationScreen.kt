@@ -133,7 +133,8 @@ fun GeoficationApp(
       }
       composable(route = GeoficationScreen.Geofences.name) {
         GeofencesScreen(
-          modifier = Modifier.fillMaxHeight()
+          modifier = Modifier.fillMaxHeight(),
+          db = db
         )
       }
     }

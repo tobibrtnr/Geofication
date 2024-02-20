@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.pm.PackageManager
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -78,7 +77,7 @@ fun MapScreen(
   // Fetch all active geofences from storage
   var geofencesArray by remember { mutableStateOf(emptyList<Geofence>()) }
   LaunchedEffect(Unit) {
-    val geofences = GeofenceUtil.getGeofences(geofencingClient, db)
+    val geofences = GeofenceUtil.getGeofences(db)
     geofencesArray = geofences
   }
 

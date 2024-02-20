@@ -18,7 +18,7 @@ class GeofenceUtil {
     /**
      * Get all existing geofences.
      */
-    suspend fun getGeofences(geofencingClient: GeofencingClient, db: AppDatabase): List<Geofence> {
+    suspend fun getGeofences(db: AppDatabase): List<Geofence> {
       return withContext(Dispatchers.IO) {
         val geoDao = db.geofenceDao()
         geoDao.getAll()
@@ -27,6 +27,8 @@ class GeofenceUtil {
 
     /**
      * Add a new geofence with a given string id, latitude, longitude and radius.
+     * TODO if the addGeofence is called after reboot, we do not need to add it again
+     * TODO to the database. so maybe alternative without db.
      */
     fun addGeofence(
       context: Context,
