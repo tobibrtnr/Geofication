@@ -24,14 +24,14 @@ interface GeofenceDao {
   @Query("SELECT * FROM geofence")
   fun getAll(): List<Geofence>
 
-  @Query("SELECT * FROM geofence WHERE gid LIKE :geoId")
+  @Query("SELECT * FROM geofence WHERE gid = :geoId")
   fun loadById(geoId: String): Geofence
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   fun insertAll(vararg geofences: Geofence)
 
-  @Delete
-  fun delete(geofence: Geofence)
+  @Query("DELETE FROM geofence WHERE gid = :gid")
+  fun delete(gid: String)
 }
 
 @Database(entities = [Geofence::class], version = 1)

@@ -87,5 +87,20 @@ class GeofenceUtil {
           }
       }
     }
+
+    /**
+     * Delete the geofence with certain gid from storage and geofencing client.
+     */
+    suspend fun deleteGeofence(gid: String, geofencingClient: GeofencingClient, db: AppDatabase) {
+      return withContext(Dispatchers.IO) {
+
+        val geofenceDao = db.geofenceDao()
+        geofenceDao.delete(gid)
+
+        geofencingClient.removeGeofences(listOf(gid))
+
+        println("Removed geofence $gid")
+      }
+    }
   }
 }

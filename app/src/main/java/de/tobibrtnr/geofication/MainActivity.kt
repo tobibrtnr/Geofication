@@ -33,27 +33,6 @@ class MainActivity : ComponentActivity() {
     locationClient = LocationServices.getFusedLocationProviderClient(this)
     geofencingClient = LocationServices.getGeofencingClient(this)
 
-    // Add a geofence for testing
-    GeofenceUtil.addGeofence(
-      this,
-      geofencingClient,
-      db,
-      "myTestGeofence",
-      37.43273342801908,
-      -122.09336310625076,
-      25.0f
-    )
-
-    GeofenceUtil.addGeofence(
-      this,
-      geofencingClient,
-      db,
-      "athleticFields",
-      37.42792352846094,
-      -122.09414027631283,
-      50.25f
-    )
-
     setContent {
       GeoficationTheme {
         GeoficationApp(
