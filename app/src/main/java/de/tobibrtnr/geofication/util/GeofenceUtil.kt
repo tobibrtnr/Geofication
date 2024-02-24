@@ -54,7 +54,8 @@ class GeofenceUtil {
           gid,
           latitude,
           longitude,
-          radius
+          radius,
+          "#FF0000"
         )
         geofenceDao.insertAll(daoGeofence)
       }

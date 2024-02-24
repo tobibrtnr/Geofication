@@ -43,6 +43,7 @@ import com.google.maps.android.compose.widgets.DisappearingScaleBar
 import de.tobibrtnr.geofication.util.AppDatabase
 import de.tobibrtnr.geofication.util.Geofence
 import de.tobibrtnr.geofication.util.GeofenceUtil
+import de.tobibrtnr.geofication.util.Vibrate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -165,6 +166,7 @@ fun MapScreen(
   }
 
   fun longClick(latLng: LatLng) {
+    Vibrate.vibrate(context, 15)
     openPopup(latLng)
   }
   // END local functions
