@@ -33,7 +33,8 @@ enum class GeoficationScreen(val title: String) {
   Start(title = "Geofication"),
   Permissions(title = "Permissions"),
   Settings(title = "Settings"),
-  Geofences(title = "Geofences")
+  Geofences(title = "Geofences"),
+  Geofications(title = "Geofications")
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -76,6 +77,9 @@ fun GeoficationAppBar(
           onClick = { showMenu = false; navController.navigate(GeoficationScreen.Geofences.name) },
           text = { Text("View Geofences") })
         DropdownMenuItem(
+          onClick = { showMenu = false; navController.navigate(GeoficationScreen.Geofications.name) },
+          text = { Text("View Geofications") })
+        DropdownMenuItem(
           onClick = { showMenu = false; navController.navigate(GeoficationScreen.Settings.name) },
           text = { Text("Settings") })
       }
@@ -85,10 +89,7 @@ fun GeoficationAppBar(
 
 @Composable
 fun GeoficationApp(
-  navController: NavHostController = rememberNavController(),
-  db: AppDatabase,
-  geofencingClient: GeofencingClient,
-  locationClient: FusedLocationProviderClient
+  navController: NavHostController = rememberNavController()
 ) {
   // Get current back stack entry
   val backStackEntry by navController.currentBackStackEntryAsState()
@@ -118,9 +119,6 @@ fun GeoficationApp(
     ) {
       composable(route = GeoficationScreen.Start.name) {
         MapScreen(
-          db = db,
-          geofencingClient = geofencingClient,
-          locationClient = locationClient,
           modifier = Modifier.fillMaxHeight()
         )
       }
@@ -131,8 +129,12 @@ fun GeoficationApp(
       }
       composable(route = GeoficationScreen.Geofences.name) {
         GeofencesScreen(
-          modifier = Modifier.fillMaxHeight(),
-          db = db
+          modifier = Modifier.fillMaxHeight()
+        )
+      }
+      composable(route = GeoficationScreen.Geofications.name) {
+        GeoficationsScreen(
+          modifier = Modifier.fillMaxHeight()
         )
       }
     }

@@ -19,32 +19,33 @@ import androidx.compose.ui.unit.dp
 import de.tobibrtnr.geofication.util.AppDatabase
 import de.tobibrtnr.geofication.util.Geofence
 import de.tobibrtnr.geofication.util.GeofenceUtil
+import de.tobibrtnr.geofication.util.Geofication
 
 @Composable
-fun GeofencesScreen(
+fun GeoficationsScreen(
   modifier: Modifier = Modifier
 ) {
 
-  var geofencesArray by remember { mutableStateOf(emptyList<Geofence>()) }
+  var geoficationsArray by remember { mutableStateOf(emptyList<Geofication>()) }
   LaunchedEffect(Unit) {
-    val geofences = GeofenceUtil.getGeofences()
-    geofencesArray = geofences
+    val geofications = GeofenceUtil.getGeofications()
+    geoficationsArray = geofications
   }
 
-  Text("${geofencesArray.size} Geofence(s) created.")
+  Text("${geoficationsArray.size} Geofication(s) created.")
 
   LazyColumn {
-    items(geofencesArray) {
+    items(geoficationsArray) {
       ListItem(it)
     }
   }
 }
 
 @Composable
-fun ListItem(geofence: Geofence) {
+fun ListItem(geofication: Geofication) {
   Column(modifier = Modifier.padding(16.dp)) {
-    Text(geofence.gid)
+    Text(geofication.gid)
     Spacer(modifier = Modifier.height(8.dp))
-    Text("Radius: ${geofence.radius}m")
+    Text("Geofence: ${geofication.fenceid}")
   }
 }

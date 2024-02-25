@@ -75,6 +75,7 @@ dependencies {
   // Nav - From Cupcake
   implementation("androidx.compose.material3:material3")
   implementation("androidx.navigation:navigation-compose:2.7.7")
+  implementation("com.google.android.material:material:1.11.0")
 
   // Room - Data Storage
   val roomVersion = "2.6.1"

@@ -1,6 +1,7 @@
 package de.tobibrtnr.geofication.util
 
 import android.app.PendingIntent
+import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -18,8 +19,9 @@ class GeofenceUtil {
     /**
      * Get all existing geofences.
      */
-    suspend fun getGeofences(db: AppDatabase): List<Geofence> {
+    suspend fun getGeofences(): List<Geofence> {
       return withContext(Dispatchers.IO) {
+        val db = ServiceProvider.database()
         val geoDao = db.geofenceDao()
         geoDao.getAll()
       }
@@ -32,13 +34,13 @@ class GeofenceUtil {
      */
     fun addGeofence(
       context: Context,
-      geofencingClient: GeofencingClient,
-      db: AppDatabase,
       gid: String,
       latitude: Double,
       longitude: Double,
       radius: Float
     ) {
+      val db = ServiceProvider.database()
+      val geofencingClient = ServiceProvider.geofence()
       val geofence = com.google.android.gms.location.Geofence.Builder()
         .setRequestId(gid)
         .setCircularRegion(latitude, longitude, radius)
@@ -92,15 +94,71 @@ class GeofenceUtil {
     /**
      * Delete the geofence with certain gid from storage and geofencing client.
      */
-    suspend fun deleteGeofence(gid: String, geofencingClient: GeofencingClient, db: AppDatabase) {
+    suspend fun deleteGeofence(gid: String) {
       return withContext(Dispatchers.IO) {
-
+        val geofencingClient = ServiceProvider.geofence()
+        val db = ServiceProvider.database()
         val geofenceDao = db.geofenceDao()
         geofenceDao.delete(gid)
 
         geofencingClient.removeGeofences(listOf(gid))
 
         println("Removed geofence $gid")
+      }
+    }
+
+
+    /**
+     * Get all existing geofications.
+     */
+    suspend fun getGeofications(): List<Geofication> {
+      return withContext(Dispatchers.IO) {
+        val db = ServiceProvider.database()
+        val geoDao = db.geoficationDao()
+        geoDao.getAll()
+      }
+    }
+
+    /**
+     * Add a geofication
+     */
+    fun addGeofication(
+      gid: String,
+      fenceid: String,
+      message: String,
+      flags: Int,
+      delay: Int,
+      repeat: Boolean,
+      color: String
+    ) {
+      CoroutineScope(SupervisorJob()).launch {
+        val geofication = Geofication(gid, fenceid, message, flags, delay, repeat, color)
+
+        val db = ServiceProvider.database()
+        val geoDao = db.geoficationDao()
+        geoDao.insertAll(geofication)
+      }
+    }
+
+    /**
+     * Delete a geofication
+     */
+    suspend fun deleteGeofication(gid: String) {
+      return withContext(Dispatchers.IO) {
+        val db = ServiceProvider.database()
+        val geoDao = db.geoficationDao()
+        geoDao.delete(gid)
+      }
+    }
+
+    /**
+     * Get all geofications with a certain geofence id
+     */
+    suspend fun getGeoficationByGeofence(fenceid: String): List<Geofication> {
+      return withContext(Dispatchers.IO) {
+        val db = ServiceProvider.database()
+        val geoDao = db.geoficationDao()
+        geoDao.getByGeofence(fenceid)
       }
     }
   }

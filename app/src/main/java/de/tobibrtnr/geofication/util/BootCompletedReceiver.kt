@@ -24,21 +24,12 @@ class BootCompletedReceiver : BroadcastReceiver() {
 }
 
 suspend fun addAllGeofences(context: Context) {
+  ServiceProvider.setInstance(context)
 
-  val geofencingClient = LocationServices.getGeofencingClient(context)
-
-  val db = Room.databaseBuilder(
-    context,
-    AppDatabase::class.java, "geofication-database"
-  ).build()
-
-  val geofences = GeofenceUtil.getGeofences(db)
-
+  val geofences = GeofenceUtil.getGeofences()
   geofences.forEach {
     GeofenceUtil.addGeofence(
       context,
-      geofencingClient,
-      db,
       it.gid,
       it.latitude,
       it.longitude,

@@ -63,7 +63,7 @@ interface GeoficationDao {
   fun loadById(geoId: String): Geofication
 
   @Query("SELECT * FROM geofication WHERE fenceid = :fenceId")
-  fun loadByFenceId(fenceId: String): List<Geofication>
+  fun getByGeofence(fenceId: String): List<Geofication>
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   fun insertAll(vararg geofications: Geofication)
