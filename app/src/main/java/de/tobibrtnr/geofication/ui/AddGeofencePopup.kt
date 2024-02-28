@@ -12,6 +12,7 @@ import kotlinx.coroutines.Job
 fun processInput(
   enteredString: String,
   enteredFloat: Float,
+  enteredColor: String,
   pos: LatLng,
   context: Context,
   function: () -> Job
@@ -21,7 +22,8 @@ fun processInput(
     enteredString,
     pos.latitude,
     pos.longitude,
-    enteredFloat
+    enteredFloat,
+    enteredColor
   )
 
   function()
@@ -46,6 +48,11 @@ fun addGeofencePopup(pos: LatLng, context: Context, function: () -> Job) {
   floatInput.hint = "Radius"
   layout.addView(floatInput)
 
+  // Create EditText for float input
+  val colorInput = EditText(context)
+  colorInput.hint = "Color"
+  layout.addView(colorInput)
+
   builder.setView(layout)
 
   // Set up the buttons
@@ -57,9 +64,13 @@ fun addGeofencePopup(pos: LatLng, context: Context, function: () -> Job) {
       Toast.makeText(context, "Invalid radius input", Toast.LENGTH_SHORT).show()
       return@setPositiveButton
     }
+    var enteredColor = colorInput.text.toString()
+    if(enteredColor.isEmpty()) {
+      enteredColor = "#FFFF0000"
+    }
 
     // Process the entered values as needed
-    processInput(enteredString, enteredFloat, pos, context, function)
+    processInput(enteredString, enteredFloat, enteredColor, pos, context, function)
   }
 
   builder.setNegativeButton("Cancel") { dialog, _ ->

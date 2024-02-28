@@ -33,7 +33,8 @@ suspend fun addAllGeofences(context: Context) {
       it.gid,
       it.latitude,
       it.longitude,
-      it.radius
+      it.radius,
+      it.color
     )
   }
 }

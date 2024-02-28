@@ -2,6 +2,7 @@ package de.tobibrtnr.geofication.ui
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.Color.parseColor
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -34,6 +35,7 @@ import androidx.compose.ui.zIndex
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.PinConfig
 import com.google.maps.android.compose.Circle
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
@@ -141,9 +143,11 @@ fun MapScreen(
 
       // Place each Geofence as Marker and Circle on the Map
       geofencesArray.forEach { geo ->
+        val pinConfig = PinConfig.builder().setBackgroundColor(parseColor(geo.color)).build()
         val mState = MarkerState(position = LatLng(geo.latitude, geo.longitude))
         MarkerInfoWindowContent(
           state = mState,
+          //pinConfig = pinConfig,
           title = geo.gid,
           onInfoWindowClick = {
             mState.hideInfoWindow()
@@ -171,8 +175,8 @@ fun MapScreen(
         Circle(
           center = LatLng(geo.latitude, geo.longitude),
           radius = geo.radius.toDouble(),
-          strokeColor = Color.Red,
-          fillColor = Color.Red.copy(alpha = 0.25f)
+          strokeColor = Color(parseColor(geo.color)),
+          fillColor = Color(parseColor(geo.color)).copy(alpha = 0.25f)
         )
       }
     }

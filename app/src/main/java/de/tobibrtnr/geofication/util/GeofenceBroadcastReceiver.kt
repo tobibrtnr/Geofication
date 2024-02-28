@@ -6,6 +6,7 @@ import android.content.Intent
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofenceStatusCodes
 import com.google.android.gms.location.GeofencingEvent
+import kotlinx.coroutines.runBlocking
 
 
 class GeofenceBroadcastReceiver : BroadcastReceiver() {
@@ -36,14 +37,29 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
         println("Geofence ${geofence.requestId}")
         println("Entering? $geofenceTransition")
 
-        if (context != null) {
-          sendNotification(
-            context,
-            "Geofication",
-            "Geofence ${geofence.requestId} - $geofenceTransition"
-          )
-        } else {
-          println("No context for notification given.")
+        runBlocking {
+          val geofications = GeofenceUtil.getGeoficationByGeofence(geofence.requestId)
+          println("THESE GEOFICATIONS ARE TRIGGERED")
+          println(geofications)
+
+          var message = ""
+          geofications.forEach {
+
+            if(it.flags == geofenceTransition || it.flags == 3) {
+              message += "${it.gid}, "
+            }
+          }
+          message = message.dropLast(2)
+
+          if (context != null && message.isNotEmpty()) {
+            sendNotification(
+              context,
+              "Geofence ${geofence.requestId} - $geofenceTransition",
+              message
+            )
+          } else {
+            println("No context for notification given.")
+          }
         }
       }
     } else {

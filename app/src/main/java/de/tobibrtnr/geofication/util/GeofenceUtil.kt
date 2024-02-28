@@ -37,7 +37,8 @@ class GeofenceUtil {
       gid: String,
       latitude: Double,
       longitude: Double,
-      radius: Float
+      radius: Float,
+      color: String
     ) {
       val db = ServiceProvider.database()
       val geofencingClient = ServiceProvider.geofence()
@@ -57,7 +58,7 @@ class GeofenceUtil {
           latitude,
           longitude,
           radius,
-          "#FF0000"
+          "#FF$color"
         )
         geofenceDao.insertAll(daoGeofence)
       }

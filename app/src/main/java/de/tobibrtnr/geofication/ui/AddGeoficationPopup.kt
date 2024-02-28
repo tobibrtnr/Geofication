@@ -33,13 +33,25 @@ import de.tobibrtnr.geofication.util.GeofenceUtil
 
 fun processInput(
   enteredString: String,
-  selectedGeofence: String
+  selectedGeofence: String,
+  flags: List<String>
 ) {
+
+  println("FLAGS: $flags")
+
+  var flagNum = 0
+  if(flags.contains("entering")) {
+    flagNum += 1
+  }
+  if(flags.contains("exiting")) {
+    flagNum += 2
+  }
+
   GeofenceUtil.addGeofication(
     enteredString,
     selectedGeofence,
     "",
-    3,
+    flagNum,
     0,
     true,
     "FFFF0000"
@@ -53,6 +65,7 @@ fun AddGeoficationPopup(
 
   var expanded by remember { mutableStateOf(false) }
   var selectedGeofence by remember { mutableStateOf("") }
+  var flags by remember {mutableStateOf(emptyList<String>())}
   var name by remember { mutableStateOf("") }
   var geofences by remember { mutableStateOf(emptyList<Geofence>()) }
 
@@ -90,11 +103,14 @@ fun AddGeoficationPopup(
           }
         )
 
+        SegmentedButtons("entering", "exiting") { flags = it }
+
         Text(
-          text = if (selectedGeofence.isNotEmpty()) selectedGeofence else "Please select a geofence.",
+          text = selectedGeofence.ifEmpty { "Please select a geofence." },
           modifier = Modifier
             .fillMaxWidth()
             .clickable { expanded = true }
+            .padding(16.dp)
         )
 
         Row(
@@ -130,7 +146,7 @@ fun AddGeoficationPopup(
           }
           TextButton(
             onClick = {
-              processInput(name, selectedGeofence)
+              processInput(name, selectedGeofence, flags)
               onDismissRequest()
             },
             modifier = Modifier.padding(8.dp),
