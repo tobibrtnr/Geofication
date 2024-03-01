@@ -33,9 +33,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.core.app.ActivityCompat
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.PinConfig
+import com.google.maps.android.compose.AdvancedMarker
 import com.google.maps.android.compose.Circle
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
@@ -98,23 +100,30 @@ fun MapScreen(
     geofencesArray = geofences
   }
 
+  var openDialog by remember { mutableStateOf(false) }
+  var openDialogGeofence by remember { mutableStateOf(false) }
+
   val context = LocalContext.current
+  var selectedPosition by remember { mutableStateOf(LatLng(0.0, 0.0))}
 
   fun longClick(latLng: LatLng) {
     Vibrate.vibrate(context, 15)
-    addGeofencePopup(latLng, context) {
+    selectedPosition = latLng
+    openDialogGeofence = true
+  }
+
+  // Return Composable
+  if (openDialog) {
+    AddGeoficationPopup { openDialog = false }
+  }
+  if (openDialogGeofence) {
+    AddGeofencePopup(selectedPosition, { openDialogGeofence = false }, {
       CoroutineScope(Dispatchers.Default).launch {
         val geofences = GeofenceUtil.getGeofences()
         geofencesArray = geofences
       }
-    }
-  }
-
-  var openDialog by remember { mutableStateOf(false) }
-
-  // Return Composable
-  if(openDialog) {
-    AddGeoficationPopup { openDialog = false}
+      openDialogGeofence = false
+    })
   }
   Box(Modifier.fillMaxSize()) {
     IconButton(
@@ -127,7 +136,7 @@ fun MapScreen(
         .border(1.dp, Color(0xFFA8DAB5), MaterialTheme.shapes.medium)
         .zIndex(1f)
         .align(Alignment.BottomEnd)
-      ) {
+    ) {
       Icon(Icons.Filled.Add, contentDescription = "Add")
     }
 
@@ -138,16 +147,16 @@ fun MapScreen(
         longClick(it)
       },
       modifier = Modifier.fillMaxSize(),
-      cameraPositionState = cameraPositionState
+      cameraPositionState = cameraPositionState,
     ) {
 
       // Place each Geofence as Marker and Circle on the Map
       geofencesArray.forEach { geo ->
-        val pinConfig = PinConfig.builder().setBackgroundColor(parseColor(geo.color)).build()
+        val bdf = BitmapDescriptorFactory.defaultMarker(geo.color.hue)
+
         val mState = MarkerState(position = LatLng(geo.latitude, geo.longitude))
         MarkerInfoWindowContent(
           state = mState,
-          //pinConfig = pinConfig,
           title = geo.gid,
           onInfoWindowClick = {
             mState.hideInfoWindow()
@@ -159,6 +168,7 @@ fun MapScreen(
 
             }
           },
+          icon = bdf,
           content = { _ ->
 
             Column(modifier = Modifier.padding(16.dp)) {
@@ -175,8 +185,8 @@ fun MapScreen(
         Circle(
           center = LatLng(geo.latitude, geo.longitude),
           radius = geo.radius.toDouble(),
-          strokeColor = Color(parseColor(geo.color)),
-          fillColor = Color(parseColor(geo.color)).copy(alpha = 0.25f)
+          strokeColor = geo.color.color,
+          fillColor = geo.color.color.copy(alpha = 0.25f)
         )
       }
     }

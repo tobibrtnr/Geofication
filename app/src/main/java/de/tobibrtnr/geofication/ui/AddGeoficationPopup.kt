@@ -34,7 +34,8 @@ import de.tobibrtnr.geofication.util.GeofenceUtil
 fun processInput(
   enteredString: String,
   selectedGeofence: String,
-  flags: List<String>
+  flags: List<String>,
+  color: MarkerColor
 ) {
 
   println("FLAGS: $flags")
@@ -54,7 +55,7 @@ fun processInput(
     flagNum,
     0,
     true,
-    "FFFF0000"
+    color
   )
 }
 
@@ -65,6 +66,8 @@ fun AddGeoficationPopup(
 
   var expanded by remember { mutableStateOf(false) }
   var selectedGeofence by remember { mutableStateOf("") }
+  var selectedColor by remember { mutableStateOf(MarkerColor.RED) }
+  var colorExpanded by remember { mutableStateOf(false) }
   var flags by remember {mutableStateOf(emptyList<String>())}
   var name by remember { mutableStateOf("") }
   var geofences by remember { mutableStateOf(emptyList<Geofence>()) }
@@ -78,7 +81,7 @@ fun AddGeoficationPopup(
     Card(
       modifier = Modifier
         .fillMaxWidth()
-        .height(375.dp)
+        .height(400.dp)
         .padding(16.dp),
       shape = RoundedCornerShape(16.dp)
     ) {
@@ -133,6 +136,34 @@ fun AddGeoficationPopup(
           }
         }
 
+        Text(
+          text = selectedColor.name.lowercase(),
+          modifier = Modifier
+            .fillMaxWidth()
+            .clickable { colorExpanded = true }
+            .padding(16.dp)
+        )
+
+        Row(
+          modifier = Modifier
+            .fillMaxWidth(),
+          horizontalArrangement = Arrangement.Center,
+        ) {
+          // Geofence dropdown menu
+          DropdownMenu(
+            modifier = Modifier.fillMaxWidth(),
+            expanded = colorExpanded,
+            onDismissRequest = { colorExpanded = false },
+          ) {
+            MarkerColor.values().forEach {
+              DropdownMenuItem(text = { Text(it.name.lowercase()) }, onClick = {
+                selectedColor = it
+                colorExpanded = false
+              })
+            }
+          }
+        }
+
         Row(
           modifier = Modifier
             .fillMaxWidth(),
@@ -146,7 +177,7 @@ fun AddGeoficationPopup(
           }
           TextButton(
             onClick = {
-              processInput(name, selectedGeofence, flags)
+              processInput(name, selectedGeofence, flags, selectedColor)
               onDismissRequest()
             },
             modifier = Modifier.padding(8.dp),

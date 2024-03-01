@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.GeofencingClient
 import com.google.android.gms.location.GeofencingRequest
+import de.tobibrtnr.geofication.ui.MarkerColor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -38,7 +39,7 @@ class GeofenceUtil {
       latitude: Double,
       longitude: Double,
       radius: Float,
-      color: String
+      color: MarkerColor
     ) {
       val db = ServiceProvider.database()
       val geofencingClient = ServiceProvider.geofence()
@@ -58,7 +59,7 @@ class GeofenceUtil {
           latitude,
           longitude,
           radius,
-          "#FF$color"
+          color
         )
         geofenceDao.insertAll(daoGeofence)
       }
@@ -130,7 +131,7 @@ class GeofenceUtil {
       flags: Int,
       delay: Int,
       repeat: Boolean,
-      color: String
+      color: MarkerColor
     ) {
       CoroutineScope(SupervisorJob()).launch {
         val geofication = Geofication(gid, fenceid, message, flags, delay, repeat, color)

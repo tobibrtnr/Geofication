@@ -11,6 +11,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.RoomDatabase
+import de.tobibrtnr.geofication.ui.MarkerColor
 
 @Entity
 data class Geofence(
@@ -18,7 +19,7 @@ data class Geofence(
   val latitude: Double,
   val longitude: Double,
   val radius: Float,
-  val color: String
+  val color: MarkerColor
 )
 
 @Entity(
@@ -36,7 +37,7 @@ data class Geofication(
   val flags: Int,
   val delay: Int,
   val repeat: Boolean,
-  val color: String
+  val color: MarkerColor
 )
 
 @Dao
