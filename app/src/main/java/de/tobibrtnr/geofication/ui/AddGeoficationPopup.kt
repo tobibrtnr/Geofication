@@ -38,8 +38,6 @@ fun processInput(
   color: MarkerColor
 ) {
 
-  println("FLAGS: $flags")
-
   var flagNum = 0
   if(flags.contains("entering")) {
     flagNum += 1
@@ -136,10 +134,10 @@ fun AddGeoficationPopup(
           }
         }
 
-        Text(
-          text = selectedColor.name.lowercase(),
+        CircleWithColor(
+          color = selectedColor.color,
+          radius = 10.dp,
           modifier = Modifier
-            .fillMaxWidth()
             .clickable { colorExpanded = true }
             .padding(16.dp)
         )
@@ -156,7 +154,7 @@ fun AddGeoficationPopup(
             onDismissRequest = { colorExpanded = false },
           ) {
             MarkerColor.values().forEach {
-              DropdownMenuItem(text = { Text(it.name.lowercase()) }, onClick = {
+              DropdownMenuItem(text = { CircleWithColor(color = it.color, radius = 10.dp) }, onClick = {
                 selectedColor = it
                 colorExpanded = false
               })

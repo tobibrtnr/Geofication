@@ -2,19 +2,29 @@ package de.tobibrtnr.geofication.ui
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.graphics.Color.parseColor
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -31,23 +41,23 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.PinConfig
-import com.google.maps.android.compose.AdvancedMarker
 import com.google.maps.android.compose.Circle
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
-import com.google.maps.android.compose.MarkerInfoWindowContent
+import com.google.maps.android.compose.MarkerInfoWindow
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.widgets.DisappearingScaleBar
 import de.tobibrtnr.geofication.util.Geofence
 import de.tobibrtnr.geofication.util.GeofenceUtil
+import de.tobibrtnr.geofication.util.Geofication
 import de.tobibrtnr.geofication.util.ServiceProvider
 import de.tobibrtnr.geofication.util.Vibrate
 import kotlinx.coroutines.CoroutineScope
@@ -106,6 +116,11 @@ fun MapScreen(
   val context = LocalContext.current
   var selectedPosition by remember { mutableStateOf(LatLng(0.0, 0.0))}
 
+  var isMapLoaded by remember { mutableStateOf(false) }
+
+  var markerPopupVisible by remember { mutableStateOf(false) }
+  var selectedMarkerId by remember { mutableStateOf("")}
+
   fun longClick(latLng: LatLng) {
     Vibrate.vibrate(context, 15)
     selectedPosition = latLng
@@ -113,6 +128,50 @@ fun MapScreen(
   }
 
   // Return Composable
+  if(markerPopupVisible && selectedMarkerId.isNotEmpty()) {
+    Dialog(onDismissRequest = { markerPopupVisible = false }) {
+      Card(
+        modifier = Modifier
+          .fillMaxWidth()
+          .height(400.dp)
+          .padding(16.dp),
+        shape = RoundedCornerShape(16.dp)
+      ) {
+        Column(
+          modifier = Modifier.fillMaxSize(),
+          verticalArrangement = Arrangement.Center,
+          horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+          Text(selectedMarkerId)
+
+          Icon(
+            imageVector = Icons.Filled.Delete,
+            contentDescription = "Delete geofence",
+            modifier = Modifier
+              .clickable {
+                CoroutineScope(Dispatchers.Default).launch {
+                  GeofenceUtil.deleteGeofence(selectedMarkerId)
+
+                  val geofences = GeofenceUtil.getGeofences()
+                  geofencesArray = geofences
+
+                }
+                markerPopupVisible = false
+              }
+          )
+
+          Spacer(modifier = Modifier.width(16.dp))
+          var selectedGeofenceNotifs by remember { mutableStateOf(emptyList<Geofication>()) }
+          LaunchedEffect(Unit) {
+            selectedGeofenceNotifs = GeofenceUtil.getGeoficationByGeofence(selectedMarkerId)
+          }
+          selectedGeofenceNotifs.forEach {
+            Text(it.gid)
+          }
+        }
+      }
+    }
+  }
   if (openDialog) {
     AddGeoficationPopup { openDialog = false }
   }
@@ -139,6 +198,14 @@ fun MapScreen(
     ) {
       Icon(Icons.Filled.Add, contentDescription = "Add")
     }
+    
+    //if(!isMapLoaded) {
+      AnimatedVisibility(visible = !isMapLoaded, modifier = Modifier.matchParentSize(), enter = EnterTransition.None, exit = fadeOut()) {
+        CircularProgressIndicator(modifier = Modifier
+          .background(MaterialTheme.colorScheme.background)
+          .wrapContentSize())
+      }
+    //}
 
     GoogleMap(
       uiSettings = uiSettings,
@@ -148,6 +215,7 @@ fun MapScreen(
       },
       modifier = Modifier.fillMaxSize(),
       cameraPositionState = cameraPositionState,
+      onMapLoaded = { isMapLoaded = true }
     ) {
 
       // Place each Geofence as Marker and Circle on the Map
@@ -155,30 +223,17 @@ fun MapScreen(
         val bdf = BitmapDescriptorFactory.defaultMarker(geo.color.hue)
 
         val mState = MarkerState(position = LatLng(geo.latitude, geo.longitude))
-        MarkerInfoWindowContent(
+        MarkerInfoWindow(
           state = mState,
           title = geo.gid,
-          onInfoWindowClick = {
-            mState.hideInfoWindow()
-            CoroutineScope(Dispatchers.Default).launch {
-              GeofenceUtil.deleteGeofence(geo.gid)
-
-              val geofences = GeofenceUtil.getGeofences()
-              geofencesArray = geofences
-
-            }
+          onClick = {
+            markerPopupVisible = true
+            selectedMarkerId = geo.gid
+            false
           },
           icon = bdf,
           content = { _ ->
-
-            Column(modifier = Modifier.padding(16.dp)) {
-              Text(geo.gid)
-              Spacer(modifier = Modifier.height(8.dp))
-              Icon(
-                imageVector = Icons.Filled.Delete,
-                contentDescription = "Delete geofence"
-              )
-            }
+            Text("")
           }
 
         )
