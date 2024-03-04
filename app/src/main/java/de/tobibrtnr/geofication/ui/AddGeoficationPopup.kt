@@ -97,6 +97,8 @@ fun AddGeoficationPopup(
             .border(
               1.dp, Color(0xFF000000)
             ),
+          placeholder = { Text("Enter Geofication name") },
+          singleLine = true,
           shape = MaterialTheme.shapes.medium,
           value = name,
           onValueChange = {

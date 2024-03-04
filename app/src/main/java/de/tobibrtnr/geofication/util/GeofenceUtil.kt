@@ -1,12 +1,10 @@
 package de.tobibrtnr.geofication.util
 
 import android.app.PendingIntent
-import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
-import com.google.android.gms.location.GeofencingClient
 import com.google.android.gms.location.GeofencingRequest
 import de.tobibrtnr.geofication.ui.MarkerColor
 import kotlinx.coroutines.CoroutineScope

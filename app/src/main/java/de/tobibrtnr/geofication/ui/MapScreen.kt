@@ -25,11 +25,13 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
 import androidx.core.app.ActivityCompat
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -62,6 +65,8 @@ import de.tobibrtnr.geofication.util.ServiceProvider
 import de.tobibrtnr.geofication.util.Vibrate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
@@ -71,7 +76,13 @@ fun MapScreen(
 ) {
 
   val uiSettings by remember {
-    mutableStateOf(MapUiSettings(zoomControlsEnabled = false))
+    mutableStateOf(
+      MapUiSettings(
+        zoomControlsEnabled = false,
+        indoorLevelPickerEnabled = false,
+        mapToolbarEnabled = false
+      )
+    )
   }
 
   val properties by remember {
@@ -114,12 +125,12 @@ fun MapScreen(
   var openDialogGeofence by remember { mutableStateOf(false) }
 
   val context = LocalContext.current
-  var selectedPosition by remember { mutableStateOf(LatLng(0.0, 0.0))}
+  var selectedPosition by remember { mutableStateOf(LatLng(0.0, 0.0)) }
 
   var isMapLoaded by remember { mutableStateOf(false) }
 
   var markerPopupVisible by remember { mutableStateOf(false) }
-  var selectedMarkerId by remember { mutableStateOf("")}
+  var selectedMarkerId by remember { mutableStateOf("") }
 
   fun longClick(latLng: LatLng) {
     Vibrate.vibrate(context, 15)
@@ -128,7 +139,7 @@ fun MapScreen(
   }
 
   // Return Composable
-  if(markerPopupVisible && selectedMarkerId.isNotEmpty()) {
+  if (markerPopupVisible && selectedMarkerId.isNotEmpty()) {
     Dialog(onDismissRequest = { markerPopupVisible = false }) {
       Card(
         modifier = Modifier
@@ -185,27 +196,46 @@ fun MapScreen(
     })
   }
   Box(Modifier.fillMaxSize()) {
-    IconButton(
+    FloatingActionButton(
       onClick = { openDialog = true },
       modifier = Modifier
         .size(100.dp)
         .padding(16.dp)
-        .clipToBounds()
-        .background(Color(0xFFC1E4CB), MaterialTheme.shapes.medium)
-        .border(1.dp, Color(0xFFA8DAB5), MaterialTheme.shapes.medium)
+        //.clipToBounds()
+        //.background(Color(0xFFC1E4CB), MaterialTheme.shapes.medium)
+        //.border(1.dp, Color(0xFFA8DAB5), MaterialTheme.shapes.medium)
         .zIndex(1f)
         .align(Alignment.BottomEnd)
     ) {
       Icon(Icons.Filled.Add, contentDescription = "Add")
     }
-    
+
     //if(!isMapLoaded) {
-      AnimatedVisibility(visible = !isMapLoaded, modifier = Modifier.matchParentSize(), enter = EnterTransition.None, exit = fadeOut()) {
-        CircularProgressIndicator(modifier = Modifier
+    AnimatedVisibility(
+      visible = !isMapLoaded,
+      modifier = Modifier.matchParentSize(),
+      enter = EnterTransition.None,
+      exit = fadeOut()
+    ) {
+      CircularProgressIndicator(
+        modifier = Modifier
           .background(MaterialTheme.colorScheme.background)
-          .wrapContentSize())
-      }
+          .wrapContentSize()
+      )
+    }
     //}
+    Box(
+      modifier = Modifier
+        .fillMaxWidth(0.85f)
+        .zIndex(1f)
+        .padding(8.dp),
+    ) {
+      LocationSearchBar(modifier = Modifier.fillMaxWidth()) {
+        MainScope().launch {
+          cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(it, 15f))
+        }
+      }
+    }
 
     GoogleMap(
       uiSettings = uiSettings,

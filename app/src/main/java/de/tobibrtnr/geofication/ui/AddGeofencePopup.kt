@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -33,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -103,6 +105,8 @@ fun AddGeofencePopup(
             .border(
               1.dp, Color(0xFF000000)
             ),
+          placeholder = { Text("Enter geofence name") },
+          singleLine = true,
           shape = MaterialTheme.shapes.medium,
           value = name,
           onValueChange = {
@@ -117,8 +121,13 @@ fun AddGeofencePopup(
             .border(
               1.dp, Color(0xFF000000)
             ),
+          keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Decimal
+          ),
           shape = MaterialTheme.shapes.medium,
           value = radius,
+          placeholder = { Text("Enter geofence radius") },
+          singleLine = true,
           onValueChange = {
             radius = it//.take(max) for max name length
           }

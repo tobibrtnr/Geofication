@@ -6,7 +6,6 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.GeofencingClient
 import com.google.android.gms.location.LocationServices
 import java.lang.IllegalStateException
-import java.lang.ref.WeakReference
 
 class ServiceProvider private constructor(context: Context) {
   private var fusedLocationClient: FusedLocationProviderClient
