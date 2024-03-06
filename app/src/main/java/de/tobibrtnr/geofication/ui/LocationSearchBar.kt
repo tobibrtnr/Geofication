@@ -5,6 +5,7 @@ import android.location.Address
 import android.location.Geocoder
 import android.location.Geocoder.GeocodeListener
 import android.os.Build
+import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -13,6 +14,7 @@ import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -20,10 +22,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.LatLng
 
 @Composable
@@ -45,15 +50,22 @@ fun LocationSearchBar(modifier: Modifier = Modifier, callback: (LatLng) -> Unit)
     onValueChange = { locationName = it },
     // on below line we are adding place holder
     // as text as "Enter your email"
-    placeholder = { Text(text = "Enter your location to search") },
+    placeholder = { Text(text = "Search") },
     // on below line we are adding modifier to it
     // and adding padding to it and filling max width
-    modifier = modifier.clip(CircleShape),
+    modifier = modifier/*.clip(CircleShape)*/
+      .border(1.dp, Color.LightGray, CircleShape)
+      .shadow(elevation = 16.dp, shape = CircleShape),
     //.padding(3.dp)
     // on below line we are adding text style
     // specifying color and font size to it.
     //textStyle = TextStyle(color = Color.Black, fontSize = 15.sp),
     // on below line we are adding single line to it.
+    colors = TextFieldDefaults.colors(
+      focusedIndicatorColor = Color.Transparent,
+      unfocusedIndicatorColor = Color.Transparent,
+      disabledIndicatorColor = Color.Transparent
+    ),
     singleLine = true,
     keyboardOptions = KeyboardOptions(
       imeAction = ImeAction.Search
@@ -63,7 +75,7 @@ fun LocationSearchBar(modifier: Modifier = Modifier, callback: (LatLng) -> Unit)
         keyboardController?.hide()
         focusManager.clearFocus()
 
-        val loc = searchLocation(locationName, context, callback)
+        searchLocation(locationName, context, callback)
       }
     )
   )

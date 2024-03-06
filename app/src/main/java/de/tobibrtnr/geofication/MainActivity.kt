@@ -2,6 +2,7 @@ package de.tobibrtnr.geofication
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.google.android.gms.maps.MapsInitializer
@@ -11,12 +12,11 @@ import de.tobibrtnr.geofication.util.ServiceProvider
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
+    enableEdgeToEdge()
+
     super.onCreate(savedInstanceState)
 
     MapsInitializer.initialize(this)
-
-    enableEdgeToEdge()
-
     ServiceProvider.setInstance(this)
 
     setContent {

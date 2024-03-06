@@ -6,18 +6,17 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
@@ -27,16 +26,13 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.LocationSearching
 import androidx.compose.material.icons.filled.MyLocation
-import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,11 +40,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
 import androidx.core.app.ActivityCompat
@@ -56,6 +52,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.SphericalUtil
 import com.google.maps.android.compose.Circle
 import com.google.maps.android.compose.GoogleMap
@@ -73,14 +70,13 @@ import de.tobibrtnr.geofication.util.Vibrate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 
 @Composable
 fun MapScreen(
   modifier: Modifier = Modifier,
+  topPadding: Dp
 ) {
 
   val uiSettings by remember {
@@ -194,6 +190,8 @@ fun MapScreen(
           }
           selectedGeofenceNotifs.forEach {
             Row {
+              CircleWithColor(color = it.color.color, radius = 8.dp)
+              Spacer(modifier = Modifier.width(16.dp))
               Text(it.gid)
               Spacer(modifier = Modifier.width(16.dp))
               Icon(
@@ -203,9 +201,9 @@ fun MapScreen(
                   .clickable {
                     CoroutineScope(Dispatchers.Default).launch {
                       GeofenceUtil.deleteGeofication(it.gid)
-
+                      selectedGeofenceNotifs =
+                        GeofenceUtil.getGeoficationByGeofence(selectedMarkerId)
                     }
-                    markerPopupVisible = false
                   }
               )
             }
@@ -244,7 +242,16 @@ fun MapScreen(
               currentLocation = LatLng(location.latitude, location.longitude)
 
               // Update the camera position state with the current location
-              cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(currentLocation, 15f))
+              cameraPositionState.animate(
+                CameraUpdateFactory.newCameraPosition(
+                  CameraPosition(
+                    currentLocation,
+                    15f,
+                    0f,
+                    0f
+                  )
+                )
+              )
             }
           },
           shape = CircleShape
@@ -253,7 +260,7 @@ fun MapScreen(
             imageVector = if (SphericalUtil.computeDistanceBetween(
                 cameraPositionState.position.target,
                 currentLocation
-              ) < 0.05
+              ) < 0.1
             ) Icons.Filled.MyLocation else Icons.Filled.LocationSearching,
             contentDescription = "Get location"
           )
@@ -285,7 +292,7 @@ fun MapScreen(
       modifier = Modifier
         .fillMaxWidth()
         .zIndex(1f)
-        .padding(8.dp),
+        .padding(8.dp, topPadding + 8.dp, 8.dp, 8.dp),
     ) {
       LocationSearchBar(modifier = Modifier.fillMaxWidth()) {
         MainScope().launch {
@@ -302,7 +309,8 @@ fun MapScreen(
       },
       modifier = Modifier.fillMaxSize(),
       cameraPositionState = cameraPositionState,
-      onMapLoaded = { isMapLoaded = true }
+      onMapLoaded = { isMapLoaded = true },
+      contentPadding = PaddingValues.Absolute(0.dp, 60.dp, 0.dp, 0.dp)
     ) {
 
       // Place each Geofence as Marker and Circle on the Map
