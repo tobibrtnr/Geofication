@@ -8,6 +8,9 @@ import android.os.Build
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -18,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import com.google.android.gms.maps.model.LatLng
@@ -27,6 +31,7 @@ fun LocationSearchBar(modifier: Modifier = Modifier, callback: (LatLng) -> Unit)
 
   val context = LocalContext.current
   val keyboardController = LocalSoftwareKeyboardController.current
+  val focusManager = LocalFocusManager.current
 
   var locationName by remember { mutableStateOf("") }
 
@@ -34,6 +39,7 @@ fun LocationSearchBar(modifier: Modifier = Modifier, callback: (LatLng) -> Unit)
     // on below line we are specifying value
     // for our message text field.
     value = locationName,
+    leadingIcon = { Icon(Icons.Outlined.Search, contentDescription = "Search location") },
     // on below line we are adding on
     // value change for text field.
     onValueChange = { locationName = it },
@@ -55,6 +61,7 @@ fun LocationSearchBar(modifier: Modifier = Modifier, callback: (LatLng) -> Unit)
     keyboardActions = KeyboardActions(
       onSearch = {
         keyboardController?.hide()
+        focusManager.clearFocus()
 
         val loc = searchLocation(locationName, context, callback)
       }

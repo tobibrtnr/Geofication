@@ -11,6 +11,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,10 +20,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.LocationSearching
+import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
@@ -42,6 +47,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
@@ -50,6 +56,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.SphericalUtil
 import com.google.maps.android.compose.Circle
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
@@ -69,6 +76,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 
 @Composable
 fun MapScreen(
@@ -80,7 +88,8 @@ fun MapScreen(
       MapUiSettings(
         zoomControlsEnabled = false,
         indoorLevelPickerEnabled = false,
-        mapToolbarEnabled = false
+        mapToolbarEnabled = false,
+        myLocationButtonEnabled = false
       )
     )
   }
@@ -92,6 +101,8 @@ fun MapScreen(
   val cameraPositionState = rememberCameraPositionState {
     CameraPosition.fromLatLngZoom(LatLng(0.0, 0.0), 10f)
   }
+
+  var currentLocation by remember { mutableStateOf(LatLng(0.0, 0.0)) }
 
   // If location permission is given, get it and set the camera position to it
   if (ActivityCompat.checkSelfPermission(
@@ -106,7 +117,7 @@ fun MapScreen(
     LaunchedEffect(Unit) {
       val locationClient = ServiceProvider.location()
       val location = locationClient.lastLocation.await()
-      val currentLocation = LatLng(location.latitude, location.longitude)
+      currentLocation = LatLng(location.latitude, location.longitude)
 
       // Update the camera position state with the current location
       cameraPositionState.position =
@@ -120,6 +131,7 @@ fun MapScreen(
     val geofences = GeofenceUtil.getGeofences()
     geofencesArray = geofences
   }
+
 
   var openDialog by remember { mutableStateOf(false) }
   var openDialogGeofence by remember { mutableStateOf(false) }
@@ -153,31 +165,51 @@ fun MapScreen(
           verticalArrangement = Arrangement.Center,
           horizontalAlignment = Alignment.CenterHorizontally
         ) {
-          Text(selectedMarkerId)
+          Row {
+            Text(text = selectedMarkerId, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.width(16.dp))
+            Icon(
+              imageVector = Icons.Filled.Delete,
+              contentDescription = "Delete geofence",
+              modifier = Modifier
+                .clickable {
+                  CoroutineScope(Dispatchers.Default).launch {
+                    GeofenceUtil.deleteGeofence(selectedMarkerId)
 
-          Icon(
-            imageVector = Icons.Filled.Delete,
-            contentDescription = "Delete geofence",
-            modifier = Modifier
-              .clickable {
-                CoroutineScope(Dispatchers.Default).launch {
-                  GeofenceUtil.deleteGeofence(selectedMarkerId)
+                    val geofences = GeofenceUtil.getGeofences()
+                    geofencesArray = geofences
 
-                  val geofences = GeofenceUtil.getGeofences()
-                  geofencesArray = geofences
-
+                  }
+                  markerPopupVisible = false
                 }
-                markerPopupVisible = false
-              }
-          )
+            )
+          }
 
-          Spacer(modifier = Modifier.width(16.dp))
+
+
+          Spacer(modifier = Modifier.height(16.dp))
           var selectedGeofenceNotifs by remember { mutableStateOf(emptyList<Geofication>()) }
           LaunchedEffect(Unit) {
             selectedGeofenceNotifs = GeofenceUtil.getGeoficationByGeofence(selectedMarkerId)
           }
           selectedGeofenceNotifs.forEach {
-            Text(it.gid)
+            Row {
+              Text(it.gid)
+              Spacer(modifier = Modifier.width(16.dp))
+              Icon(
+                imageVector = Icons.Filled.Delete,
+                contentDescription = "Delete Geofication",
+                modifier = Modifier
+                  .clickable {
+                    CoroutineScope(Dispatchers.Default).launch {
+                      GeofenceUtil.deleteGeofication(it.gid)
+
+                    }
+                    markerPopupVisible = false
+                  }
+              )
+            }
+            Spacer(Modifier.height(8.dp))
           }
         }
       }
@@ -196,18 +228,43 @@ fun MapScreen(
     })
   }
   Box(Modifier.fillMaxSize()) {
-    FloatingActionButton(
-      onClick = { openDialog = true },
-      modifier = Modifier
-        .size(100.dp)
-        .padding(16.dp)
-        //.clipToBounds()
-        //.background(Color(0xFFC1E4CB), MaterialTheme.shapes.medium)
-        //.border(1.dp, Color(0xFFA8DAB5), MaterialTheme.shapes.medium)
-        .zIndex(1f)
+    Box(
+      Modifier
         .align(Alignment.BottomEnd)
+        .zIndex(1f)
+        .padding(16.dp)
     ) {
-      Icon(Icons.Filled.Add, contentDescription = "Add")
+      Column {
+        FloatingActionButton(
+          onClick = {
+            MainScope().launch {
+              // Asynchronously set the position of the map camera to current position
+              val locationClient = ServiceProvider.location()
+              val location = locationClient.lastLocation.await()
+              currentLocation = LatLng(location.latitude, location.longitude)
+
+              // Update the camera position state with the current location
+              cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(currentLocation, 15f))
+            }
+          },
+          shape = CircleShape
+        ) {
+          Icon(
+            imageVector = if (SphericalUtil.computeDistanceBetween(
+                cameraPositionState.position.target,
+                currentLocation
+              ) < 0.05
+            ) Icons.Filled.MyLocation else Icons.Filled.LocationSearching,
+            contentDescription = "Get location"
+          )
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        FloatingActionButton(
+          onClick = { openDialog = true },
+        ) {
+          Icon(Icons.Filled.Add, contentDescription = "Add Geofication")
+        }
+      }
     }
 
     //if(!isMapLoaded) {
@@ -226,7 +283,7 @@ fun MapScreen(
     //}
     Box(
       modifier = Modifier
-        .fillMaxWidth(0.85f)
+        .fillMaxWidth()
         .zIndex(1f)
         .padding(8.dp),
     ) {

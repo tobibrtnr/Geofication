@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -25,9 +25,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.GeofencingClient
-import de.tobibrtnr.geofication.util.AppDatabase
 
 enum class GeoficationScreen(val title: String) {
   Start(title = "Geofication"),
@@ -55,7 +52,7 @@ fun GeoficationAppBar(
         // Back Button always navigates to start for now
         IconButton(onClick = { navController.navigate(GeoficationScreen.Start.name) }) {
           Icon(
-            imageVector = Icons.Filled.ArrowBack,
+            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
             contentDescription = "Back"
           )
         }
