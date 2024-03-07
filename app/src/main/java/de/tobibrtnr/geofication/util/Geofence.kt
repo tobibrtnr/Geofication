@@ -19,7 +19,9 @@ data class Geofence(
   val latitude: Double,
   val longitude: Double,
   val radius: Float,
-  val color: MarkerColor
+  val color: MarkerColor,
+  val active: Boolean,
+  val triggerCount: Int
 )
 
 @Entity(
@@ -37,7 +39,10 @@ data class Geofication(
   val flags: Int,
   val delay: Int,
   val repeat: Boolean,
-  val color: MarkerColor
+  val color: MarkerColor,
+  val active: Boolean,
+  val onTrigger: Int,
+  val triggerCount: Int
 )
 
 @Dao

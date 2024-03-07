@@ -44,7 +44,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
 import androidx.core.app.ActivityCompat
@@ -52,7 +51,6 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.SphericalUtil
 import com.google.maps.android.compose.Circle
 import com.google.maps.android.compose.GoogleMap
@@ -275,7 +273,7 @@ fun MapScreen(
     }
 
     //if(!isMapLoaded) {
-    AnimatedVisibility(
+    /*AnimatedVisibility(
       visible = !isMapLoaded,
       modifier = Modifier.matchParentSize(),
       enter = EnterTransition.None,
@@ -286,7 +284,7 @@ fun MapScreen(
           .background(MaterialTheme.colorScheme.background)
           .wrapContentSize()
       )
-    }
+    }*/
     //}
     Box(
       modifier = Modifier

@@ -37,7 +37,9 @@ class GeofenceUtil {
       latitude: Double,
       longitude: Double,
       radius: Float,
-      color: MarkerColor
+      color: MarkerColor,
+      active: Boolean,
+      triggerCount: Int
     ) {
       val db = ServiceProvider.database()
       val geofencingClient = ServiceProvider.geofence()
@@ -57,7 +59,9 @@ class GeofenceUtil {
           latitude,
           longitude,
           radius,
-          color
+          color,
+          active,
+          triggerCount
         )
         geofenceDao.insertAll(daoGeofence)
       }
@@ -129,10 +133,24 @@ class GeofenceUtil {
       flags: Int,
       delay: Int,
       repeat: Boolean,
-      color: MarkerColor
+      color: MarkerColor,
+      active: Boolean,
+      onTrigger: Int,
+      triggerCount: Int
     ) {
       CoroutineScope(SupervisorJob()).launch {
-        val geofication = Geofication(gid, fenceid, message, flags, delay, repeat, color)
+        val geofication = Geofication(
+          gid,
+          fenceid,
+          message,
+          flags,
+          delay,
+          repeat,
+          color,
+          active,
+          onTrigger,
+          triggerCount
+        )
 
         val db = ServiceProvider.database()
         val geoDao = db.geoficationDao()

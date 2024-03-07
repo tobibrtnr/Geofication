@@ -1,5 +1,6 @@
 package de.tobibrtnr.geofication.ui
 
+import android.Manifest
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.calculateEndPadding
@@ -42,6 +43,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import com.google.accompanist.permissions.rememberPermissionState
 
 enum class GeoficationScreen(val title: String, val icon: ImageVector) {
   Start(title = "Start", icon = Icons.Outlined.Map),
@@ -102,6 +107,7 @@ fun GeoficationAppBar(
   )
 }
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun GeoficationApp(
   navController: NavHostController = rememberNavController()
@@ -111,78 +117,106 @@ fun GeoficationApp(
     mutableStateOf(0)
   }
 
-  Scaffold(
-    modifier = Modifier.fillMaxSize(),
-    bottomBar = {
-      NavigationBar {
-        GeoficationScreen.values().forEachIndexed { index, navItem ->
-          val sel = index == navigationSelectedItem
-          NavigationBarItem(
-            selected = sel,
-            label = {
-              Text(
-                text = navItem.title,
-                fontWeight = if (sel) FontWeight.Bold else FontWeight.Normal
-              )
-            },
-            onClick = {
-              navigationSelectedItem = index
-              navController.navigate(navItem.name) {
-                popUpTo(navController.graph.findStartDestination().id) {
-                  saveState = true
-                }
-                launchSingleTop = true
-                restoreState = true
-              }
-            },
-            icon = { Icon(navItem.icon, contentDescription = navItem.title) })
-        }
-      }
-    }
-  ) { innerPadding ->
-    val ld = LocalLayoutDirection.current
-    NavHost(
-      navController = navController,
-      startDestination = GeoficationScreen.Start.name,
-      modifier = Modifier
-        .fillMaxSize()
-      //.verticalScroll(rememberScrollState())
-      //.padding(innerPadding)
+  val permissions = rememberMultiplePermissionsState(
+    permissions = listOf(
+      Manifest.permission.ACCESS_COARSE_LOCATION,
+      Manifest.permission.ACCESS_FINE_LOCATION,
+      Manifest.permission.POST_NOTIFICATIONS
+    ),
+  )
+
+  val backgroundPermission = rememberPermissionState(
+    Manifest.permission.ACCESS_BACKGROUND_LOCATION
+  )
+
+  var permissionsGranted by remember {
+    mutableStateOf(
+      permissions.allPermissionsGranted && backgroundPermission.status.isGranted
+    )
+  }
+
+  if (!permissionsGranted) {
+    PermissionScreen(
+      permissions,
+      backgroundPermission
     ) {
-      composable(route = GeoficationScreen.Start.name) {
-        Box(
-          modifier = Modifier.padding(
-            innerPadding.calculateStartPadding(ld),
-            0.dp,
-            innerPadding.calculateEndPadding(ld),
-            innerPadding.calculateBottomPadding()
-          )
-        ) {
-          MapScreen(
-            modifier = Modifier.fillMaxHeight(),
-            topPadding = innerPadding.calculateTopPadding()
-          )
+      permissionsGranted = true
+    }
+  } else {
+
+    Scaffold(
+      modifier = Modifier.fillMaxSize(),
+      bottomBar = {
+        NavigationBar {
+          GeoficationScreen.values().forEachIndexed { index, navItem ->
+            val sel = index == navigationSelectedItem
+            NavigationBarItem(
+              selected = sel,
+              label = {
+                Text(
+                  text = navItem.title,
+                  fontWeight = if (sel) FontWeight.Bold else FontWeight.Normal
+                )
+              },
+              onClick = {
+                navigationSelectedItem = index
+                navController.navigate(navItem.name) {
+                  popUpTo(navController.graph.findStartDestination().id) {
+                    saveState = true
+                  }
+                  launchSingleTop = true
+                  restoreState = true
+                }
+              },
+              icon = { Icon(navItem.icon, contentDescription = navItem.title) })
+          }
         }
       }
-      composable(route = GeoficationScreen.Settings.name) {
-        Box(modifier = Modifier.padding(innerPadding)) {
-          SettingsScreen(
-            modifier = Modifier.fillMaxSize()
-          )
+    ) { innerPadding ->
+      val ld = LocalLayoutDirection.current
+      NavHost(
+        navController = navController,
+        startDestination = GeoficationScreen.Start.name,
+        modifier = Modifier
+          .fillMaxSize()
+        //.verticalScroll(rememberScrollState())
+        //.padding(innerPadding)
+      ) {
+        composable(route = GeoficationScreen.Start.name) {
+          Box(
+            modifier = Modifier.padding(
+              innerPadding.calculateStartPadding(ld),
+              0.dp,
+              innerPadding.calculateEndPadding(ld),
+              innerPadding.calculateBottomPadding()
+            )
+          ) {
+            MapScreen(
+              modifier = Modifier.fillMaxHeight(),
+              topPadding = innerPadding.calculateTopPadding()
+            )
+          }
         }
-      }
-      composable(route = GeoficationScreen.Geofences.name) {
-        Box(modifier = Modifier.padding(innerPadding)) {
-          GeofencesScreen(
-            modifier = Modifier.fillMaxSize()
-          )
+        composable(route = GeoficationScreen.Settings.name) {
+          Box(modifier = Modifier.padding(innerPadding)) {
+            SettingsScreen(
+              modifier = Modifier.fillMaxSize()
+            )
+          }
         }
-      }
-      composable(route = GeoficationScreen.Geofications.name) {
-        Box(modifier = Modifier.padding(innerPadding)) {
-          GeoficationsScreen(
-            modifier = Modifier.fillMaxSize()
-          )
+        composable(route = GeoficationScreen.Geofences.name) {
+          Box(modifier = Modifier.padding(innerPadding)) {
+            GeofencesScreen(
+              modifier = Modifier.fillMaxSize()
+            )
+          }
+        }
+        composable(route = GeoficationScreen.Geofications.name) {
+          Box(modifier = Modifier.padding(innerPadding)) {
+            GeoficationsScreen(
+              modifier = Modifier.fillMaxSize()
+            )
+          }
         }
       }
     }

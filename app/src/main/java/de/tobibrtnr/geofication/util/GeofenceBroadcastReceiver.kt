@@ -45,7 +45,8 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
           var message = ""
           geofications.forEach {
 
-            if(it.flags == geofenceTransition || it.flags == 3) {
+            // If the flags equals the triggered one or is both, and the geofication is active:
+            if((it.flags == geofenceTransition || it.flags == 3) && it.active) {
               message += "${it.gid}, "
             }
           }

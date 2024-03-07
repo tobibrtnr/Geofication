@@ -63,7 +63,9 @@ fun processInput(
     pos.latitude,
     pos.longitude,
     enteredFloat,
-    color
+    color,
+    true,
+    0
   )
 
   function()

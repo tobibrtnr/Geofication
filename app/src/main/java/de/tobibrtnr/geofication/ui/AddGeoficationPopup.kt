@@ -53,7 +53,10 @@ fun processInput(
     flagNum,
     0,
     true,
-    color
+    color,
+    true,
+    /*TODO*/ 1,
+    0
   )
 }
 

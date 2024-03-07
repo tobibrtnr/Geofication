@@ -34,7 +34,9 @@ suspend fun addAllGeofences(context: Context) {
       it.latitude,
       it.longitude,
       it.radius,
-      it.color
+      it.color,
+      it.active,
+      it.triggerCount
     )
   }
 }
