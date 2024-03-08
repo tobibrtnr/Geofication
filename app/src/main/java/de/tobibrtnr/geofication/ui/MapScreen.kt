@@ -7,6 +7,7 @@ import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -26,7 +28,10 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.LocationSearching
 import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.ChipColors
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -70,6 +75,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlin.math.roundToInt
 
 @Composable
 fun MapScreen(
@@ -121,9 +127,12 @@ fun MapScreen(
 
   // Fetch all active geofences from storage
   var geofencesArray by remember { mutableStateOf(emptyList<Geofence>()) }
+  var geoficationsArray by remember { mutableStateOf(emptyList<Geofication>()) }
+
   LaunchedEffect(Unit) {
     val geofences = GeofenceUtil.getGeofences()
     geofencesArray = geofences
+    geoficationsArray = GeofenceUtil.getGeofications()
   }
 
 
@@ -137,6 +146,8 @@ fun MapScreen(
 
   var markerPopupVisible by remember { mutableStateOf(false) }
   var selectedMarkerId by remember { mutableStateOf("") }
+
+  val geoficationsRow = rememberScrollState()
 
   fun longClick(latLng: LatLng) {
     Vibrate.vibrate(context, 15)
@@ -292,10 +303,50 @@ fun MapScreen(
         .zIndex(1f)
         .padding(8.dp, topPadding + 8.dp, 8.dp, 8.dp),
     ) {
-      LocationSearchBar(modifier = Modifier.fillMaxWidth()) {
-        MainScope().launch {
-          cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(it, 15f))
+      Column {
+        LocationSearchBar(modifier = Modifier.fillMaxWidth()) {
+          MainScope().launch {
+            cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(it, 15f))
+          }
         }
+        Row(Modifier.horizontalScroll(geoficationsRow)) {
+          geoficationsArray.forEach {
+
+            val fence = geofencesArray.first { it2 ->
+              it2.gid == it.fenceid
+            }
+
+            val distance = SphericalUtil.computeDistanceBetween(
+              LatLng(fence.latitude, fence.longitude),
+              currentLocation
+            ).roundToInt()
+
+            val meterText = if(distance > 1000) {
+              "${distance/1000} km"
+            } else {
+              "${distance} m"
+            }
+
+            AssistChip(
+              shape = CircleShape,
+              border = AssistChipDefaults.assistChipBorder(enabled = false),
+              colors = AssistChipDefaults.assistChipColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+              onClick = { println("Click on Chip of ${it.gid}") },
+              label = {
+                Text(
+                  "${it.gid} | $meterText"
+                )
+              },
+              leadingIcon = {
+                CircleWithColor(
+                  color = it.color.color,
+                  radius = 8.dp
+                )
+              })
+            Spacer(Modifier.width(8.dp))
+          }
+        }
+
       }
     }
 
