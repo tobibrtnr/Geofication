@@ -301,16 +301,30 @@ fun MapScreen(
       modifier = Modifier
         .fillMaxWidth()
         .zIndex(1f)
-        .padding(8.dp, topPadding + 8.dp, 8.dp, 8.dp),
+        .padding(0.dp, topPadding + 8.dp, 0.dp, 8.dp),
     ) {
       Column {
-        LocationSearchBar(modifier = Modifier.fillMaxWidth()) {
+        LocationSearchBar(
+          modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+        ) {
           MainScope().launch {
             cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(it, 15f))
           }
         }
         Row(Modifier.horizontalScroll(geoficationsRow)) {
-          geoficationsArray.forEach {
+          Spacer(Modifier.width(16.dp))
+          geoficationsArray.sortedBy {
+            val fence = geofencesArray.first { it2 ->
+              it2.gid == it.fenceid
+            }
+
+            SphericalUtil.computeDistanceBetween(
+              LatLng(fence.latitude, fence.longitude),
+              currentLocation
+            )
+          }.forEach {
 
             val fence = geofencesArray.first { it2 ->
               it2.gid == it.fenceid
@@ -321,8 +335,8 @@ fun MapScreen(
               currentLocation
             ).roundToInt()
 
-            val meterText = if(distance > 1000) {
-              "${distance/1000} km"
+            val meterText = if (distance > 1000) {
+              "${distance / 1000} km"
             } else {
               "${distance} m"
             }
@@ -345,6 +359,7 @@ fun MapScreen(
               })
             Spacer(Modifier.width(8.dp))
           }
+          Spacer(Modifier.width(8.dp))
         }
 
       }
