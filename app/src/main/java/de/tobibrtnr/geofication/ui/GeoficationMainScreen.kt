@@ -117,28 +117,32 @@ fun GeoficationApp(
     mutableStateOf(0)
   }
 
-  val permissions = rememberMultiplePermissionsState(
+  val locPerm = rememberMultiplePermissionsState(
     permissions = listOf(
       Manifest.permission.ACCESS_COARSE_LOCATION,
-      Manifest.permission.ACCESS_FINE_LOCATION,
-      Manifest.permission.POST_NOTIFICATIONS
+      Manifest.permission.ACCESS_FINE_LOCATION
     ),
   )
 
-  val backgroundPermission = rememberPermissionState(
+  val notifPerm = rememberPermissionState(
+    Manifest.permission.POST_NOTIFICATIONS
+  )
+
+  val bgPerm = rememberPermissionState(
     Manifest.permission.ACCESS_BACKGROUND_LOCATION
   )
 
   var permissionsGranted by remember {
     mutableStateOf(
-      permissions.allPermissionsGranted && backgroundPermission.status.isGranted
+      locPerm.allPermissionsGranted && bgPerm.status.isGranted && notifPerm.status.isGranted
     )
   }
 
   if (!permissionsGranted) {
     PermissionScreen(
-      permissions,
-      backgroundPermission
+      locPerm,
+      bgPerm,
+      notifPerm
     ) {
       permissionsGranted = true
     }
