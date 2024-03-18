@@ -58,6 +58,12 @@ interface GeofenceDao {
 
   @Query("DELETE FROM geofence WHERE gid = :gid")
   fun delete(gid: String)
+
+  @Query("UPDATE geofence SET triggerCount = triggerCount + 1 WHERE gid = :gid")
+  fun incrementTriggerCount(gid: String)
+
+  @Query("UPDATE geofence SET active = :isActive WHERE gid = :gid")
+  fun setActive(isActive: Boolean, gid: String)
 }
 
 @Dao
@@ -76,6 +82,12 @@ interface GeoficationDao {
 
   @Query("DELETE FROM geofication WHERE gid = :gid")
   fun delete(gid: String)
+
+  @Query("UPDATE geofication SET triggerCount = triggerCount + 1 WHERE gid = :gid")
+  fun incrementTriggerCount(gid: String)
+
+  @Query("UPDATE geofication SET active = :isActive WHERE gid = :gid")
+  fun setActive(isActive: Boolean, gid: String)
 }
 
 @Database(entities = [Geofence::class, Geofication::class], version = 1)

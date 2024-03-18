@@ -44,7 +44,9 @@ fun GeofencesScreen(
 fun ListItem(geofence: Geofence) {
   Column(modifier = Modifier.padding(16.dp)) {
     Text(geofence.gid)
-    Spacer(modifier = Modifier.height(8.dp))
+    Spacer(modifier = Modifier.height(4.dp))
     Text("Radius: ${geofence.radius}m")
+    Spacer(modifier = Modifier.height(4.dp))
+    Text("Trigger Count: ${geofence.triggerCount}")
   }
 }

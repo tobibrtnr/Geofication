@@ -179,5 +179,49 @@ class GeofenceUtil {
         geoDao.getByGeofence(fenceid)
       }
     }
+
+    /**
+     * Increment trigger count for geofence
+     */
+    suspend fun incrementFenceTriggerCount(fenceid: String) {
+      withContext(Dispatchers.IO) {
+        val db = ServiceProvider.database()
+        val geoDao = db.geofenceDao()
+        geoDao.incrementTriggerCount(fenceid)
+      }
+    }
+
+    /**
+     * Increment trigger count for geofication
+     */
+    suspend fun incrementNotifTriggerCount(notifid: String) {
+      withContext(Dispatchers.IO) {
+        val db = ServiceProvider.database()
+        val geoDao = db.geoficationDao()
+        geoDao.incrementTriggerCount(notifid)
+      }
+    }
+
+    /**
+     * Set active value for geofence
+     */
+    suspend fun setFenceActive(fenceid: String, isActive: Boolean) {
+      withContext(Dispatchers.IO) {
+        val db = ServiceProvider.database()
+        val geoDao = db.geofenceDao()
+        geoDao.setActive(isActive, fenceid)
+      }
+    }
+
+    /**
+     * Set active value for Geofication
+     */
+    suspend fun setNotifActive(fenceid: String, isActive: Boolean) {
+      withContext(Dispatchers.IO) {
+        val db = ServiceProvider.database()
+        val geoDao = db.geoficationDao()
+        geoDao.setActive(isActive, fenceid)
+      }
+    }
   }
 }

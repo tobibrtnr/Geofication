@@ -45,7 +45,9 @@ fun GeoficationsScreen(
 fun ListItem(geofication: Geofication) {
   Column(modifier = Modifier.padding(16.dp)) {
     Text(geofication.gid)
-    Spacer(modifier = Modifier.height(8.dp))
+    Spacer(modifier = Modifier.height(4.dp))
     Text("Geofence: ${geofication.fenceid}")
+    Spacer(modifier = Modifier.height(4.dp))
+    Text("Trigger Count: ${geofication.triggerCount}")
   }
 }

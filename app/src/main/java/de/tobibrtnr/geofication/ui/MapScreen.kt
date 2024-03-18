@@ -203,6 +203,8 @@ fun MapScreen(
               Spacer(modifier = Modifier.width(16.dp))
               Text(it.gid)
               Spacer(modifier = Modifier.width(16.dp))
+              Text(it.flags.toString())
+              Spacer(modifier = Modifier.width(16.dp))
               Icon(
                 imageVector = Icons.Filled.Delete,
                 contentDescription = "Delete Geofication",

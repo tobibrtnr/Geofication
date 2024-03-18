@@ -38,15 +38,17 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
         println("Entering? $geofenceTransition")
 
         runBlocking {
+          GeofenceUtil.incrementFenceTriggerCount(geofence.requestId)
+
           val geofications = GeofenceUtil.getGeoficationByGeofence(geofence.requestId)
           println("THESE GEOFICATIONS ARE TRIGGERED")
           println(geofications)
 
           var message = ""
           geofications.forEach {
-
             // If the flags equals the triggered one or is both, and the geofication is active:
             if((it.flags == geofenceTransition || it.flags == 3) && it.active) {
+              GeofenceUtil.incrementNotifTriggerCount(it.gid)
               message += "${it.gid}, "
             }
           }
