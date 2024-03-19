@@ -1,6 +1,9 @@
 package de.tobibrtnr.geofication.ui
 
 import android.content.Context
+import android.location.Address
+import android.location.Geocoder
+import android.os.Build
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -84,6 +87,27 @@ fun AddGeofencePopup(
   var radius by remember {mutableStateOf("")}
   var name by remember { mutableStateOf("") }
 
+  val geocoder = Geocoder(context)
+
+  if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+    // Implementation of GeocodeListener
+    val listener = object: Geocoder.GeocodeListener {
+      override fun onGeocode(addresses: MutableList<Address>) {
+        if (addresses.size > 0) {
+          name = getLocationName(addresses[0])
+        }
+      }
+      override fun onError(errorMessage: String?) {
+        println(errorMessage)
+      }
+    }
+    geocoder.getFromLocation(pos.latitude, pos.longitude, 1, listener)
+  } else {
+    val addresses = geocoder.getFromLocation(pos.latitude, pos.longitude, 1)
+    if (addresses != null && addresses.size > 0) {
+      name = getLocationName(addresses[0])
+    }
+  }
 
   Dialog(onDismissRequest = { onDismissRequest() }) {
     Card(
@@ -197,4 +221,21 @@ fun CircleWithColor(modifier: Modifier = Modifier, color: Color, radius: Dp) {
       .clip(CircleShape)
       .background(color)
   )
+}
+
+fun getLocationName(address: Address): String {
+  /*if(address.featureName != null && address.thoroughfare != null) {
+    return "${address.featureName} ${address.thoroughfare}"
+  }*/
+  if(address.getAddressLine(0) != null) {
+    return address.getAddressLine(0)
+  }
+  if(address.countryName != null) {
+    return address.countryName
+  }
+  if(address.featureName != null) {
+    return address.featureName
+  }
+
+  return ""
 }
