@@ -2,10 +2,6 @@ package de.tobibrtnr.geofication.ui
 
 import android.Manifest
 import android.content.pm.PackageManager
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -19,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -31,8 +26,6 @@ import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.ChipColors
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -89,7 +82,8 @@ fun MapScreen(
         zoomControlsEnabled = false,
         indoorLevelPickerEnabled = false,
         mapToolbarEnabled = false,
-        myLocationButtonEnabled = false
+        myLocationButtonEnabled = false,
+        compassEnabled = false // TODO maybe add own compass component and position
       )
     )
   }
@@ -349,10 +343,23 @@ fun MapScreen(
               shape = CircleShape,
               border = AssistChipDefaults.assistChipBorder(enabled = false),
               colors = AssistChipDefaults.assistChipColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-              onClick = { println("Click on Chip of ${it.gid}") },
+              onClick = {
+                MainScope().launch {
+                  cameraPositionState.animate(
+                    CameraUpdateFactory.newCameraPosition(
+                      CameraPosition(
+                        LatLng(fence.latitude, fence.longitude),
+                        15f,
+                        0f,
+                        0f
+                      )
+                    )
+                  )
+                }
+              },
               label = {
                 Text(
-                  "${it.gid} | $meterText"
+                  "${it.gid.take(15).trim()}${if (it.gid.length > 15) "..." else ""} | $meterText"
                 )
               },
               leadingIcon = {
@@ -392,6 +399,18 @@ fun MapScreen(
           onClick = {
             markerPopupVisible = true
             selectedMarkerId = geo.gid
+            MainScope().launch {
+              cameraPositionState.animate(
+                CameraUpdateFactory.newCameraPosition(
+                  CameraPosition(
+                    LatLng(geo.latitude, geo.longitude),
+                    15f,
+                    0f,
+                    0f
+                  )
+                )
+              )
+            }
             false
           },
           icon = bdf,

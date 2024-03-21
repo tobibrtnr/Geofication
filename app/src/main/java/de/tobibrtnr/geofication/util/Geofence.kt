@@ -88,6 +88,9 @@ interface GeoficationDao {
 
   @Query("UPDATE geofication SET active = :isActive WHERE gid = :gid")
   fun setActive(isActive: Boolean, gid: String)
+
+  @Query("UPDATE geofication SET active = 0 WHERE fenceid = :fenceid")
+  fun deactivateAll(fenceid: String)
 }
 
 @Database(entities = [Geofence::class, Geofication::class], version = 1)

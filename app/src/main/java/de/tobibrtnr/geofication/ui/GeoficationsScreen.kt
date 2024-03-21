@@ -5,12 +5,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -24,7 +26,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import de.tobibrtnr.geofication.util.AppDatabase
 import de.tobibrtnr.geofication.util.Geofence
@@ -69,20 +73,28 @@ fun ListItem(geofication: Geofication, refreshData: suspend () -> Unit) {
   Card(
     colors = CardDefaults.cardColors()
   ) {
-    Column(Modifier.padding(16.dp)) {
+    Column(
+      Modifier
+        .fillMaxSize()
+        .padding(16.dp)) {
       Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth()
       ) {
         Row {
-          CircleWithColor(color = geofication.color.color, radius = 15.dp)
+          CircleWithColor(color = geofication.color.color, radius = 15.dp, modifier = Modifier.shadow(4.dp, CircleShape))
           Spacer(Modifier.width(8.dp))
-          Text(
-            geofication.gid,
-            style = MaterialTheme.typography.headlineSmall,
-            fontStyle = if (geofication.active) FontStyle.Normal else FontStyle.Italic
-          )
+          Row {
+            Text(
+              modifier = Modifier.fillMaxWidth(0.75f),
+              text = geofication.gid,
+              style = MaterialTheme.typography.headlineSmall,
+              fontStyle = if (geofication.active) FontStyle.Normal else FontStyle.Italic,
+              maxLines = 1,
+              overflow = TextOverflow.Ellipsis
+            )
+          }
         }
 
         Switch(checked = geofication.active, onCheckedChange = {
@@ -93,11 +105,10 @@ fun ListItem(geofication: Geofication, refreshData: suspend () -> Unit) {
         })
       }
       Spacer(modifier = Modifier.height(4.dp))
-      Text("Geofence: ${geofication.fenceid}")
+      Text("Geofence: ${geofication.fenceid}", maxLines = 1, overflow = TextOverflow.Ellipsis)
       Spacer(modifier = Modifier.height(4.dp))
       Text("Trigger Count: ${geofication.triggerCount}")
     }
   }
   Spacer(modifier = Modifier.height(8.dp))
-
 }

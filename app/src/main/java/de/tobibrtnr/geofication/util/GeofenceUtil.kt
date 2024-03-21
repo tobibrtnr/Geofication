@@ -221,6 +221,11 @@ class GeofenceUtil {
         val db = ServiceProvider.database()
         val geoDao = db.geofenceDao()
         geoDao.setActive(isActive, fenceid)
+
+        if(!isActive) {
+          val notifDao = db.geoficationDao()
+          notifDao.deactivateAll(fenceid)
+        }
       }
     }
 
@@ -232,6 +237,12 @@ class GeofenceUtil {
         val db = ServiceProvider.database()
         val geoDao = db.geoficationDao()
         geoDao.setActive(isActive, fenceid)
+
+        if(isActive) {
+          val geofication = geoDao.loadById(fenceid)
+          val geofenceDao = db.geofenceDao()
+          geofenceDao.setActive(true, geofication.fenceid)
+        }
       }
     }
   }
