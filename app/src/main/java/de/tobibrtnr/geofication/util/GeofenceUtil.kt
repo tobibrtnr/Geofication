@@ -16,6 +16,17 @@ import kotlinx.coroutines.withContext
 class GeofenceUtil {
   companion object {
     /**
+     * Get geofence by id
+     */
+    suspend fun getGeofenceById(fenceid: String): Geofence {
+      return withContext(Dispatchers.IO) {
+        val db = ServiceProvider.database()
+        val geoDao = db.geofenceDao()
+        geoDao.loadById(fenceid)
+      }
+    }
+
+    /**
      * Get all existing geofences.
      */
     suspend fun getGeofences(): List<Geofence> {

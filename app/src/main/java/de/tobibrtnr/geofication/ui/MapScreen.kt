@@ -317,7 +317,9 @@ fun MapScreen(
         }
         Row(Modifier.horizontalScroll(geoficationsRow)) {
           Spacer(Modifier.width(16.dp))
-          geoficationsArray.sortedBy {
+          geoficationsArray.filter {
+            it.active
+          }.sortedBy {
             val fence = geofencesArray.first { it2 ->
               it2.gid == it.fenceid
             }

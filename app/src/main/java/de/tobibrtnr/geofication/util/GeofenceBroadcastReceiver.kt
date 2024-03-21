@@ -38,6 +38,10 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
         println("Entering? $geofenceTransition")
 
         runBlocking {
+          // Check if geofence is active
+          val geofenceObject = GeofenceUtil.getGeofenceById(geofence.requestId)
+          if(!geofenceObject.active) return@runBlocking
+
           GeofenceUtil.incrementFenceTriggerCount(geofence.requestId)
 
           val geofications = GeofenceUtil.getGeoficationByGeofence(geofence.requestId)

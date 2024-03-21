@@ -69,13 +69,12 @@ fun AddGeoficationPopup(
   var selectedGeofence by remember { mutableStateOf("") }
   var selectedColor by remember { mutableStateOf(MarkerColor.RED) }
   var colorExpanded by remember { mutableStateOf(false) }
-  var flags by remember {mutableStateOf(emptyList<String>())}
+  var flags by remember {mutableStateOf(listOf("entering"))}
   var name by remember { mutableStateOf("") }
   var geofences by remember { mutableStateOf(emptyList<Geofence>()) }
 
   LaunchedEffect(Unit) {
     geofences = GeofenceUtil.getGeofences()
-    println(geofences)
   }
 
   Dialog(onDismissRequest = { onDismissRequest() }) {

@@ -55,58 +55,6 @@ enum class GeoficationScreen(val title: String, val icon: ImageVector) {
   Settings(title = "Settings", icon = Icons.Outlined.Settings)
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun GeoficationAppBar(
-  currentScreen: GeoficationScreen,
-  canNavigateBack: Boolean,
-  navController: NavHostController,
-  modifier: Modifier = Modifier
-) {
-  var showMenu by remember { mutableStateOf(false) }
-
-  TopAppBar(
-    title = { Text(currentScreen.title) },
-    modifier = modifier,
-    navigationIcon = {
-      if (canNavigateBack) {
-        // Back Button always navigates to start for now
-        IconButton(onClick = { navController.navigate(GeoficationScreen.Start.name) }) {
-          Icon(
-            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-            contentDescription = "Back"
-          )
-        }
-      }
-    },
-    actions = {
-      IconButton(onClick = { showMenu = !showMenu }) {
-        Icon(
-          imageVector = Icons.Filled.MoreVert,
-          contentDescription = "Menu"
-        )
-      }
-
-      DropdownMenu(
-        expanded = showMenu,
-        onDismissRequest = { showMenu = false }
-      ) {
-        DropdownMenuItem(
-          onClick = { showMenu = false; navController.navigate(GeoficationScreen.Geofences.name) },
-          text = { Text("View Geofences") })
-        DropdownMenuItem(
-          onClick = {
-            showMenu = false; navController.navigate(GeoficationScreen.Geofications.name)
-          },
-          text = { Text("View Geofications") })
-        DropdownMenuItem(
-          onClick = { showMenu = false; navController.navigate(GeoficationScreen.Settings.name) },
-          text = { Text("Settings") })
-      }
-    }
-  )
-}
-
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun GeoficationApp(
