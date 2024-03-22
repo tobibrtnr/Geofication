@@ -2,7 +2,10 @@ package de.tobibrtnr.geofication.ui
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.Point
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,6 +41,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
@@ -68,6 +73,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlin.math.abs
 import kotlin.math.roundToInt
 
 @Composable
@@ -129,12 +135,15 @@ fun MapScreen(
     geoficationsArray = GeofenceUtil.getGeofications()
   }
 
+  var tempGeofenceLocation by remember { mutableStateOf<LatLng?>(null)}
+  var tempGeofenceRadius by remember {mutableStateOf(0.0)}
 
   var openDialog by remember { mutableStateOf(false) }
   var openDialogGeofence by remember { mutableStateOf(false) }
 
   val context = LocalContext.current
   var selectedPosition by remember { mutableStateOf(LatLng(0.0, 0.0)) }
+  var newRadius by remember { mutableStateOf(0.0)}
 
   var isMapLoaded by remember { mutableStateOf(false) }
 
@@ -143,8 +152,8 @@ fun MapScreen(
 
   val geoficationsRow = rememberScrollState()
 
-  fun longClick(latLng: LatLng) {
-    Vibrate.vibrate(context, 15)
+  fun longClick(latLng: LatLng, tempGeofenceRadius: Double) {
+    newRadius = tempGeofenceRadius
     selectedPosition = latLng
     openDialogGeofence = true
   }
@@ -222,7 +231,7 @@ fun MapScreen(
     AddGeoficationPopup { openDialog = false }
   }
   if (openDialogGeofence) {
-    AddGeofencePopup(selectedPosition, { openDialogGeofence = false }, {
+    AddGeofencePopup(selectedPosition, newRadius, { openDialogGeofence = false; }, {
       CoroutineScope(Dispatchers.Default).launch {
         val geofences = GeofenceUtil.getGeofences()
         geofencesArray = geofences
@@ -380,13 +389,52 @@ fun MapScreen(
       uiSettings = uiSettings,
       properties = properties,
       onMapLongClick = {
-        longClick(it)
+        Vibrate.vibrate(context, 15)
+        tempGeofenceLocation = it
+        //longClick(it)
       },
-      modifier = Modifier.fillMaxSize(),
+      modifier = Modifier
+        .fillMaxSize()
+        .pointerInput(Unit) {
+          detectDragGesturesAfterLongPress(onDrag = { change, dragAmount ->
+            if(tempGeofenceLocation != null) {
+              //println(change)
+              //println(dragAmount)
+              //tempGeofenceRadius = ((abs(dragAmount.x) + abs(dragAmount.y)) * 10).toInt()
+              val projection = cameraPositionState.projection
+              if (projection != null) {
+                val pointerLocation = projection.fromScreenLocation(Point(
+                  change.position.x.toInt(),
+                  change.position.y.toInt()
+                ))
+                tempGeofenceRadius = SphericalUtil.computeDistanceBetween(tempGeofenceLocation, pointerLocation)
+              }
+            }
+          }, onDragCancel = {
+            tempGeofenceLocation?.let { longClick(it, tempGeofenceRadius) }
+            tempGeofenceLocation = null
+            tempGeofenceRadius = 0.0
+          }, onDragEnd = {
+            tempGeofenceLocation?.let { longClick(it, tempGeofenceRadius) }
+            tempGeofenceLocation = null
+            tempGeofenceRadius = 0.0
+          })
+        },
       cameraPositionState = cameraPositionState,
-      onMapLoaded = { isMapLoaded = true },
-      contentPadding = PaddingValues.Absolute(0.dp, 60.dp, 0.dp, 0.dp)
+      onMapLoaded = {
+        isMapLoaded = true
+      },
+      contentPadding = PaddingValues.Absolute(0.dp, 60.dp, 0.dp, 0.dp),
     ) {
+
+      tempGeofenceLocation?.let {
+        Circle(
+          center = LatLng(it.latitude, it.longitude),
+          radius = tempGeofenceRadius + 30.0,
+          strokeColor = Color.Red,
+          fillColor = Color.Red.copy(alpha = 0.25f)
+        )
+      }
 
       // Place each Geofence as Marker and Circle on the Map
       geofencesArray.forEach { geo ->

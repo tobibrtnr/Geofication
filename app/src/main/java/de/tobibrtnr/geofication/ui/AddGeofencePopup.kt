@@ -77,9 +77,11 @@ fun processInput(
 @Composable
 fun AddGeofencePopup(
   pos: LatLng,
+  rad: Double,
   onDismissRequest: () -> Unit,
   function: () -> Unit
 ) {
+
   val context = LocalContext.current
 
   var selectedColor by remember { mutableStateOf(MarkerColor.RED) }
@@ -88,6 +90,10 @@ fun AddGeofencePopup(
   var name by remember { mutableStateOf("") }
 
   val geocoder = Geocoder(context)
+
+  if(rad != 0.0) {
+    radius = rad.toInt().toString()
+  }
 
   if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
     // Implementation of GeocodeListener
