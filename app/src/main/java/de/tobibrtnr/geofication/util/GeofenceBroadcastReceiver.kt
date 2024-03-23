@@ -10,7 +10,11 @@ import kotlinx.coroutines.runBlocking
 
 
 class GeofenceBroadcastReceiver : BroadcastReceiver() {
-  override fun onReceive(context: Context?, intent: Intent) {
+  override fun onReceive(context: Context, intent: Intent) {
+    ServiceProvider.setInstance(context)
+
+    LogUtil.addLog("GeofenceBroadcastReceiver started.")
+
     val geofencingEvent = GeofencingEvent.fromIntent(intent)
 
     // Check if the Event has errors
@@ -32,26 +36,31 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
       // Get the geofences that were triggered. A single event can trigger multiple geofences.
       val triggeringGeofences = geofencingEvent.triggeringGeofences
 
-      triggeringGeofences?.forEachIndexed { i, geofence ->
-        println("Triggered Geofence $i")
-        println("Geofence ${geofence.requestId}")
-        println("Entering? $geofenceTransition")
+      triggeringGeofences?.forEachIndexed { _, geofence ->
+
+        LogUtil.addLog(
+          "Geofence ${geofence.requestId} was triggered.\n" +
+              "Entering? $geofenceTransition\n" +
+              "Context == null? ${context == null}"
+        )
 
         runBlocking {
           // Check if geofence is active
           val geofenceObject = GeofenceUtil.getGeofenceById(geofence.requestId)
-          if(!geofenceObject.active) return@runBlocking
+          if (!geofenceObject.active) return@runBlocking
 
           GeofenceUtil.incrementFenceTriggerCount(geofence.requestId)
 
           val geofications = GeofenceUtil.getGeoficationByGeofence(geofence.requestId)
-          println("THESE GEOFICATIONS ARE TRIGGERED")
-          println(geofications)
 
           var message = ""
           geofications.forEach {
+            LogUtil.addLog(
+              "Geofence ${it.gid}\n" +
+                  "Triggered? ${(it.flags == geofenceTransition || it.flags == 3) && it.active}"
+            )
             // If the flags equals the triggered one or is both, and the geofication is active:
-            if((it.flags == geofenceTransition || it.flags == 3) && it.active) {
+            if ((it.flags == geofenceTransition || it.flags == 3) && it.active) {
               GeofenceUtil.incrementNotifTriggerCount(it.gid)
               message += "${it.gid}, "
             }
@@ -59,6 +68,9 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
           message = message.dropLast(2)
 
           if (context != null && message.isNotEmpty()) {
+
+            LogUtil.addLog("Attempt to send Notification with message \"$message\"")
+
             sendNotification(
               context,
               "Geofence ${geofence.requestId} - $geofenceTransition",

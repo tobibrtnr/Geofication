@@ -135,15 +135,15 @@ fun MapScreen(
     geoficationsArray = GeofenceUtil.getGeofications()
   }
 
-  var tempGeofenceLocation by remember { mutableStateOf<LatLng?>(null)}
-  var tempGeofenceRadius by remember {mutableStateOf(0.0)}
+  var tempGeofenceLocation by remember { mutableStateOf<LatLng?>(null) }
+  var tempGeofenceRadius by remember { mutableStateOf(0.0) }
 
   var openDialog by remember { mutableStateOf(false) }
   var openDialogGeofence by remember { mutableStateOf(false) }
 
   val context = LocalContext.current
   var selectedPosition by remember { mutableStateOf(LatLng(0.0, 0.0)) }
-  var newRadius by remember { mutableStateOf(0.0)}
+  var newRadius by remember { mutableStateOf(0.0) }
 
   var isMapLoaded by remember { mutableStateOf(false) }
 
@@ -397,90 +397,96 @@ fun MapScreen(
         .fillMaxSize()
         .pointerInput(Unit) {
           detectDragGesturesAfterLongPress(onDrag = { change, dragAmount ->
-            if(tempGeofenceLocation != null) {
+            if (tempGeofenceLocation != null) {
               //println(change)
-              //println(dragAmount)
+              println(dragAmount)
               //tempGeofenceRadius = ((abs(dragAmount.x) + abs(dragAmount.y)) * 10).toInt()
               val projection = cameraPositionState.projection
               if (projection != null) {
-                val pointerLocation = projection.fromScreenLocation(Point(
-                  change.position.x.toInt(),
-                  change.position.y.toInt()
-                ))
-                tempGeofenceRadius = SphericalUtil.computeDistanceBetween(tempGeofenceLocation, pointerLocation)
-              }
-            }
-          }, onDragCancel = {
-            tempGeofenceLocation?.let { longClick(it, tempGeofenceRadius) }
-            tempGeofenceLocation = null
-            tempGeofenceRadius = 0.0
-          }, onDragEnd = {
-            tempGeofenceLocation?.let { longClick(it, tempGeofenceRadius) }
-            tempGeofenceLocation = null
-            tempGeofenceRadius = 0.0
-          })
-        },
-      cameraPositionState = cameraPositionState,
-      onMapLoaded = {
-        isMapLoaded = true
-      },
-      contentPadding = PaddingValues.Absolute(0.dp, 60.dp, 0.dp, 0.dp),
-    ) {
-
-      tempGeofenceLocation?.let {
-        Circle(
-          center = LatLng(it.latitude, it.longitude),
-          radius = tempGeofenceRadius + 30.0,
-          strokeColor = Color.Red,
-          fillColor = Color.Red.copy(alpha = 0.25f)
-        )
-      }
-
-      // Place each Geofence as Marker and Circle on the Map
-      geofencesArray.forEach { geo ->
-        val bdf = BitmapDescriptorFactory.defaultMarker(geo.color.hue)
-
-        val mState = MarkerState(position = LatLng(geo.latitude, geo.longitude))
-        MarkerInfoWindow(
-          state = mState,
-          title = geo.gid,
-          onClick = {
-            markerPopupVisible = true
-            selectedMarkerId = geo.gid
-            MainScope().launch {
-              cameraPositionState.animate(
-                CameraUpdateFactory.newCameraPosition(
-                  CameraPosition(
-                    LatLng(geo.latitude, geo.longitude),
-                    15f,
-                    0f,
-                    0f
+                val pointerLocation = projection.fromScreenLocation(
+                  Point(
+                    change.position.x.toInt(),
+                    change.position.y.toInt()
                   )
                 )
-              )
+                tempGeofenceRadius =
+                  SphericalUtil.computeDistanceBetween(tempGeofenceLocation, pointerLocation)
+                if (dragAmount.x > 0.5 || dragAmount.y > 0.5) {
+                  Vibrate.vibrate(context, 1)
+                }
             }
-            false
-          },
-          icon = bdf,
-          content = { _ ->
-            Text("")
           }
+        }, onDragCancel = {
+        tempGeofenceLocation?.let { longClick(it, tempGeofenceRadius) }
+        tempGeofenceLocation = null
+        tempGeofenceRadius = 0.0
+      }, onDragEnd = {
+        tempGeofenceLocation?.let { longClick(it, tempGeofenceRadius) }
+        tempGeofenceLocation = null
+        tempGeofenceRadius = 0.0
+      })
+  },
+  cameraPositionState = cameraPositionState,
+  onMapLoaded = {
+    isMapLoaded = true
+  },
+  contentPadding = PaddingValues.Absolute(0.dp, 60.dp, 0.dp, 0.dp),
+  ) {
 
-        )
-        Circle(
-          center = LatLng(geo.latitude, geo.longitude),
-          radius = geo.radius.toDouble(),
-          strokeColor = geo.color.color,
-          fillColor = geo.color.color.copy(alpha = 0.25f)
-        )
-      }
+    tempGeofenceLocation?.let {
+      Circle(
+        center = LatLng(it.latitude, it.longitude),
+        radius = tempGeofenceRadius + 30.0,
+        strokeColor = Color.Red,
+        fillColor = Color.Red.copy(alpha = 0.25f)
+      )
     }
 
-    DisappearingScaleBar(
-      modifier = Modifier
-        .padding(bottom = 10.dp, end = 105.dp)
-        .align(Alignment.BottomEnd),
-      cameraPositionState = cameraPositionState
-    )
+    // Place each Geofence as Marker and Circle on the Map
+    geofencesArray.forEach { geo ->
+      val bdf = BitmapDescriptorFactory.defaultMarker(geo.color.hue)
+
+      val mState = MarkerState(position = LatLng(geo.latitude, geo.longitude))
+      MarkerInfoWindow(
+        state = mState,
+        title = geo.gid,
+        onClick = {
+          markerPopupVisible = true
+          selectedMarkerId = geo.gid
+          MainScope().launch {
+            cameraPositionState.animate(
+              CameraUpdateFactory.newCameraPosition(
+                CameraPosition(
+                  LatLng(geo.latitude, geo.longitude),
+                  15f,
+                  0f,
+                  0f
+                )
+              )
+            )
+          }
+          false
+        },
+        icon = bdf,
+        content = { _ ->
+          Text("")
+        }
+
+      )
+      Circle(
+        center = LatLng(geo.latitude, geo.longitude),
+        radius = geo.radius.toDouble(),
+        strokeColor = geo.color.color,
+        fillColor = geo.color.color.copy(alpha = 0.25f)
+      )
+    }
   }
+
+  DisappearingScaleBar(
+    modifier = Modifier
+      .padding(bottom = 10.dp, end = 105.dp)
+      .align(Alignment.BottomEnd),
+    cameraPositionState = cameraPositionState
+  )
+}
 }

@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import de.tobibrtnr.geofication.util.Geofence
 import de.tobibrtnr.geofication.util.GeofenceUtil
 import de.tobibrtnr.geofication.util.Geofication
+import de.tobibrtnr.geofication.util.LogUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch

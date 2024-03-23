@@ -45,6 +45,15 @@ data class Geofication(
   val triggerCount: Int
 )
 
+@Entity
+data class LogEntry(
+  @PrimaryKey(autoGenerate = true)
+  val id: Int = 0,
+  val timestamp: Long,
+  val message: String,
+  val severity: Int
+)
+
 @Dao
 interface GeofenceDao {
   @Query("SELECT * FROM geofence")
@@ -93,8 +102,21 @@ interface GeoficationDao {
   fun deactivateAll(fenceid: String)
 }
 
-@Database(entities = [Geofence::class, Geofication::class], version = 1)
+@Dao
+interface LogDao {
+  @Query("SELECT * FROM logEntry ORDER BY id DESC")
+  fun getAll(): List<LogEntry>
+
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  fun insertAll(vararg logEntries: LogEntry)
+
+  @Query("DELETE FROM logEntry")
+  fun deleteAll()
+}
+
+@Database(entities = [Geofence::class, Geofication::class, LogEntry::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {
   abstract fun geofenceDao(): GeofenceDao
   abstract fun geoficationDao(): GeoficationDao
+  abstract fun logDao(): LogDao
 }
