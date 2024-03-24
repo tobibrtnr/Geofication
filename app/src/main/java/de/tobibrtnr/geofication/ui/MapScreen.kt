@@ -41,6 +41,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
@@ -436,7 +437,7 @@ fun MapScreen(
     tempGeofenceLocation?.let {
       Circle(
         center = LatLng(it.latitude, it.longitude),
-        radius = tempGeofenceRadius + 30.0,
+        radius = tempGeofenceRadius,
         strokeColor = Color.Red,
         fillColor = Color.Red.copy(alpha = 0.25f)
       )
@@ -448,6 +449,7 @@ fun MapScreen(
 
       val mState = MarkerState(position = LatLng(geo.latitude, geo.longitude))
       MarkerInfoWindow(
+        alpha = if(geo.active) 1.0f else 0.5f,
         state = mState,
         title = geo.gid,
         onClick = {
@@ -476,8 +478,8 @@ fun MapScreen(
       Circle(
         center = LatLng(geo.latitude, geo.longitude),
         radius = geo.radius.toDouble(),
-        strokeColor = geo.color.color,
-        fillColor = geo.color.color.copy(alpha = 0.25f)
+        strokeColor = if(geo.active) geo.color.color else geo.color.color.copy(alpha = 0.4f),
+        fillColor = if(geo.active) geo.color.color.copy(alpha = 0.25f) else geo.color.color.copy(alpha = 0.125f)
       )
     }
   }
