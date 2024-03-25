@@ -15,10 +15,14 @@ import de.tobibrtnr.geofication.ui.MarkerColor
 
 @Entity
 data class Geofence(
-  @PrimaryKey val gid: String,
+  @PrimaryKey(autoGenerate = true)
+  val id: Int = 0,
+
+  val fenceName: String,
   val latitude: Double,
   val longitude: Double,
   val radius: Float,
+
   val color: MarkerColor,
   val active: Boolean,
   val triggerCount: Int
@@ -27,19 +31,20 @@ data class Geofence(
 @Entity(
   foreignKeys = [ForeignKey(
     entity = Geofence::class,
-    parentColumns = ["gid"],
+    parentColumns = ["id"],
     childColumns = ["fenceid"],
     onDelete = ForeignKey.CASCADE
   )]
 )
 data class Geofication(
-  @PrimaryKey val gid: String,
-  @ColumnInfo(index = true) val fenceid: String,
+  @PrimaryKey(autoGenerate = true)
+  val id: Int = 0,
+  @ColumnInfo(index = true) val fenceid: Int,
+
   val message: String,
   val flags: Int,
   val delay: Int,
   val repeat: Boolean,
-  val color: MarkerColor,
   val active: Boolean,
   val onTrigger: Int,
   val triggerCount: Int
@@ -59,20 +64,20 @@ interface GeofenceDao {
   @Query("SELECT * FROM geofence")
   fun getAll(): List<Geofence>
 
-  @Query("SELECT * FROM geofence WHERE gid = :geoId")
-  fun loadById(geoId: String): Geofence
+  @Query("SELECT * FROM geofence WHERE id = :geoId")
+  fun loadById(geoId: Int): Geofence
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
-  fun insertAll(vararg geofences: Geofence)
+  fun insert(geofence: Geofence): Long
 
-  @Query("DELETE FROM geofence WHERE gid = :gid")
-  fun delete(gid: String)
+  @Query("DELETE FROM geofence WHERE id = :gid")
+  fun delete(gid: Int)
 
-  @Query("UPDATE geofence SET triggerCount = triggerCount + 1 WHERE gid = :gid")
-  fun incrementTriggerCount(gid: String)
+  @Query("UPDATE geofence SET triggerCount = triggerCount + 1 WHERE id = :gid")
+  fun incrementTriggerCount(gid: Int)
 
-  @Query("UPDATE geofence SET active = :isActive WHERE gid = :gid")
-  fun setActive(isActive: Boolean, gid: String)
+  @Query("UPDATE geofence SET active = :isActive WHERE id = :gid")
+  fun setActive(isActive: Boolean, gid: Int)
 }
 
 @Dao
@@ -80,26 +85,26 @@ interface GeoficationDao {
   @Query("SELECT * FROM geofication")
   fun getAll(): List<Geofication>
 
-  @Query("SELECT * FROM geofication WHERE gid = :geoId")
-  fun loadById(geoId: String): Geofication
+  @Query("SELECT * FROM geofication WHERE id = :geoId")
+  fun loadById(geoId: Int): Geofication
 
   @Query("SELECT * FROM geofication WHERE fenceid = :fenceId")
-  fun getByGeofence(fenceId: String): List<Geofication>
+  fun getByGeofence(fenceId: Int): List<Geofication>
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   fun insertAll(vararg geofications: Geofication)
 
-  @Query("DELETE FROM geofication WHERE gid = :gid")
-  fun delete(gid: String)
+  @Query("DELETE FROM geofication WHERE id = :gid")
+  fun delete(gid: Int)
 
-  @Query("UPDATE geofication SET triggerCount = triggerCount + 1 WHERE gid = :gid")
-  fun incrementTriggerCount(gid: String)
+  @Query("UPDATE geofication SET triggerCount = triggerCount + 1 WHERE id = :gid")
+  fun incrementTriggerCount(gid: Int)
 
-  @Query("UPDATE geofication SET active = :isActive WHERE gid = :gid")
-  fun setActive(isActive: Boolean, gid: String)
+  @Query("UPDATE geofication SET active = :isActive WHERE id = :gid")
+  fun setActive(isActive: Boolean, gid: Int)
 
   @Query("UPDATE geofication SET active = 0 WHERE fenceid = :fenceid")
-  fun deactivateAll(fenceid: String)
+  fun deactivateAll(fenceid: Int)
 }
 
 @Dao

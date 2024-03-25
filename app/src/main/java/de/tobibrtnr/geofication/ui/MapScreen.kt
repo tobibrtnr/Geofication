@@ -137,7 +137,7 @@ fun MapScreen(
   }
 
   var tempGeofenceLocation by remember { mutableStateOf<LatLng?>(null) }
-  var tempGeofenceRadius by remember { mutableStateOf(0.0) }
+  var tempGeofenceRadius by remember { mutableStateOf(30.0) }
 
   var openDialog by remember { mutableStateOf(false) }
   var openDialogGeofence by remember { mutableStateOf(false) }
@@ -149,7 +149,7 @@ fun MapScreen(
   var isMapLoaded by remember { mutableStateOf(false) }
 
   var markerPopupVisible by remember { mutableStateOf(false) }
-  var selectedMarkerId by remember { mutableStateOf("") }
+  var selectedMarkerId by remember { mutableStateOf(-1) }
 
   val geoficationsRow = rememberScrollState()
 
@@ -160,7 +160,7 @@ fun MapScreen(
   }
 
   // Return Composable
-  if (markerPopupVisible && selectedMarkerId.isNotEmpty()) {
+  if (markerPopupVisible && selectedMarkerId >= 0) {
     Dialog(onDismissRequest = { markerPopupVisible = false }) {
       Card(
         modifier = Modifier
@@ -175,7 +175,7 @@ fun MapScreen(
           horizontalAlignment = Alignment.CenterHorizontally
         ) {
           Row {
-            Text(text = selectedMarkerId, fontWeight = FontWeight.Bold)
+            Text(text = selectedMarkerId.toString(), fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.width(16.dp))
             Icon(
               imageVector = Icons.Filled.Delete,
@@ -203,9 +203,9 @@ fun MapScreen(
           }
           selectedGeofenceNotifs.forEach {
             Row {
-              CircleWithColor(color = it.color.color, radius = 8.dp)
-              Spacer(modifier = Modifier.width(16.dp))
-              Text(it.gid)
+              /*CircleWithColor(color = it.color.color, radius = 8.dp)
+              Spacer(modifier = Modifier.width(16.dp))*/
+              Text("${it.id} - ${it.message}")
               Spacer(modifier = Modifier.width(16.dp))
               Text(it.flags.toString())
               Spacer(modifier = Modifier.width(16.dp))
@@ -215,7 +215,7 @@ fun MapScreen(
                 modifier = Modifier
                   .clickable {
                     CoroutineScope(Dispatchers.Default).launch {
-                      GeofenceUtil.deleteGeofication(it.gid)
+                      GeofenceUtil.deleteGeofication(it.id)
                       selectedGeofenceNotifs =
                         GeofenceUtil.getGeoficationByGeofence(selectedMarkerId)
                     }
@@ -325,7 +325,7 @@ fun MapScreen(
             it.active
           }.sortedBy {
             val fence = geofencesArray.first { it2 ->
-              it2.gid == it.fenceid
+              it2.id == it.fenceid
             }
 
             SphericalUtil.computeDistanceBetween(
@@ -335,7 +335,7 @@ fun MapScreen(
           }.forEach {
 
             val fence = geofencesArray.first { it2 ->
-              it2.gid == it.fenceid
+              it2.id == it.fenceid
             }
 
             val distance = SphericalUtil.computeDistanceBetween(
@@ -369,12 +369,12 @@ fun MapScreen(
               },
               label = {
                 Text(
-                  "${it.gid.take(15).trim()}${if (it.gid.length > 15) "..." else ""} | $meterText"
+                  "${it.message.take(15).trim()}${if (it.message.length > 15) "..." else ""} | $meterText"
                 )
               },
               leadingIcon = {
                 CircleWithColor(
-                  color = it.color.color,
+                  color = Color.Blue, // TODO use Color of the Geofence
                   radius = 8.dp
                 )
               })
@@ -412,6 +412,7 @@ fun MapScreen(
                 )
                 tempGeofenceRadius =
                   SphericalUtil.computeDistanceBetween(tempGeofenceLocation, pointerLocation)
+                if (tempGeofenceRadius < 30.0) tempGeofenceRadius = 30.0
                 if (dragAmount.x > 0.5 || dragAmount.y > 0.5) {
                   Vibrate.vibrate(context, 1)
                 }
@@ -420,11 +421,11 @@ fun MapScreen(
         }, onDragCancel = {
         tempGeofenceLocation?.let { longClick(it, tempGeofenceRadius) }
         tempGeofenceLocation = null
-        tempGeofenceRadius = 0.0
+        tempGeofenceRadius = 30.0
       }, onDragEnd = {
         tempGeofenceLocation?.let { longClick(it, tempGeofenceRadius) }
         tempGeofenceLocation = null
-        tempGeofenceRadius = 0.0
+        tempGeofenceRadius = 30.0
       })
   },
   cameraPositionState = cameraPositionState,
@@ -451,10 +452,10 @@ fun MapScreen(
       MarkerInfoWindow(
         alpha = if(geo.active) 1.0f else 0.5f,
         state = mState,
-        title = geo.gid,
+        title = geo.fenceName,
         onClick = {
           markerPopupVisible = true
-          selectedMarkerId = geo.gid
+          selectedMarkerId = geo.id
           MainScope().launch {
             cameraPositionState.animate(
               CameraUpdateFactory.newCameraPosition(

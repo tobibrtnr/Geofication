@@ -87,7 +87,7 @@ fun ListItem(geofence: Geofence, refreshData: suspend () -> Unit) {
           Row {
             Text(
               modifier = Modifier.fillMaxWidth(0.75f),
-              text = geofence.gid,
+              text = geofence.fenceName,
               style = MaterialTheme.typography.headlineSmall,
               fontStyle = if (geofence.active) FontStyle.Normal else FontStyle.Italic,
               maxLines = 1,
@@ -98,7 +98,7 @@ fun ListItem(geofence: Geofence, refreshData: suspend () -> Unit) {
 
         Switch(checked = geofence.active, onCheckedChange = {
           CoroutineScope(SupervisorJob()).launch {
-            GeofenceUtil.setFenceActive(geofence.gid, it)
+            GeofenceUtil.setFenceActive(geofence.id, it)
             refreshData()
           }
         })

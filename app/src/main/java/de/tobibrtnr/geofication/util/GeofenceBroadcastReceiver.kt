@@ -40,34 +40,33 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
 
         LogUtil.addLog(
           "Geofence ${geofence.requestId} was triggered.\n" +
-              "Entering? $geofenceTransition\n" +
-              "Context == null? ${context == null}"
+              "Entering? $geofenceTransition\n"
         )
 
         runBlocking {
           // Check if geofence is active
-          val geofenceObject = GeofenceUtil.getGeofenceById(geofence.requestId)
+          val geofenceObject = GeofenceUtil.getGeofenceById(geofence.requestId.toInt())
           if (!geofenceObject.active) return@runBlocking
 
-          GeofenceUtil.incrementFenceTriggerCount(geofence.requestId)
+          GeofenceUtil.incrementFenceTriggerCount(geofence.requestId.toInt())
 
-          val geofications = GeofenceUtil.getGeoficationByGeofence(geofence.requestId)
+          val geofications = GeofenceUtil.getGeoficationByGeofence(geofence.requestId.toInt())
 
           var message = ""
           geofications.forEach {
             LogUtil.addLog(
-              "Geofence ${it.gid}\n" +
+              "Geofence ${it.id}\n" +
                   "Triggered? ${(it.flags == geofenceTransition || it.flags == 3) && it.active}"
             )
             // If the flags equals the triggered one or is both, and the geofication is active:
             if ((it.flags == geofenceTransition || it.flags == 3) && it.active) {
-              GeofenceUtil.incrementNotifTriggerCount(it.gid)
-              message += "${it.gid}, "
+              GeofenceUtil.incrementNotifTriggerCount(it.id)
+              message += "${it.id}, "
             }
           }
           message = message.dropLast(2)
 
-          if (context != null && message.isNotEmpty()) {
+          if (message.isNotEmpty()) {
 
             LogUtil.addLog("Attempt to send Notification with message \"$message\"")
 

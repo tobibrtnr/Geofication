@@ -30,7 +30,7 @@ suspend fun addAllGeofences(context: Context) {
   geofences.forEach {
     GeofenceUtil.addGeofence(
       context,
-      it.gid,
+      it.fenceName,
       it.latitude,
       it.longitude,
       it.radius,

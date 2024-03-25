@@ -83,12 +83,12 @@ fun ListItem(geofication: Geofication, refreshData: suspend () -> Unit) {
         modifier = Modifier.fillMaxWidth()
       ) {
         Row {
-          CircleWithColor(color = geofication.color.color, radius = 15.dp, modifier = Modifier.shadow(4.dp, CircleShape))
-          Spacer(Modifier.width(8.dp))
+          //CircleWithColor(color = geofication.color.color, radius = 15.dp, modifier = Modifier.shadow(4.dp, CircleShape))
+          //Spacer(Modifier.width(8.dp))
           Row {
             Text(
               modifier = Modifier.fillMaxWidth(0.75f),
-              text = geofication.gid,
+              text = geofication.message,
               style = MaterialTheme.typography.headlineSmall,
               fontStyle = if (geofication.active) FontStyle.Normal else FontStyle.Italic,
               maxLines = 1,
@@ -99,7 +99,7 @@ fun ListItem(geofication: Geofication, refreshData: suspend () -> Unit) {
 
         Switch(checked = geofication.active, onCheckedChange = {
           CoroutineScope(SupervisorJob()).launch {
-            GeofenceUtil.setNotifActive(geofication.gid, it)
+            GeofenceUtil.setNotifActive(geofication.id, it)
             refreshData()
           }
         })

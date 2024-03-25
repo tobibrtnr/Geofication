@@ -33,9 +33,8 @@ import de.tobibrtnr.geofication.util.GeofenceUtil
 
 fun processInput(
   enteredString: String,
-  selectedGeofence: String,
+  selectedGeofence: Int,
   flags: List<String>,
-  color: MarkerColor
 ) {
 
   var flagNum = 0
@@ -47,13 +46,11 @@ fun processInput(
   }
 
   GeofenceUtil.addGeofication(
-    enteredString,
     selectedGeofence,
-    "",
+    enteredString,
     flagNum,
     0,
     true,
-    color,
     true,
     /*TODO*/ 1,
     0
@@ -66,7 +63,7 @@ fun AddGeoficationPopup(
 ) {
 
   var expanded by remember { mutableStateOf(false) }
-  var selectedGeofence by remember { mutableStateOf("") }
+  var selectedGeofence by remember { mutableStateOf(0) }
   var selectedColor by remember { mutableStateOf(MarkerColor.RED) }
   var colorExpanded by remember { mutableStateOf(false) }
   var flags by remember {mutableStateOf(listOf("entering"))}
@@ -111,7 +108,7 @@ fun AddGeoficationPopup(
         SegmentedButtons("entering", "exiting") { flags = it }
 
         Text(
-          text = selectedGeofence.ifEmpty { "Please select a geofence." },
+          text = selectedGeofence.toString(), //selectedGeofence.ifEmpty { "Please select a geofence." },
           modifier = Modifier
             .fillMaxWidth()
             .clickable { expanded = true }
@@ -130,8 +127,8 @@ fun AddGeoficationPopup(
             onDismissRequest = { expanded = false },
           ) {
             geofences.forEach {
-              DropdownMenuItem(text = { Text(it.gid) }, onClick = {
-                selectedGeofence = it.gid
+              DropdownMenuItem(text = { Text(it.fenceName) }, onClick = {
+                selectedGeofence = it.id
                 expanded = false
               })
             }
@@ -179,7 +176,7 @@ fun AddGeoficationPopup(
           }
           TextButton(
             onClick = {
-              processInput(name, selectedGeofence, flags, selectedColor)
+              processInput(name, selectedGeofence, flags)
               onDismissRequest()
             },
             modifier = Modifier.padding(8.dp),
