@@ -42,7 +42,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.google.android.gms.maps.model.LatLng
+import de.tobibrtnr.geofication.util.Geofence
 import de.tobibrtnr.geofication.util.GeofenceUtil
+import de.tobibrtnr.geofication.util.Geofication
 
 fun processInput(
   context: Context,
@@ -50,6 +52,8 @@ fun processInput(
   radius: String,
   color: MarkerColor,
   pos: LatLng,
+  message: String,
+  flagList: List<String>,
   function: () -> Unit
 ) {
 
@@ -60,15 +64,39 @@ fun processInput(
     return
   }
 
+  var flags = 0
+  if(flagList.contains("entering")) {
+    flags += 1
+  }
+  if(flagList.contains("exiting")) {
+    flags += 2
+  }
+
+  val newGeofence = Geofence(
+    fenceName = name,
+    latitude = pos.latitude,
+    longitude = pos.longitude,
+    radius = enteredFloat,
+    color = color,
+    active = true,
+    triggerCount = 0
+  )
+
+  val geofication = Geofication(
+    fenceid = 0,
+    message = message,
+    flags = flags,
+    delay = 0, // TODO
+    repeat = true, // TODO
+    active = true,
+    onTrigger = 1, // TODO
+    triggerCount = 0
+  )
+
   GeofenceUtil.addGeofence(
     context,
-    name,
-    pos.latitude,
-    pos.longitude,
-    enteredFloat,
-    color,
-    true,
-    0
+    newGeofence,
+    geofication
   )
 
   function()
@@ -89,6 +117,12 @@ fun AddGeofencePopup(
   var radius by remember {mutableStateOf("")}
   var name by remember { mutableStateOf("") }
 
+  var message by remember { mutableStateOf("") }
+
+  var flags by remember {mutableStateOf(listOf("entering"))}
+
+  var inputValid by remember {mutableStateOf(false)}//(message/*, radius*/) { mutableStateOf(message.isNotEmpty())}// && (radius.toFloatOrNull() != null)) }
+
   val geocoder = Geocoder(context)
 
   if(rad != 0.0) {
@@ -99,8 +133,11 @@ fun AddGeofencePopup(
     // Implementation of GeocodeListener
     val listener = object: Geocoder.GeocodeListener {
       override fun onGeocode(addresses: MutableList<Address>) {
-        if (addresses.size > 0) {
-          name = getLocationName(addresses[0])
+        println(addresses)
+        name = if (addresses.size > 0) {
+          "Geofence in ${getLocationName(addresses[0])}"
+        } else {
+          "Unnamed Geofence"
         }
       }
       override fun onError(errorMessage: String?) {
@@ -110,8 +147,10 @@ fun AddGeofencePopup(
     geocoder.getFromLocation(pos.latitude, pos.longitude, 1, listener)
   } else {
     val addresses = geocoder.getFromLocation(pos.latitude, pos.longitude, 1)
-    if (addresses != null && addresses.size > 0) {
-      name = getLocationName(addresses[0])
+    name = if (addresses != null && addresses.size > 0) {
+      "Geofence in ${getLocationName(addresses[0])}"
+    } else {
+      "Unnamed Geofence"
     }
   }
 
@@ -119,7 +158,7 @@ fun AddGeofencePopup(
     Card(
       modifier = Modifier
         .fillMaxWidth()
-        .height(400.dp)
+        .height(450.dp)
         .padding(16.dp),
       shape = RoundedCornerShape(16.dp)
     ) {
@@ -128,7 +167,7 @@ fun AddGeofencePopup(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
       ) {
-        Text("Add a new Geofence")
+        Text("Add a new Geofication")
 
         TextField(
           modifier = Modifier
@@ -137,12 +176,13 @@ fun AddGeofencePopup(
             .border(
               1.dp, Color(0xFF000000)
             ),
-          placeholder = { Text("Enter geofence name") },
+          placeholder = { Text("Add notification message") },
           singleLine = true,
           shape = MaterialTheme.shapes.medium,
-          value = name,
+          value = message,
           onValueChange = {
-            name = it//.take(max) for max name length
+            message = it//.take(max) for max name length
+            inputValid = message.isNotEmpty() && (radius.toFloatOrNull() != null) && (radius.toFloat() > 0)
           }
         )
 
@@ -161,7 +201,11 @@ fun AddGeofencePopup(
           placeholder = { Text("Enter geofence radius") },
           singleLine = true,
           onValueChange = {
-            radius = it//.take(max) for max name length
+            val newValue = it.filter { char ->
+              char.isDigit() || char == '.' //|| char == ','
+            }
+            radius = newValue
+            inputValid = message.isNotEmpty() && (radius.toFloatOrNull() != null) && (radius.toFloat() > 0)
           }
         )
 
@@ -172,6 +216,8 @@ fun AddGeofencePopup(
             .clickable { colorExpanded = true }
             .padding(16.dp)
         )
+
+        SegmentedButtons("entering", "exiting") { flags = it }
 
         Row(
           modifier = Modifier
@@ -206,9 +252,10 @@ fun AddGeofencePopup(
           }
           TextButton(
             onClick = {
-              processInput(context, name, radius, selectedColor, pos, function)
+              processInput(context, name, radius, selectedColor, pos, message, flags, function)
               onDismissRequest()
             },
+            enabled = inputValid,
             modifier = Modifier.padding(8.dp),
           ) {
             Text("Add")
@@ -230,11 +277,14 @@ fun CircleWithColor(modifier: Modifier = Modifier, color: Color, radius: Dp) {
 }
 
 fun getLocationName(address: Address): String {
-  /*if(address.featureName != null && address.thoroughfare != null) {
-    return "${address.featureName} ${address.thoroughfare}"
-  }*/
-  if(address.getAddressLine(0) != null) {
-    return address.getAddressLine(0)
+  if(address.locality != null) {
+    return address.locality
+  }
+  if(address.subAdminArea != null) {
+    return address.subAdminArea
+  }
+  if(address.adminArea != null) {
+    return address.adminArea
   }
   if(address.countryName != null) {
     return address.countryName
@@ -243,5 +293,5 @@ fun getLocationName(address: Address): String {
     return address.featureName
   }
 
-  return ""
+  return "unnamed Area"
 }

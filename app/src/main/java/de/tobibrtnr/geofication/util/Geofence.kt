@@ -39,7 +39,7 @@ data class Geofence(
 data class Geofication(
   @PrimaryKey(autoGenerate = true)
   val id: Int = 0,
-  @ColumnInfo(index = true) val fenceid: Int,
+  @ColumnInfo(index = true) var fenceid: Int,
 
   val message: String,
   val flags: Int,

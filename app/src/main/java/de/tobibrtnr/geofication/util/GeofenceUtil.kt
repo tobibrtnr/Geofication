@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.GeofencingRequest
-import de.tobibrtnr.geofication.ui.MarkerColor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -39,40 +38,28 @@ class GeofenceUtil {
 
     /**
      * Add a new geofence with a given string id, latitude, longitude and radius.
-     * TODO if the addGeofence is called after reboot, we do not need to add it again
-     * TODO to the database. so maybe alternative without db.
      */
     fun addGeofence(
       context: Context,
-      geofenceName: String,
-      latitude: Double,
-      longitude: Double,
-      radius: Float,
-      color: MarkerColor,
-      active: Boolean,
-      triggerCount: Int
+      daoGeofence: Geofence,
+      daoGeofication: Geofication? = null
     ) {
       val db = ServiceProvider.database()
       val geofencingClient = ServiceProvider.geofence()
 
       // Coroutine in order to add geofence asynchronously to storage
       CoroutineScope(SupervisorJob()).launch {
-        // Add geofence to local database
-        val geofenceDao = db.geofenceDao()
-        val daoGeofence = Geofence(
-          fenceName = geofenceName,
-          latitude = latitude,
-          longitude = longitude,
-          radius = radius,
-          color = color,
-          active = active,
-          triggerCount = triggerCount
-        )
-        val newId = geofenceDao.insert(daoGeofence)
+        val newId = if (daoGeofence.id <= 0) {
+          // Add geofence to local database
+          val geofenceDao = db.geofenceDao()
+          geofenceDao.insert(daoGeofence).toInt()
+        } else {
+          daoGeofence.id
+        }
 
         val newGeofence = com.google.android.gms.location.Geofence.Builder()
           .setRequestId(newId.toString())
-          .setCircularRegion(latitude, longitude, radius)
+          .setCircularRegion(daoGeofence.latitude, daoGeofence.longitude, daoGeofence.radius)
           .setExpirationDuration(com.google.android.gms.location.Geofence.NEVER_EXPIRE)
           .setTransitionTypes(com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_ENTER or com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_EXIT)
           .build()
@@ -97,6 +84,11 @@ class GeofenceUtil {
               // Geofence added successfully
               println("Geofence Added:")
               println(newGeofence)
+
+              if(daoGeofication != null) {
+                daoGeofication.fenceid = newId
+                addGeofication(daoGeofication)
+              }
             }
             .addOnFailureListener { e ->
               // Geofence addition failed
@@ -141,27 +133,9 @@ class GeofenceUtil {
      * Add a geofication
      */
     fun addGeofication(
-      fenceid: Int,
-      message: String,
-      flags: Int,
-      delay: Int,
-      repeat: Boolean,
-      active: Boolean,
-      onTrigger: Int,
-      triggerCount: Int
+      geofication: Geofication
     ) {
       CoroutineScope(SupervisorJob()).launch {
-        val geofication = Geofication(
-          fenceid = fenceid,
-          message = message,
-          flags = flags,
-          delay = delay,
-          repeat = repeat,
-          active = active,
-          onTrigger = onTrigger,
-          triggerCount = triggerCount
-        )
-
         val db = ServiceProvider.database()
         val geoDao = db.geoficationDao()
         geoDao.insertAll(geofication)

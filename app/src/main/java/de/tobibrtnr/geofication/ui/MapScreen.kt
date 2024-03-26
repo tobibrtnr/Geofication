@@ -334,22 +334,29 @@ fun MapScreen(
             )
           }.forEach {
 
-            val fence = geofencesArray.first { it2 ->
-              it2.id == it.fenceid
+            var fence: Geofence? = null
+            var meterText = ""
+            try {
+              fence = geofencesArray.first { it2 ->
+                it2.id == it.fenceid
+              }
+
+              val distance = SphericalUtil.computeDistanceBetween(
+                LatLng(fence.latitude, fence.longitude),
+                currentLocation
+              ).roundToInt()
+
+              meterText = if (distance > 1000) {
+                "${distance / 1000} km"
+              } else {
+                "${distance} m"
+              }
+            } catch (e: NoSuchElementException) {
+              println("no such element exception")
             }
 
-            val distance = SphericalUtil.computeDistanceBetween(
-              LatLng(fence.latitude, fence.longitude),
-              currentLocation
-            ).roundToInt()
-
-            val meterText = if (distance > 1000) {
-              "${distance / 1000} km"
-            } else {
-              "${distance} m"
-            }
-
-            AssistChip(
+            fence?.let { _ ->
+              AssistChip(
               shape = CircleShape,
               border = AssistChipDefaults.assistChipBorder(enabled = false),
               colors = AssistChipDefaults.assistChipColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
@@ -377,7 +384,7 @@ fun MapScreen(
                   color = Color.Blue, // TODO use Color of the Geofence
                   radius = 8.dp
                 )
-              })
+              })}
             Spacer(Modifier.width(8.dp))
           }
           Spacer(Modifier.width(8.dp))
@@ -450,7 +457,7 @@ fun MapScreen(
 
       val mState = MarkerState(position = LatLng(geo.latitude, geo.longitude))
       MarkerInfoWindow(
-        alpha = if(geo.active) 1.0f else 0.5f,
+        alpha = if(geo.active) 1.0f else 0.25f,
         state = mState,
         title = geo.fenceName,
         onClick = {
@@ -479,8 +486,8 @@ fun MapScreen(
       Circle(
         center = LatLng(geo.latitude, geo.longitude),
         radius = geo.radius.toDouble(),
-        strokeColor = if(geo.active) geo.color.color else geo.color.color.copy(alpha = 0.4f),
-        fillColor = if(geo.active) geo.color.color.copy(alpha = 0.25f) else geo.color.color.copy(alpha = 0.125f)
+        strokeColor = if(geo.active) geo.color.color else geo.color.color.copy(alpha = 0.3f),
+        fillColor = if(geo.active) geo.color.color.copy(alpha = 0.25f) else geo.color.color.copy(alpha = 0.1f)
       )
     }
   }

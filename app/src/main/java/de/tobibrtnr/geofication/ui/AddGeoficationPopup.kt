@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import de.tobibrtnr.geofication.util.Geofence
 import de.tobibrtnr.geofication.util.GeofenceUtil
+import de.tobibrtnr.geofication.util.Geofication
 
 fun processInput(
   enteredString: String,
@@ -45,15 +46,18 @@ fun processInput(
     flagNum += 2
   }
 
+  val geofication = Geofication(
+    fenceid = selectedGeofence,
+    message = enteredString,
+    flags = flagNum,
+    delay = 0, // TODO
+    repeat = true, // TODO
+    active = true,
+    onTrigger = 1, // TODO
+    triggerCount = 0
+  )
   GeofenceUtil.addGeofication(
-    selectedGeofence,
-    enteredString,
-    flagNum,
-    0,
-    true,
-    true,
-    /*TODO*/ 1,
-    0
+    geofication
   )
 }
 
