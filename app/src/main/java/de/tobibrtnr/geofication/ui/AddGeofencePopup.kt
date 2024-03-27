@@ -37,7 +37,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.TransformedText
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -53,8 +57,7 @@ fun processInput(
   color: MarkerColor,
   pos: LatLng,
   message: String,
-  flagList: List<String>,
-  function: () -> Unit
+  flagList: List<String>
 ) {
 
   val enteredFloat = try {
@@ -98,8 +101,6 @@ fun processInput(
     newGeofence,
     geofication
   )
-
-  function()
 }
 
 @Composable
@@ -107,7 +108,6 @@ fun AddGeofencePopup(
   pos: LatLng,
   rad: Double,
   onDismissRequest: () -> Unit,
-  function: () -> Unit
 ) {
 
   val context = LocalContext.current
@@ -206,7 +206,8 @@ fun AddGeofencePopup(
             }
             radius = newValue
             inputValid = message.isNotEmpty() && (radius.toFloatOrNull() != null) && (radius.toFloat() > 0)
-          }
+          },
+          visualTransformation = NumericUnitTransformation()
         )
 
         CircleWithColor(
@@ -252,7 +253,7 @@ fun AddGeofencePopup(
           }
           TextButton(
             onClick = {
-              processInput(context, name, radius, selectedColor, pos, message, flags, function)
+              processInput(context, name, radius, selectedColor, pos, message, flags)
               onDismissRequest()
             },
             enabled = inputValid,
@@ -273,6 +274,25 @@ fun CircleWithColor(modifier: Modifier = Modifier, color: Color, radius: Dp) {
       .size(radius * 2)
       .clip(CircleShape)
       .background(color)
+  )
+}
+
+@Composable
+fun NumericUnitTransformation() = VisualTransformation { text ->
+  TransformedText(
+    text = buildAnnotatedString {
+      append(text)
+      append(" m") // Appending the unit 'm' after the number input
+    },
+    offsetMapping = object : OffsetMapping {
+      override fun originalToTransformed(offset: Int): Int {
+        return offset
+      }
+
+      override fun transformedToOriginal(offset: Int): Int {
+        return if (offset <= text.length) offset else text.length
+      }
+    }
   )
 }
 

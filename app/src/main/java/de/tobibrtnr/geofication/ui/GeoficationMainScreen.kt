@@ -1,7 +1,6 @@
 package de.tobibrtnr.geofication.ui
 
 import android.Manifest
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
@@ -9,30 +8,20 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ElectricBolt
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.material.icons.outlined.Map
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
@@ -41,7 +30,6 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -50,7 +38,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 
 enum class GeoficationScreen(val title: String, val icon: ImageVector) {
   Start(title = "Start", icon = Icons.Outlined.Map),
-  Geofences(title = "Geofences", icon = Icons.Outlined.Circle),
+  //Geofences(title = "Geofences", icon = Icons.Outlined.Circle),
   Geofications(title = "Geofications", icon = Icons.Outlined.Notifications),
   Settings(title = "Settings", icon = Icons.Outlined.Settings)
 }
@@ -156,13 +144,13 @@ fun GeoficationApp(
             )
           }
         }
-        composable(route = GeoficationScreen.Geofences.name) {
+        /*composable(route = GeoficationScreen.Geofences.name) {
           Box(modifier = Modifier.padding(innerPadding)) {
             GeofencesScreen(
               modifier = Modifier.fillMaxSize()
             )
           }
-        }
+        }*/
         composable(route = GeoficationScreen.Geofications.name) {
           Box(modifier = Modifier.padding(innerPadding)) {
             GeoficationsScreen(

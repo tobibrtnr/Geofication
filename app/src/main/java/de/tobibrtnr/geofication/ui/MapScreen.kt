@@ -4,8 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Point
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
-import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -41,8 +40,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -74,7 +73,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import kotlin.math.abs
 import kotlin.math.roundToInt
 
 @Composable
@@ -83,14 +81,14 @@ fun MapScreen(
   topPadding: Dp
 ) {
 
-  val uiSettings by remember {
+  var uiSettings by remember {
     mutableStateOf(
       MapUiSettings(
         zoomControlsEnabled = false,
         indoorLevelPickerEnabled = false,
         mapToolbarEnabled = false,
         myLocationButtonEnabled = false,
-        compassEnabled = false // TODO maybe add own compass component and position
+        compassEnabled = false, // TODO maybe add own compass component and position
       )
     )
   }
@@ -118,6 +116,12 @@ fun MapScreen(
     LaunchedEffect(Unit) {
       val locationClient = ServiceProvider.location()
       val location = locationClient.lastLocation.await()
+
+      if (location == null) {
+        println("location is null!?")
+        return@LaunchedEffect
+      }
+
       currentLocation = LatLng(location.latitude, location.longitude)
 
       // Update the camera position state with the current location
@@ -232,13 +236,13 @@ fun MapScreen(
     AddGeoficationPopup { openDialog = false }
   }
   if (openDialogGeofence) {
-    AddGeofencePopup(selectedPosition, newRadius, { openDialogGeofence = false; }, {
+    AddGeofencePopup(selectedPosition, newRadius) {
       CoroutineScope(Dispatchers.Default).launch {
         val geofences = GeofenceUtil.getGeofences()
         geofencesArray = geofences
       }
       openDialogGeofence = false
-    })
+    }
   }
   Box(Modifier.fillMaxSize()) {
     Box(
@@ -254,6 +258,12 @@ fun MapScreen(
               // Asynchronously set the position of the map camera to current position
               val locationClient = ServiceProvider.location()
               val location = locationClient.lastLocation.await()
+
+              if (location == null) {
+                println("location is null!?")
+                return@launch
+              }
+
               currentLocation = LatLng(location.latitude, location.longitude)
 
               // Update the camera position state with the current location
@@ -303,6 +313,7 @@ fun MapScreen(
       )
     }*/
     //}
+
     Box(
       modifier = Modifier
         .fillMaxWidth()
@@ -357,34 +368,37 @@ fun MapScreen(
 
             fence?.let { _ ->
               AssistChip(
-              shape = CircleShape,
-              border = AssistChipDefaults.assistChipBorder(enabled = false),
-              colors = AssistChipDefaults.assistChipColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-              onClick = {
-                MainScope().launch {
-                  cameraPositionState.animate(
-                    CameraUpdateFactory.newCameraPosition(
-                      CameraPosition(
-                        LatLng(fence.latitude, fence.longitude),
-                        15f,
-                        0f,
-                        0f
+                shape = CircleShape,
+                border = AssistChipDefaults.assistChipBorder(enabled = false),
+                colors = AssistChipDefaults.assistChipColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+                onClick = {
+                  MainScope().launch {
+                    cameraPositionState.animate(
+                      CameraUpdateFactory.newCameraPosition(
+                        CameraPosition(
+                          LatLng(fence.latitude, fence.longitude),
+                          15f,
+                          0f,
+                          0f
+                        )
                       )
                     )
+                  }
+                },
+                label = {
+                  Text(
+                    "${
+                      it.message.take(15).trim()
+                    }${if (it.message.length > 15) "..." else ""} | $meterText"
                   )
-                }
-              },
-              label = {
-                Text(
-                  "${it.message.take(15).trim()}${if (it.message.length > 15) "..." else ""} | $meterText"
-                )
-              },
-              leadingIcon = {
-                CircleWithColor(
-                  color = Color.Blue, // TODO use Color of the Geofence
-                  radius = 8.dp
-                )
-              })}
+                },
+                leadingIcon = {
+                  CircleWithColor(
+                    color = fence.color.color,
+                    radius = 8.dp
+                  )
+                })
+            }
             Spacer(Modifier.width(8.dp))
           }
           Spacer(Modifier.width(8.dp))
@@ -397,106 +411,124 @@ fun MapScreen(
       uiSettings = uiSettings,
       properties = properties,
       onMapLongClick = {
+        println("HERE ON MAP LONG CLICK IS REGISTERED")
         Vibrate.vibrate(context, 15)
         tempGeofenceLocation = it
-        //longClick(it)
+
+        uiSettings = uiSettings.copy(
+          scrollGesturesEnabled = false,
+          zoomGesturesEnabled = false,
+          tiltGesturesEnabled = false,
+          rotationGesturesEnabled = false
+        )
       },
       modifier = Modifier
         .fillMaxSize()
         .pointerInput(Unit) {
-          detectDragGesturesAfterLongPress(onDrag = { change, dragAmount ->
-            if (tempGeofenceLocation != null) {
-              //println(change)
-              println(dragAmount)
-              //tempGeofenceRadius = ((abs(dragAmount.x) + abs(dragAmount.y)) * 10).toInt()
-              val projection = cameraPositionState.projection
-              if (projection != null) {
-                val pointerLocation = projection.fromScreenLocation(
-                  Point(
-                    change.position.x.toInt(),
-                    change.position.y.toInt()
+          awaitEachGesture {
+            do {
+              val event = awaitPointerEvent()
+              event.changes.forEach {
+                when (event.type) {
+                  PointerEventType.Move -> {
+                    if (tempGeofenceLocation != null) {
+                      val projection = cameraPositionState.projection
+                      if (projection != null) {
+                        val pointerLocation = projection.fromScreenLocation(
+                          Point(
+                            it.position.x.toInt(),
+                            it.position.y.toInt()
+                          )
+                        )
+                        tempGeofenceRadius =
+                          SphericalUtil.computeDistanceBetween(tempGeofenceLocation, pointerLocation)
+                        if (tempGeofenceRadius < 30.0) tempGeofenceRadius = 30.0
+                        /*if (dragAmount.x > 0.5 || dragAmount.y > 0.5) {
+                          Vibrate.vibrate(context, 1)
+                        }*/
+                      }
+                    }
+                  }
+                  PointerEventType.Release -> {
+                    uiSettings = uiSettings.copy(
+                      scrollGesturesEnabled = true,
+                      zoomGesturesEnabled = true,
+                      tiltGesturesEnabled = true,
+                      rotationGesturesEnabled = true
+                    )
+                    tempGeofenceLocation?.let { longClick(it, tempGeofenceRadius) }
+                    tempGeofenceLocation = null
+                    tempGeofenceRadius = 30.0
+                  }
+                }
+              }
+            } while (event.changes.any { it.pressed })
+          }
+        },
+      cameraPositionState = cameraPositionState,
+      onMapLoaded = {
+        isMapLoaded = true
+      },
+      contentPadding = PaddingValues.Absolute(0.dp, 60.dp, 0.dp, 0.dp),
+    ) {
+
+      tempGeofenceLocation?.let {
+        Circle(
+          center = LatLng(it.latitude, it.longitude),
+          radius = tempGeofenceRadius,
+          strokeColor = Color.Red,
+          fillColor = Color.Red.copy(alpha = 0.25f)
+        )
+      }
+
+      // Place each Geofence as Marker and Circle on the Map
+      geofencesArray.forEach { geo ->
+        val bdf = BitmapDescriptorFactory.defaultMarker(geo.color.hue)
+
+        val mState = MarkerState(position = LatLng(geo.latitude, geo.longitude))
+        MarkerInfoWindow(
+          alpha = if (geo.active) 1.0f else 0.25f,
+          state = mState,
+          title = geo.fenceName,
+          onClick = {
+            markerPopupVisible = true
+            selectedMarkerId = geo.id
+            MainScope().launch {
+              cameraPositionState.animate(
+                CameraUpdateFactory.newCameraPosition(
+                  CameraPosition(
+                    LatLng(geo.latitude, geo.longitude),
+                    15f,
+                    0f,
+                    0f
                   )
                 )
-                tempGeofenceRadius =
-                  SphericalUtil.computeDistanceBetween(tempGeofenceLocation, pointerLocation)
-                if (tempGeofenceRadius < 30.0) tempGeofenceRadius = 30.0
-                if (dragAmount.x > 0.5 || dragAmount.y > 0.5) {
-                  Vibrate.vibrate(context, 1)
-                }
-            }
-          }
-        }, onDragCancel = {
-        tempGeofenceLocation?.let { longClick(it, tempGeofenceRadius) }
-        tempGeofenceLocation = null
-        tempGeofenceRadius = 30.0
-      }, onDragEnd = {
-        tempGeofenceLocation?.let { longClick(it, tempGeofenceRadius) }
-        tempGeofenceLocation = null
-        tempGeofenceRadius = 30.0
-      })
-  },
-  cameraPositionState = cameraPositionState,
-  onMapLoaded = {
-    isMapLoaded = true
-  },
-  contentPadding = PaddingValues.Absolute(0.dp, 60.dp, 0.dp, 0.dp),
-  ) {
-
-    tempGeofenceLocation?.let {
-      Circle(
-        center = LatLng(it.latitude, it.longitude),
-        radius = tempGeofenceRadius,
-        strokeColor = Color.Red,
-        fillColor = Color.Red.copy(alpha = 0.25f)
-      )
-    }
-
-    // Place each Geofence as Marker and Circle on the Map
-    geofencesArray.forEach { geo ->
-      val bdf = BitmapDescriptorFactory.defaultMarker(geo.color.hue)
-
-      val mState = MarkerState(position = LatLng(geo.latitude, geo.longitude))
-      MarkerInfoWindow(
-        alpha = if(geo.active) 1.0f else 0.25f,
-        state = mState,
-        title = geo.fenceName,
-        onClick = {
-          markerPopupVisible = true
-          selectedMarkerId = geo.id
-          MainScope().launch {
-            cameraPositionState.animate(
-              CameraUpdateFactory.newCameraPosition(
-                CameraPosition(
-                  LatLng(geo.latitude, geo.longitude),
-                  15f,
-                  0f,
-                  0f
-                )
               )
-            )
+            }
+            false
+          },
+          icon = bdf,
+          content = { _ ->
+            Text("")
           }
-          false
-        },
-        icon = bdf,
-        content = { _ ->
-          Text("")
-        }
 
-      )
-      Circle(
-        center = LatLng(geo.latitude, geo.longitude),
-        radius = geo.radius.toDouble(),
-        strokeColor = if(geo.active) geo.color.color else geo.color.color.copy(alpha = 0.3f),
-        fillColor = if(geo.active) geo.color.color.copy(alpha = 0.25f) else geo.color.color.copy(alpha = 0.1f)
-      )
+        )
+        Circle(
+          center = LatLng(geo.latitude, geo.longitude),
+          radius = geo.radius.toDouble(),
+          strokeColor = if (geo.active) geo.color.color else geo.color.color.copy(alpha = 0.3f),
+          fillColor = if (geo.active) geo.color.color.copy(alpha = 0.25f) else geo.color.color.copy(
+            alpha = 0.1f
+          )
+        )
+      }
     }
-  }
 
-  DisappearingScaleBar(
-    modifier = Modifier
-      .padding(bottom = 10.dp, end = 105.dp)
-      .align(Alignment.BottomEnd),
-    cameraPositionState = cameraPositionState
-  )
-}
+    DisappearingScaleBar(
+      modifier = Modifier
+        .padding(bottom = 10.dp, end = 105.dp)
+        .align(Alignment.BottomEnd),
+      cameraPositionState = cameraPositionState
+    )
+  }
 }
