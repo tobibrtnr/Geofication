@@ -1,15 +1,12 @@
 package de.tobibrtnr.geofication.ui
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -31,7 +28,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun SegmentedButtons(opt1: String, opt2: String, onValueChange: (List<String>) -> Unit) {
-  var selectedOptions by remember { mutableStateOf(listOf("entering")) }
+  var selectedOptions by remember { mutableStateOf(listOf(opt1)) }
 
   Row(
     modifier = Modifier
@@ -70,7 +67,7 @@ fun SegmentedButtons(opt1: String, opt2: String, onValueChange: (List<String>) -
         onValueChange(selectedOptions)
       },
       shape = RoundedCornerShape(topEndPercent = 50, bottomEndPercent = 50),
-      icon = Icons.Filled.ArrowBack
+      icon = Icons.AutoMirrored.Filled.ArrowBack
     )
   }
 }
@@ -111,5 +108,5 @@ fun SegmentedButton(
 @Preview(showBackground = true)
 @Composable
 fun SegmentedButtonsPreview() {
-  SegmentedButtons("entering", "exiting") {}
+  SegmentedButtons(opt1 = "entering", opt2 = "exiting") {}
 }

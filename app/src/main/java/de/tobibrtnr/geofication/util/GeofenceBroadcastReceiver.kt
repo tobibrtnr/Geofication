@@ -63,6 +63,11 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
               GeofenceUtil.incrementNotifTriggerCount(it.id)
               message += "${it.id}, "
             }
+
+            when (it.onTrigger) {
+              1 -> GeofenceUtil.setNotifActive(it.id, false)
+              2 -> GeofenceUtil.deleteGeofence(geofenceObject.id)
+            }
           }
           message = message.dropLast(2)
 

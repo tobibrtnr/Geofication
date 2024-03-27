@@ -12,11 +12,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -38,13 +39,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.google.android.gms.maps.model.LatLng
 import de.tobibrtnr.geofication.util.Geofence
 import de.tobibrtnr.geofication.util.GeofenceUtil
@@ -57,7 +61,8 @@ fun processInput(
   color: MarkerColor,
   pos: LatLng,
   message: String,
-  flagList: List<String>
+  flagList: List<String>,
+  onTrigger: Int
 ) {
 
   val enteredFloat = try {
@@ -68,10 +73,10 @@ fun processInput(
   }
 
   var flags = 0
-  if(flagList.contains("entering")) {
+  if (flagList.contains("entering")) {
     flags += 1
   }
-  if(flagList.contains("exiting")) {
+  if (flagList.contains("exiting")) {
     flags += 2
   }
 
@@ -92,7 +97,7 @@ fun processInput(
     delay = 0, // TODO
     repeat = true, // TODO
     active = true,
-    onTrigger = 1, // TODO
+    onTrigger = onTrigger,
     triggerCount = 0
   )
 
@@ -114,24 +119,21 @@ fun AddGeofencePopup(
 
   var selectedColor by remember { mutableStateOf(MarkerColor.RED) }
   var colorExpanded by remember { mutableStateOf(false) }
-  var radius by remember {mutableStateOf("")}
+  var radius by remember { mutableStateOf(rad.toInt().toString()) }
   var name by remember { mutableStateOf("") }
 
   var message by remember { mutableStateOf("") }
 
-  var flags by remember {mutableStateOf(listOf("entering"))}
+  var flags by remember { mutableStateOf(listOf("entering")) }
+  var onTrigger by remember { mutableStateOf(1) }
 
-  var inputValid by remember {mutableStateOf(false)}//(message/*, radius*/) { mutableStateOf(message.isNotEmpty())}// && (radius.toFloatOrNull() != null)) }
+  var inputValid by remember { mutableStateOf(false) }
 
   val geocoder = Geocoder(context)
 
-  if(rad != 0.0) {
-    radius = rad.toInt().toString()
-  }
-
-  if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
     // Implementation of GeocodeListener
-    val listener = object: Geocoder.GeocodeListener {
+    val listener = object : Geocoder.GeocodeListener {
       override fun onGeocode(addresses: MutableList<Address>) {
         println(addresses)
         name = if (addresses.size > 0) {
@@ -140,6 +142,7 @@ fun AddGeofencePopup(
           "Unnamed Geofence"
         }
       }
+
       override fun onError(errorMessage: String?) {
         println(errorMessage)
       }
@@ -154,20 +157,69 @@ fun AddGeofencePopup(
     }
   }
 
-  Dialog(onDismissRequest = { onDismissRequest() }) {
+  //Box(Modifier.padding(64.dp)) {
+  Dialog(
+    onDismissRequest = { onDismissRequest() },
+    properties = DialogProperties(usePlatformDefaultWidth = false)
+  ) {
     Card(
       modifier = Modifier
-        .fillMaxWidth()
-        .height(450.dp)
-        .padding(16.dp),
+        .fillMaxHeight(0.75f)
+        .fillMaxWidth(0.9f),
+      //.height(450.dp)
       shape = RoundedCornerShape(16.dp)
     ) {
       Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = Modifier
+          .fillMaxSize()
+          .padding(16.dp),
+        verticalArrangement = Arrangement.SpaceBetween,
+        horizontalAlignment = Alignment.Start
       ) {
-        Text("Add a new Geofication")
+        Row(
+          horizontalArrangement = Arrangement.SpaceBetween,
+          verticalAlignment = Alignment.CenterVertically,
+          modifier = Modifier.fillMaxWidth()
+        ) {
+          Text(
+            "New Geofication",
+            style = MaterialTheme.typography.headlineMedium,
+            modifier = Modifier.padding(start = 16.dp),
+            fontWeight = FontWeight.Bold
+          )
+
+          Box(Modifier.clip(CircleShape)) {
+            CircleWithColor(
+              color = selectedColor.color,
+              radius = 10.dp,
+              modifier = Modifier
+                .clickable { colorExpanded = true }
+                .padding(16.dp)
+            )
+            DropdownMenu(
+              modifier = Modifier.width(45.dp),
+              expanded = colorExpanded,
+              onDismissRequest = { colorExpanded = false },
+            ) {
+              MarkerColor.values().filter {
+                it != selectedColor
+              }.forEach {
+                DropdownMenuItem(
+                  text = { CircleWithColor(color = it.color, radius = 10.dp) },
+                  onClick = {
+                    selectedColor = it
+                    colorExpanded = false
+                  })
+              }
+            }
+          }
+        }
+
+        Text(
+          text = "Geofication title",
+          style = MaterialTheme.typography.titleLarge,
+          modifier = Modifier.padding(start = 16.dp)
+        )
 
         TextField(
           modifier = Modifier
@@ -182,8 +234,15 @@ fun AddGeofencePopup(
           value = message,
           onValueChange = {
             message = it//.take(max) for max name length
-            inputValid = message.isNotEmpty() && (radius.toFloatOrNull() != null) && (radius.toFloat() > 0)
+            inputValid =
+              message.isNotEmpty() && (radius.toFloatOrNull() != null) && (radius.toFloat() > 0)
           }
+        )
+
+        Text(
+          text = "Geofence radius",
+          style = MaterialTheme.typography.titleLarge,
+          modifier = Modifier.padding(start = 16.dp)
         )
 
         TextField(
@@ -205,67 +264,62 @@ fun AddGeofencePopup(
               char.isDigit() || char == '.' //|| char == ','
             }
             radius = newValue
-            inputValid = message.isNotEmpty() && (radius.toFloatOrNull() != null) && (radius.toFloat() > 0)
+            inputValid =
+              message.isNotEmpty() && (radius.toFloatOrNull() != null) && (radius.toFloat() > 0)
           },
           visualTransformation = NumericUnitTransformation()
         )
 
-        CircleWithColor(
-          color = selectedColor.color,
-          radius = 10.dp,
-          modifier = Modifier
-            .clickable { colorExpanded = true }
-            .padding(16.dp)
+        Text(
+          text = "Trigger event",
+          style = MaterialTheme.typography.titleLarge,
+          modifier = Modifier.padding(start = 16.dp)
         )
 
         SegmentedButtons("entering", "exiting") { flags = it }
 
-        Row(
-          modifier = Modifier
-            .fillMaxWidth(),
-          horizontalArrangement = Arrangement.Center,
-        ) {
-          // Geofence dropdown menu
-          DropdownMenu(
-            modifier = Modifier.fillMaxWidth(),
-            expanded = colorExpanded,
-            onDismissRequest = { colorExpanded = false },
-          ) {
-            MarkerColor.values().forEach {
-              DropdownMenuItem(text = { CircleWithColor(color = it.color, radius = 10.dp) }, onClick = {
-                selectedColor = it
-                colorExpanded = false
-              })
-            }
+        Text(
+          text = "Behavior after triggering",
+          style = MaterialTheme.typography.titleLarge,
+          modifier = Modifier.padding(start = 16.dp)
+        )
+
+        SegmentedRadioButtons(
+          opt1 = "stay active",
+          opt2 = "disable",
+          opt3 = "delete",
+          onValueChange = {
+            onTrigger = it
           }
-        }
+        )
 
         Row(
           modifier = Modifier
             .fillMaxWidth(),
-          horizontalArrangement = Arrangement.Center,
+          horizontalArrangement = Arrangement.End,
         ) {
           TextButton(
             onClick = { onDismissRequest() },
             modifier = Modifier.padding(8.dp),
           ) {
-            Text("Dismiss")
+            Text("Cancel")
           }
           TextButton(
             onClick = {
-              processInput(context, name, radius, selectedColor, pos, message, flags)
+              processInput(context, name, radius, selectedColor, pos, message, flags, onTrigger)
               onDismissRequest()
             },
             enabled = inputValid,
             modifier = Modifier.padding(8.dp),
           ) {
-            Text("Add")
+            Text("Save")
           }
         }
       }
     }
   }
 }
+//}
 
 @Composable
 fun CircleWithColor(modifier: Modifier = Modifier, color: Color, radius: Dp) {
@@ -297,19 +351,19 @@ fun NumericUnitTransformation() = VisualTransformation { text ->
 }
 
 fun getLocationName(address: Address): String {
-  if(address.locality != null) {
+  if (address.locality != null) {
     return address.locality
   }
-  if(address.subAdminArea != null) {
+  if (address.subAdminArea != null) {
     return address.subAdminArea
   }
-  if(address.adminArea != null) {
+  if (address.adminArea != null) {
     return address.adminArea
   }
-  if(address.countryName != null) {
+  if (address.countryName != null) {
     return address.countryName
   }
-  if(address.featureName != null) {
+  if (address.featureName != null) {
     return address.featureName
   }
 

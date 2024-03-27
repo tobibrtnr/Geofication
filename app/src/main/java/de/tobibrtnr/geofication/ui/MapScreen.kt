@@ -290,12 +290,12 @@ fun MapScreen(
             contentDescription = "Get location"
           )
         }
-        Spacer(modifier = Modifier.height(8.dp))
+        /*Spacer(modifier = Modifier.height(8.dp))
         FloatingActionButton(
           onClick = { openDialog = true },
         ) {
           Icon(Icons.Filled.Add, contentDescription = "Add Geofication")
-        }
+        }*/
       }
     }
 
@@ -342,7 +342,7 @@ fun MapScreen(
             SphericalUtil.computeDistanceBetween(
               LatLng(fence.latitude, fence.longitude),
               currentLocation
-            )
+            ) - fence.radius
           }.forEach {
 
             var fence: Geofence? = null
@@ -352,16 +352,18 @@ fun MapScreen(
                 it2.id == it.fenceid
               }
 
-              val distance = SphericalUtil.computeDistanceBetween(
+              val distance = (SphericalUtil.computeDistanceBetween(
                 LatLng(fence.latitude, fence.longitude),
                 currentLocation
-              ).roundToInt()
+              ) - fence.radius).roundToInt()
 
-              meterText = if (distance > 1000) {
-                "${distance / 1000} km"
-              } else {
-                "${distance} m"
-              }
+              meterText = if(distance < fence.radius) {
+                  "✅"
+                } else if (distance > 1000) {
+                  "${distance / 1000} km"
+                } else {
+                  "${distance} m"
+                }
             } catch (e: NoSuchElementException) {
               println("no such element exception")
             }

@@ -37,7 +37,7 @@ import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.accompanist.permissions.rememberPermissionState
 
 enum class GeoficationScreen(val title: String, val icon: ImageVector) {
-  Start(title = "Start", icon = Icons.Outlined.Map),
+  Start(title = "Map", icon = Icons.Outlined.Map),
   //Geofences(title = "Geofences", icon = Icons.Outlined.Circle),
   Geofications(title = "Geofications", icon = Icons.Outlined.Notifications),
   Settings(title = "Settings", icon = Icons.Outlined.Settings)
