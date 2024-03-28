@@ -6,6 +6,7 @@ import android.graphics.Point
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -54,6 +55,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.SphericalUtil
 import com.google.maps.android.compose.Circle
 import com.google.maps.android.compose.GoogleMap
@@ -63,6 +65,7 @@ import com.google.maps.android.compose.MarkerInfoWindow
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.widgets.DisappearingScaleBar
+import de.tobibrtnr.geofication.R
 import de.tobibrtnr.geofication.util.Geofence
 import de.tobibrtnr.geofication.util.GeofenceUtil
 import de.tobibrtnr.geofication.util.Geofication
@@ -93,8 +96,21 @@ fun MapScreen(
     )
   }
 
+  val context = LocalContext.current
+
+  val mapStyleOptions = if (isSystemInDarkTheme()) MapStyleOptions.loadRawResourceStyle(
+    context,
+    R.raw.google_maps_style_dark_mode
+  ) else null
+
   val properties by remember {
-    mutableStateOf(MapProperties(isMyLocationEnabled = true, isBuildingEnabled = true))
+    mutableStateOf(
+      MapProperties(
+        isMyLocationEnabled = true,
+        isBuildingEnabled = true,
+        mapStyleOptions = mapStyleOptions
+      )
+    )
   }
 
   val cameraPositionState = rememberCameraPositionState {
@@ -146,7 +162,6 @@ fun MapScreen(
   var openDialog by remember { mutableStateOf(false) }
   var openDialogGeofence by remember { mutableStateOf(false) }
 
-  val context = LocalContext.current
   var selectedPosition by remember { mutableStateOf(LatLng(0.0, 0.0)) }
   var newRadius by remember { mutableStateOf(0.0) }
 
@@ -357,13 +372,13 @@ fun MapScreen(
                 currentLocation
               ) - fence.radius).roundToInt()
 
-              meterText = if(distance < fence.radius) {
-                  "✅"
-                } else if (distance > 1000) {
-                  "${distance / 1000} km"
-                } else {
-                  "${distance} m"
-                }
+              meterText = if (distance < fence.radius) {
+                "✅"
+              } else if (distance > 1000) {
+                "${distance / 1000} km"
+              } else {
+                "${distance} m"
+              }
             } catch (e: NoSuchElementException) {
               println("no such element exception")
             }
@@ -443,7 +458,10 @@ fun MapScreen(
                           )
                         )
                         tempGeofenceRadius =
-                          SphericalUtil.computeDistanceBetween(tempGeofenceLocation, pointerLocation)
+                          SphericalUtil.computeDistanceBetween(
+                            tempGeofenceLocation,
+                            pointerLocation
+                          )
                         if (tempGeofenceRadius < 30.0) tempGeofenceRadius = 30.0
                         /*if (dragAmount.x > 0.5 || dragAmount.y > 0.5) {
                           Vibrate.vibrate(context, 1)
@@ -451,6 +469,7 @@ fun MapScreen(
                       }
                     }
                   }
+
                   PointerEventType.Release -> {
                     uiSettings = uiSettings.copy(
                       scrollGesturesEnabled = true,
