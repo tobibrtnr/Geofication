@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,6 +26,8 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -62,7 +65,8 @@ fun processInput(
   pos: LatLng,
   message: String,
   flagList: List<String>,
-  onTrigger: Int
+  onTrigger: Int,
+  delay: Int
 ) {
 
   val enteredFloat = try {
@@ -94,8 +98,8 @@ fun processInput(
     fenceid = 0,
     message = message,
     flags = flags,
-    delay = 0, // TODO
-    repeat = true, // TODO
+    delay = delay,
+    repeat = true, // TODO, but not used right now
     active = true,
     onTrigger = onTrigger,
     triggerCount = 0
@@ -127,6 +131,8 @@ fun AddGeofencePopup(
   var flags by remember { mutableStateOf(listOf("entering")) }
   var onTrigger by remember { mutableStateOf(1) }
 
+  var delay by remember { mutableStateOf(0.0f) }
+
   var inputValid by remember { mutableStateOf(false) }
 
   val geocoder = Geocoder(context)
@@ -157,14 +163,13 @@ fun AddGeofencePopup(
     }
   }
 
-  //Box(Modifier.padding(64.dp)) {
   Dialog(
     onDismissRequest = { onDismissRequest() },
     properties = DialogProperties(usePlatformDefaultWidth = false)
   ) {
     Card(
       modifier = Modifier
-        .fillMaxHeight(0.75f)
+        .fillMaxHeight(0.85f)
         .fillMaxWidth(0.9f),
       //.height(450.dp)
       shape = RoundedCornerShape(16.dp)
@@ -225,12 +230,12 @@ fun AddGeofencePopup(
           modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
+            .clip(CircleShape)
             .border(
-              1.dp, Color(0xFF000000)
+              1.dp, Color(0xFF000000), CircleShape
             ),
-          placeholder = { Text("Add notification message") },
+          placeholder = { Text("Notification message") },
           singleLine = true,
-          shape = MaterialTheme.shapes.medium,
           value = message,
           onValueChange = {
             message = it//.take(max) for max name length
@@ -249,8 +254,9 @@ fun AddGeofencePopup(
           modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
+            .clip(CircleShape)
             .border(
-              1.dp, Color(0xFF000000)
+              1.dp, Color(0xFF000000), CircleShape
             ),
           keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Decimal
@@ -293,6 +299,38 @@ fun AddGeofencePopup(
           }
         )
 
+        Text(
+          text = "Delay after Triggering",
+          style = MaterialTheme.typography.titleLarge,
+          modifier = Modifier.padding(start = 16.dp)
+        )
+
+        Row(
+          horizontalArrangement = Arrangement.SpaceBetween,
+          verticalAlignment = Alignment.CenterVertically,
+          modifier = Modifier.fillMaxWidth()
+        ) {
+          Text(
+            text = "${delay.toInt()} minutes",
+            modifier = Modifier.padding(start = 16.dp)
+          )
+
+          Spacer(modifier = Modifier.width(16.dp))
+
+          Slider(
+            modifier = Modifier.padding(end = 16.dp),
+            value = delay,
+            onValueChange = { delay = it },
+            colors = SliderDefaults.colors(
+              thumbColor = MaterialTheme.colorScheme.primary,
+              activeTrackColor = MaterialTheme.colorScheme.primary,
+              inactiveTrackColor = MaterialTheme.colorScheme.primaryContainer,
+            ),
+            valueRange = 0f..60f,
+            steps = 11
+          )
+        }
+
         Row(
           modifier = Modifier
             .fillMaxWidth(),
@@ -306,7 +344,17 @@ fun AddGeofencePopup(
           }
           TextButton(
             onClick = {
-              processInput(context, name, radius, selectedColor, pos, message, flags, onTrigger)
+              processInput(
+                context,
+                name,
+                radius,
+                selectedColor,
+                pos,
+                message,
+                flags,
+                onTrigger,
+                delay.toInt()
+              )
               onDismissRequest()
             },
             enabled = inputValid,
@@ -319,7 +367,6 @@ fun AddGeofencePopup(
     }
   }
 }
-//}
 
 @Composable
 fun CircleWithColor(modifier: Modifier = Modifier, color: Color, radius: Dp) {

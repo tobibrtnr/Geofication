@@ -7,6 +7,7 @@ import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofenceStatusCodes
 import com.google.android.gms.location.GeofencingEvent
 import kotlinx.coroutines.runBlocking
+import kotlin.concurrent.thread
 
 
 class GeofenceBroadcastReceiver : BroadcastReceiver() {
@@ -36,6 +37,9 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
       // Get the geofences that were triggered. A single event can trigger multiple geofences.
       val triggeringGeofences = geofencingEvent.triggeringGeofences
 
+      // Delay of the one geofication that is assigned to the geofence
+      var delay = 0
+
       triggeringGeofences?.forEachIndexed { _, geofence ->
 
         LogUtil.addLog(
@@ -61,7 +65,8 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
             // If the flags equals the triggered one or is both, and the geofication is active:
             if ((it.flags == geofenceTransition || it.flags == 3) && it.active) {
               GeofenceUtil.incrementNotifTriggerCount(it.id)
-              message += "${it.id}, "
+              message += "${it.message}, "
+              delay = it.delay
             }
 
             when (it.onTrigger) {
@@ -75,11 +80,16 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
 
             LogUtil.addLog("Attempt to send Notification with message \"$message\"")
 
-            sendNotification(
-              context,
-              "Geofence ${geofence.requestId} - $geofenceTransition",
-              message
-            )
+            thread {
+              // x minutes in ms
+              Thread.sleep((delay * 60 * 1000).toLong())
+
+              sendNotification(
+                context,
+                "Geofence ${geofence.requestId} - $geofenceTransition",
+                message
+              )
+            }
           } else {
             println("No context for notification given.")
           }

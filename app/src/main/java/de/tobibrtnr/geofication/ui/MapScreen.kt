@@ -478,8 +478,8 @@ fun MapScreen(
         Circle(
           center = LatLng(it.latitude, it.longitude),
           radius = tempGeofenceRadius,
-          strokeColor = Color.Red,
-          fillColor = Color.Red.copy(alpha = 0.25f)
+          strokeColor = MarkerColor.RED.color,
+          fillColor = MarkerColor.RED.color.copy(alpha = 0.25f)
         )
       }
 
