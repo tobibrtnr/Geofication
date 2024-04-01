@@ -25,7 +25,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.LocationSearching
+import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material.icons.filled.Satellite
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Card
@@ -60,6 +62,7 @@ import com.google.maps.android.SphericalUtil
 import com.google.maps.android.compose.Circle
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MapType
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.MarkerInfoWindow
 import com.google.maps.android.compose.MarkerState
@@ -70,6 +73,7 @@ import de.tobibrtnr.geofication.util.Geofence
 import de.tobibrtnr.geofication.util.GeofenceUtil
 import de.tobibrtnr.geofication.util.Geofication
 import de.tobibrtnr.geofication.util.ServiceProvider
+import de.tobibrtnr.geofication.util.UnitUtil
 import de.tobibrtnr.geofication.util.Vibrate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -103,12 +107,13 @@ fun MapScreen(
     R.raw.google_maps_style_dark_mode
   ) else null
 
-  val properties by remember {
+  var properties by remember {
     mutableStateOf(
       MapProperties(
         isMyLocationEnabled = true,
         isBuildingEnabled = true,
-        mapStyleOptions = mapStyleOptions
+        mapStyleOptions = mapStyleOptions,
+        mapType = MapType.NORMAL
       )
     )
   }
@@ -305,12 +310,23 @@ fun MapScreen(
             contentDescription = "Get location"
           )
         }
-        /*Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(8.dp))
         FloatingActionButton(
-          onClick = { openDialog = true },
+          onClick = {
+            properties = properties.copy(
+              mapType = if (properties.mapType == MapType.NORMAL) {
+                MapType.HYBRID
+              } else {
+                MapType.NORMAL
+              }
+            )
+          },
         ) {
-          Icon(Icons.Filled.Add, contentDescription = "Add Geofication")
-        }*/
+          Icon(
+            if (properties.mapType == MapType.NORMAL) Icons.Filled.Satellite else Icons.Filled.Map,
+            contentDescription = "Switch Map Type"
+          )
+        }
       }
     }
 
@@ -372,13 +388,12 @@ fun MapScreen(
                 currentLocation
               ) - fence.radius).roundToInt()
 
-              meterText = if (distance < fence.radius) {
-                "✅"
-              } else if (distance > 1000) {
-                "${distance / 1000} km"
-              } else {
-                "${distance} m"
-              }
+              meterText =
+                if (distance < 0) {
+                  "✅"
+                } else {
+                  UnitUtil.appendUnit(distance)
+                }
             } catch (e: NoSuchElementException) {
               println("no such element exception")
             }

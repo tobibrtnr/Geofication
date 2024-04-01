@@ -3,7 +3,6 @@ package de.tobibrtnr.geofication.util
 import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Database
-import androidx.room.Delete
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Insert
@@ -58,6 +57,30 @@ data class LogEntry(
   val message: String,
   val severity: Int
 )
+
+@Entity
+data class Setting(
+  @PrimaryKey
+  val key: String,
+  val value: ByteArray
+) {
+
+  // Generated
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+
+    other as Setting
+
+    if (key != other.key) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    return key.hashCode()
+  }
+}
 
 @Dao
 interface GeofenceDao {
@@ -119,9 +142,19 @@ interface LogDao {
   fun deleteAll()
 }
 
-@Database(entities = [Geofence::class, Geofication::class, LogEntry::class], version = 1)
+@Dao
+interface SettingsDao {
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  fun setSetting(setting: Setting)
+
+  @Query("SELECT value FROM setting WHERE `key` = :name")
+  fun getSetting(name: String): ByteArray
+}
+
+@Database(entities = [Geofence::class, Geofication::class, LogEntry::class, Setting::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {
   abstract fun geofenceDao(): GeofenceDao
   abstract fun geoficationDao(): GeoficationDao
   abstract fun logDao(): LogDao
+  abstract fun settingsDao(): SettingsDao
 }

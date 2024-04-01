@@ -56,6 +56,7 @@ import com.google.android.gms.maps.model.LatLng
 import de.tobibrtnr.geofication.util.Geofence
 import de.tobibrtnr.geofication.util.GeofenceUtil
 import de.tobibrtnr.geofication.util.Geofication
+import de.tobibrtnr.geofication.util.UnitUtil
 
 fun processInput(
   context: Context,
@@ -88,7 +89,7 @@ fun processInput(
     fenceName = name,
     latitude = pos.latitude,
     longitude = pos.longitude,
-    radius = enteredFloat,
+    radius = (enteredFloat / UnitUtil.distanceFactor()).toFloat(),
     color = color,
     active = true,
     triggerCount = 0
@@ -123,7 +124,7 @@ fun AddGeofencePopup(
 
   var selectedColor by remember { mutableStateOf(MarkerColor.RED) }
   var colorExpanded by remember { mutableStateOf(false) }
-  var radius by remember { mutableStateOf(rad.toInt().toString()) }
+  var radius by remember { mutableStateOf((rad * UnitUtil.distanceFactor()).toInt().toString()) }
   var name by remember { mutableStateOf("") }
 
   var message by remember { mutableStateOf("") }
@@ -383,7 +384,7 @@ fun NumericUnitTransformation() = VisualTransformation { text ->
   TransformedText(
     text = buildAnnotatedString {
       append(text)
-      append(" m") // Appending the unit 'm' after the number input
+      append(" ${UnitUtil.distanceUnit()}")
     },
     offsetMapping = object : OffsetMapping {
       override fun originalToTransformed(offset: Int): Int {

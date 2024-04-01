@@ -36,6 +36,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import de.tobibrtnr.geofication.util.LogEntry
 import de.tobibrtnr.geofication.util.LogUtil
+import de.tobibrtnr.geofication.util.UnitUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
@@ -53,8 +54,10 @@ fun SettingsScreen(
   val uiModeManager = context.getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
 
   var selectedMode by remember { mutableStateOf(uiModeManager.nightMode) }
-  println(selectedMode)
-  Configuration.UI_MODE_NIGHT_NO
+
+  // true is meter, false is foot
+  var selectedUnit by remember { mutableStateOf(UnitUtil.getDistanceUnit()) }
+
   var logEntryArray by remember { mutableStateOf(emptyList<LogEntry>()) }
   LaunchedEffect(Unit) {
     val logEntries = LogUtil.getLogs()
@@ -102,7 +105,28 @@ fun SettingsScreen(
       Text(text = "System Default")
     }
     Spacer(modifier = Modifier.height(8.dp))
-    Text(text = "Unit", style = MaterialTheme.typography.titleLarge)
+    Text(text = "Distance Unit", style = MaterialTheme.typography.titleLarge)
+    Row(verticalAlignment = Alignment.CenterVertically) {
+      RadioButton(
+        selected = selectedUnit,
+        onClick = {
+          selectedUnit = true
+          UnitUtil.setDistanceUnit(true)
+        },
+      )
+      Text(text = "Metric (m)")
+    }
+
+    Row(verticalAlignment = Alignment.CenterVertically) {
+      RadioButton(
+        selected = !selectedUnit,
+        onClick = {
+          selectedUnit = false
+          UnitUtil.setDistanceUnit(false)
+        },
+      )
+      Text(text = "Imperial (ft)")
+    }
     Spacer(modifier = Modifier.height(8.dp))
     Row(verticalAlignment = Alignment.CenterVertically) {
       Text(text = "Debug Log", style = MaterialTheme.typography.titleLarge)

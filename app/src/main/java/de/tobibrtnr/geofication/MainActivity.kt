@@ -9,6 +9,7 @@ import com.google.android.gms.maps.MapsInitializer
 import de.tobibrtnr.geofication.ui.GeoficationApp
 import de.tobibrtnr.geofication.ui.theme.GeoficationTheme
 import de.tobibrtnr.geofication.util.ServiceProvider
+import de.tobibrtnr.geofication.util.UnitUtil
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -18,6 +19,8 @@ class MainActivity : ComponentActivity() {
 
     MapsInitializer.initialize(this)
     ServiceProvider.setInstance(this)
+
+    UnitUtil.init()
 
     setContent {
       GeoficationTheme {
