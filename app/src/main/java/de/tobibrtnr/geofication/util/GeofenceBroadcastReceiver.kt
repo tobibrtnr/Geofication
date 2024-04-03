@@ -78,7 +78,7 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
 
           if (message.isNotEmpty()) {
 
-            LogUtil.addLog("Attempt to send Notification with message \"$message\"")
+            LogUtil.addLog("Attempt to send Notification with message \"$message\", \"${geofenceObject.fenceName}\"")
 
             thread {
               // x minutes in ms
@@ -86,8 +86,8 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
 
               sendNotification(
                 context,
-                "Geofence ${geofence.requestId} - $geofenceTransition",
-                message
+                message,
+                geofenceObject.fenceName
               )
             }
           } else {

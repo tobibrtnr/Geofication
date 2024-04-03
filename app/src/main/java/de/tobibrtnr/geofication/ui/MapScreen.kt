@@ -48,6 +48,7 @@ import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -79,13 +80,16 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
+import org.w3c.dom.Text
 import kotlin.math.roundToInt
 
 @Composable
 fun MapScreen(
   modifier: Modifier = Modifier,
-  topPadding: Dp
+  topPadding: Dp,
+  openGeoId: Int?
 ) {
 
   var uiSettings by remember {
@@ -101,6 +105,12 @@ fun MapScreen(
   }
 
   val context = LocalContext.current
+
+  val tmpGeofenceOpen = runBlocking {
+    if (openGeoId != null && openGeoId > 0) GeofenceUtil.getGeofenceById(openGeoId) else null
+  }
+
+  var openedGeofence by remember { mutableStateOf(tmpGeofenceOpen) }
 
   val mapStyleOptions = if (isSystemInDarkTheme()) MapStyleOptions.loadRawResourceStyle(
     context,
@@ -185,7 +195,7 @@ fun MapScreen(
 
   // Return Composable
   if (markerPopupVisible && selectedMarkerId >= 0) {
-    Dialog(onDismissRequest = { markerPopupVisible = false }) {
+    Dialog(onDismissRequest = { markerPopupVisible = false; openedGeofence = null }) {
       Card(
         modifier = Modifier
           .fillMaxWidth()
@@ -198,60 +208,73 @@ fun MapScreen(
           verticalArrangement = Arrangement.Center,
           horizontalAlignment = Alignment.CenterHorizontally
         ) {
-          Row {
-            Text(text = selectedMarkerId.toString(), fontWeight = FontWeight.Bold)
-            Spacer(modifier = Modifier.width(16.dp))
-            Icon(
-              imageVector = Icons.Filled.Delete,
-              contentDescription = "Delete geofence",
-              modifier = Modifier
-                .clickable {
-                  CoroutineScope(Dispatchers.Default).launch {
-                    GeofenceUtil.deleteGeofence(selectedMarkerId)
-
-                    val geofences = GeofenceUtil.getGeofences()
-                    geofencesArray = geofences
-
-                  }
-                  markerPopupVisible = false
-                }
-            )
-          }
-
-
-
           Spacer(modifier = Modifier.height(16.dp))
           var selectedGeofenceNotifs by remember { mutableStateOf(emptyList<Geofication>()) }
+          var selectedGeofence by remember { mutableStateOf<Geofence?>(null) }
           LaunchedEffect(Unit) {
             selectedGeofenceNotifs = GeofenceUtil.getGeoficationByGeofence(selectedMarkerId)
+            selectedGeofence = GeofenceUtil.getGeofenceById(selectedMarkerId)
           }
-          selectedGeofenceNotifs.forEach {
-            Row {
-              /*CircleWithColor(color = it.color.color, radius = 8.dp)
-              Spacer(modifier = Modifier.width(16.dp))*/
-              Text("${it.id} - ${it.message}")
-              Spacer(modifier = Modifier.width(16.dp))
-              Text(it.flags.toString())
-              Spacer(modifier = Modifier.width(16.dp))
-              Icon(
-                imageVector = Icons.Filled.Delete,
-                contentDescription = "Delete Geofication",
-                modifier = Modifier
-                  .clickable {
-                    CoroutineScope(Dispatchers.Default).launch {
-                      GeofenceUtil.deleteGeofication(it.id)
-                      selectedGeofenceNotifs =
-                        GeofenceUtil.getGeoficationByGeofence(selectedMarkerId)
+          selectedGeofence?.let {
+            selectedGeofenceNotifs.forEach {
+              Row {
+                CircleWithColor(color = selectedGeofence!!.color.color, radius = 8.dp)
+                Spacer(modifier = Modifier.width(16.dp))
+                Text(
+                  it.message,
+                  maxLines = 1,
+                  overflow = TextOverflow.Ellipsis,
+                  style = MaterialTheme.typography.titleMedium
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Icon(
+                  imageVector = Icons.Filled.Delete,
+                  contentDescription = "Delete Geofication",
+                  modifier = Modifier
+                    .clickable {
+                      CoroutineScope(Dispatchers.Default).launch {
+                        GeofenceUtil.deleteGeofence(selectedMarkerId)
+
+                        val geofences = GeofenceUtil.getGeofences()
+                        geofencesArray = geofences
+
+                      }
+                      markerPopupVisible = false
+                      openedGeofence = null
                     }
-                  }
-              )
+                )
+              }
+              Spacer(Modifier.height(8.dp))
+
+              Row { Text(selectedGeofence!!.fenceName) }
             }
-            Spacer(Modifier.height(8.dp))
           }
         }
       }
     }
   }
+
+  // Move to geofence if one is selected on startup
+  if (openedGeofence != null) {
+    markerPopupVisible = true
+    selectedMarkerId = openedGeofence!!.id
+    MainScope().launch {
+      cameraPositionState.animate(
+        CameraUpdateFactory.newCameraPosition(
+          CameraPosition(
+            LatLng(openedGeofence!!.latitude, openedGeofence!!.longitude),
+            15f,
+            0f,
+            0f
+          )
+        )
+      )
+    }
+  }
+
+
+
+
   if (openDialog) {
     AddGeoficationPopup { openDialog = false }
   }
@@ -366,14 +389,18 @@ fun MapScreen(
           geoficationsArray.filter {
             it.active
           }.sortedBy {
-            val fence = geofencesArray.first { it2 ->
+            val fence = geofencesArray.firstOrNull() { it2 ->
               it2.id == it.fenceid
             }
 
-            SphericalUtil.computeDistanceBetween(
-              LatLng(fence.latitude, fence.longitude),
-              currentLocation
-            ) - fence.radius
+            if (fence == null) {
+              Double.MAX_VALUE
+            } else {
+              SphericalUtil.computeDistanceBetween(
+                LatLng(fence.latitude, fence.longitude),
+                currentLocation
+              ) - fence.radius
+            }
           }.forEach {
 
             var fence: Geofence? = null

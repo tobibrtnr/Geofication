@@ -28,7 +28,7 @@ fun sendNotification(context: Context, title: String, message: String) {
     .setSmallIcon(R.drawable.ic_notification)
     .setContentTitle(title)
     .setContentText(message)
-    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+    .setPriority(NotificationCompat.PRIORITY_MAX)
 
   // Show the notification
   with(NotificationManagerCompat.from(context)) {

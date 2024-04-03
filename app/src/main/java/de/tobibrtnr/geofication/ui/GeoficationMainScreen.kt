@@ -31,6 +31,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
@@ -38,6 +39,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 
 enum class GeoficationScreen(val title: String, val icon: ImageVector) {
   Start(title = "Map", icon = Icons.Outlined.Map),
+
   //Geofences(title = "Geofences", icon = Icons.Outlined.Circle),
   Geofications(title = "Geofications", icon = Icons.Outlined.Notifications),
   Settings(title = "Settings", icon = Icons.Outlined.Settings)
@@ -100,7 +102,9 @@ fun GeoficationApp(
               },
               onClick = {
                 navigationSelectedItem = index
-                navController.navigate(navItem.name) {
+                var target = navItem.name
+                if (target == GeoficationScreen.Start.name) target += "/0"
+                navController.navigate(target) {
                   popUpTo(navController.graph.findStartDestination().id) {
                     saveState = true
                   }
@@ -116,13 +120,17 @@ fun GeoficationApp(
       val ld = LocalLayoutDirection.current
       NavHost(
         navController = navController,
-        startDestination = GeoficationScreen.Start.name,
+        startDestination = "${GeoficationScreen.Start.name}/{openGeofence}",
         modifier = Modifier
           .fillMaxSize()
         //.verticalScroll(rememberScrollState())
         //.padding(innerPadding)
       ) {
-        composable(route = GeoficationScreen.Start.name) {
+        composable(
+          route = "${GeoficationScreen.Start.name}/{openGeofence}",
+          arguments = listOf(navArgument("openGeofence") { defaultValue = 0 })
+        ) { backStackEntry ->
+          val openGeofence = backStackEntry.arguments?.getInt("openGeofence", 0)
           Box(
             modifier = Modifier.padding(
               innerPadding.calculateStartPadding(ld),
@@ -133,7 +141,8 @@ fun GeoficationApp(
           ) {
             MapScreen(
               modifier = Modifier.fillMaxHeight(),
-              topPadding = innerPadding.calculateTopPadding()
+              topPadding = innerPadding.calculateTopPadding(),
+              openGeofence
             )
           }
         }
@@ -154,7 +163,8 @@ fun GeoficationApp(
         composable(route = GeoficationScreen.Geofications.name) {
           Box(modifier = Modifier.padding(innerPadding)) {
             GeoficationsScreen(
-              modifier = Modifier.fillMaxSize()
+              modifier = Modifier.fillMaxSize(),
+              navController = navController
             )
           }
         }

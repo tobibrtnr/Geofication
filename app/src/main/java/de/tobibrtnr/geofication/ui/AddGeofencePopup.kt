@@ -85,6 +85,8 @@ fun processInput(
     flags += 2
   }
 
+  println("GEOFENCE NAME: $name")
+
   val newGeofence = Geofence(
     fenceName = name,
     latitude = pos.latitude,
@@ -125,7 +127,7 @@ fun AddGeofencePopup(
   var selectedColor by remember { mutableStateOf(MarkerColor.RED) }
   var colorExpanded by remember { mutableStateOf(false) }
   var radius by remember { mutableStateOf((rad * UnitUtil.distanceFactor()).toInt().toString()) }
-  var name by remember { mutableStateOf("") }
+  var name by remember { mutableStateOf("Unnamed Geofence") }
 
   var message by remember { mutableStateOf("") }
 
@@ -142,16 +144,13 @@ fun AddGeofencePopup(
     // Implementation of GeocodeListener
     val listener = object : Geocoder.GeocodeListener {
       override fun onGeocode(addresses: MutableList<Address>) {
-        println(addresses)
-        name = if (addresses.size > 0) {
-          "Geofence in ${getLocationName(addresses[0])}"
-        } else {
-          "Unnamed Geofence"
+        if (addresses.size > 0) {
+          name = "Geofence in ${getLocationName(addresses[0])}"
         }
       }
 
       override fun onError(errorMessage: String?) {
-        println(errorMessage)
+        println("GEOCODER ERROR $errorMessage")
       }
     }
     geocoder.getFromLocation(pos.latitude, pos.longitude, 1, listener)

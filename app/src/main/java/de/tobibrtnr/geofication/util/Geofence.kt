@@ -1,5 +1,6 @@
 package de.tobibrtnr.geofication.util
 
+import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Database
