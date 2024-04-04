@@ -259,16 +259,10 @@ fun MapScreen(
     markerPopupVisible = true
     selectedMarkerId = openedGeofence!!.id
     MainScope().launch {
-      cameraPositionState.animate(
-        CameraUpdateFactory.newCameraPosition(
-          CameraPosition(
-            LatLng(openedGeofence!!.latitude, openedGeofence!!.longitude),
-            15f,
-            0f,
-            0f
-          )
-        )
-      )
+      val geoLocation = LatLng(openedGeofence!!.latitude, openedGeofence!!.longitude)
+      
+      cameraPositionState.position =
+        CameraPosition(geoLocation, 15f, 0f, 0f)
     }
   }
 

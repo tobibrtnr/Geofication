@@ -28,7 +28,7 @@ fun sendNotification(context: Context, title: String, message: String) {
     .setSmallIcon(R.drawable.ic_notification)
     .setContentTitle(title)
     .setContentText(message)
-    .setPriority(NotificationCompat.PRIORITY_MAX)
+    .setPriority(NotificationCompat.PRIORITY_HIGH)
 
   // Show the notification
   with(NotificationManagerCompat.from(context)) {
@@ -57,7 +57,7 @@ private fun createNotificationChannel(context: Context) {
     val channel = NotificationChannel(
       CHANNEL_ID,
       "Geofication",
-      NotificationManager.IMPORTANCE_DEFAULT
+      NotificationManager.IMPORTANCE_HIGH
     ).apply {
       description = "Geofication Notifications"
     }
