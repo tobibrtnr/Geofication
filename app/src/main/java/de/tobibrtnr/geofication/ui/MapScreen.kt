@@ -114,7 +114,7 @@ fun MapScreen(
 
   val mapStyleOptions = if (isSystemInDarkTheme()) MapStyleOptions.loadRawResourceStyle(
     context,
-    R.raw.google_maps_style_dark_mode
+    R.raw.google_maps_style_aubergine
   ) else null
 
   var properties by remember {

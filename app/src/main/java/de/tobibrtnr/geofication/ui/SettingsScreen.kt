@@ -36,6 +36,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import de.tobibrtnr.geofication.util.LogEntry
 import de.tobibrtnr.geofication.util.LogUtil
+import de.tobibrtnr.geofication.util.SettingsUtil
 import de.tobibrtnr.geofication.util.UnitUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -53,7 +54,7 @@ fun SettingsScreen(
   val context = LocalContext.current
   val uiModeManager = context.getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
 
-  var selectedMode by remember { mutableStateOf(uiModeManager.nightMode) }
+  var selectedMode by remember { mutableStateOf(SettingsUtil.getThemeMode()) }
 
   // true is meter, false is foot
   var selectedUnit by remember { mutableStateOf(UnitUtil.getDistanceUnit()) }
@@ -71,9 +72,9 @@ fun SettingsScreen(
     Text(text = "Theme", style = MaterialTheme.typography.titleLarge)
     Row(verticalAlignment = Alignment.CenterVertically) {
       RadioButton(
-        selected = selectedMode == UiModeManager.MODE_NIGHT_YES,
+        selected = selectedMode == "yes",
         onClick = {
-          selectedMode = UiModeManager.MODE_NIGHT_YES; uiModeManager.setApplicationNightMode(
+          selectedMode = "yes"; SettingsUtil.setThemeMode("yes"); uiModeManager.setApplicationNightMode(
           UiModeManager.MODE_NIGHT_YES
         )
         },
@@ -83,9 +84,9 @@ fun SettingsScreen(
 
     Row(verticalAlignment = Alignment.CenterVertically) {
       RadioButton(
-        selected = selectedMode == UiModeManager.MODE_NIGHT_NO,
+        selected = selectedMode == "no",
         onClick = {
-          selectedMode = UiModeManager.MODE_NIGHT_NO; uiModeManager.setApplicationNightMode(
+          selectedMode = "no"; SettingsUtil.setThemeMode("no"); uiModeManager.setApplicationNightMode(
           UiModeManager.MODE_NIGHT_NO
         )
         },
@@ -95,9 +96,9 @@ fun SettingsScreen(
 
     Row(verticalAlignment = Alignment.CenterVertically) {
       RadioButton(
-        selected = selectedMode == UiModeManager.MODE_NIGHT_AUTO,
+        selected = selectedMode == "auto",
         onClick = {
-          selectedMode = UiModeManager.MODE_NIGHT_AUTO; uiModeManager.setApplicationNightMode(
+          selectedMode = "auto"; SettingsUtil.setThemeMode("auto"); uiModeManager.setApplicationNightMode(
           UiModeManager.MODE_NIGHT_AUTO
         )
         },
