@@ -1,6 +1,5 @@
-package de.tobibrtnr.geofication.util
+package de.tobibrtnr.geofication.util.storage
 
-import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Database
@@ -11,7 +10,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.RoomDatabase
-import de.tobibrtnr.geofication.ui.MarkerColor
+import de.tobibrtnr.geofication.ui.common.MarkerColor
 
 @Entity
 data class Geofence(

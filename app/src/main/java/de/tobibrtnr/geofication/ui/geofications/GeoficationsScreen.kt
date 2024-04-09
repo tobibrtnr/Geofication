@@ -1,9 +1,7 @@
-package de.tobibrtnr.geofication.ui
+package de.tobibrtnr.geofication.ui.geofications
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -33,15 +31,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import de.tobibrtnr.geofication.util.AppDatabase
-import de.tobibrtnr.geofication.util.Geofence
-import de.tobibrtnr.geofication.util.GeofenceUtil
-import de.tobibrtnr.geofication.util.Geofication
+import de.tobibrtnr.geofication.ui.GeoficationScreen
+import de.tobibrtnr.geofication.ui.common.CircleWithColor
+import de.tobibrtnr.geofication.util.storage.Geofence
+import de.tobibrtnr.geofication.util.storage.GeofenceUtil
+import de.tobibrtnr.geofication.util.storage.Geofication
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

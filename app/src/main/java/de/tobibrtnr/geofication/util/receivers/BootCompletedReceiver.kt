@@ -1,8 +1,10 @@
-package de.tobibrtnr.geofication.util
+package de.tobibrtnr.geofication.util.receivers
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import de.tobibrtnr.geofication.util.storage.GeofenceUtil
+import de.tobibrtnr.geofication.util.misc.ServiceProvider
 import kotlinx.coroutines.runBlocking
 
 

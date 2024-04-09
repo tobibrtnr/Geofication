@@ -1,10 +1,11 @@
-package de.tobibrtnr.geofication.util
+package de.tobibrtnr.geofication.util.misc
 
 import android.content.Context
 import androidx.room.Room
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.GeofencingClient
 import com.google.android.gms.location.LocationServices
+import de.tobibrtnr.geofication.util.storage.AppDatabase
 import java.lang.IllegalStateException
 
 class ServiceProvider private constructor(context: Context) {

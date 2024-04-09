@@ -1,4 +1,4 @@
-package de.tobibrtnr.geofication.util
+package de.tobibrtnr.geofication.util.storage
 
 import android.app.PendingIntent
 import android.content.Context
@@ -6,6 +6,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.GeofencingRequest
+import de.tobibrtnr.geofication.util.misc.ServiceProvider
+import de.tobibrtnr.geofication.util.receivers.GeofenceBroadcastReceiver
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

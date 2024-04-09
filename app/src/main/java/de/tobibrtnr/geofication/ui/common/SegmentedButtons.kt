@@ -1,4 +1,4 @@
-package de.tobibrtnr.geofication.ui
+package de.tobibrtnr.geofication.ui.common
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row

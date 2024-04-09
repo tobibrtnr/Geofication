@@ -1,4 +1,4 @@
-package de.tobibrtnr.geofication.ui
+package de.tobibrtnr.geofication.ui.map
 
 import android.content.Context
 import android.location.Address
@@ -21,7 +21,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext

@@ -1,13 +1,11 @@
-package de.tobibrtnr.geofication.ui
+package de.tobibrtnr.geofication.ui.map
 
 import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Point
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -20,21 +18,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.LocationSearching
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Satellite
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.AssistChipDefaults
-import androidx.compose.material3.Card
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -43,19 +33,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
@@ -65,24 +50,22 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapType
 import com.google.maps.android.compose.MapUiSettings
-import com.google.maps.android.compose.MarkerInfoWindow
-import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.widgets.DisappearingScaleBar
 import de.tobibrtnr.geofication.R
-import de.tobibrtnr.geofication.util.Geofence
-import de.tobibrtnr.geofication.util.GeofenceUtil
-import de.tobibrtnr.geofication.util.Geofication
-import de.tobibrtnr.geofication.util.ServiceProvider
-import de.tobibrtnr.geofication.util.UnitUtil
-import de.tobibrtnr.geofication.util.Vibrate
+import de.tobibrtnr.geofication.ui.common.MarkerColor
+import de.tobibrtnr.geofication.util.misc.ServiceProvider
+import de.tobibrtnr.geofication.util.misc.Vibrate
+import de.tobibrtnr.geofication.util.storage.Geofence
+import de.tobibrtnr.geofication.util.storage.GeofenceUtil
+import de.tobibrtnr.geofication.util.storage.Geofication
+import de.tobibrtnr.geofication.util.storage.UnitUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
-import org.w3c.dom.Text
 import kotlin.math.roundToInt
 
 @Composable
@@ -128,6 +111,25 @@ fun MapScreen(
     )
   }
 
+  // Fetch all active geofences from storage
+  var geofencesArray by remember { mutableStateOf(emptyList<Geofence>()) }
+  var geoficationsArray by remember { mutableStateOf(emptyList<Geofication>()) }
+
+  var tempGeofenceLocation by remember { mutableStateOf<LatLng?>(null) }
+  var tempGeofenceRadius by remember { mutableStateOf(30.0) }
+
+  var openDialogGeofence by remember { mutableStateOf(false) }
+
+  var selectedPosition by remember { mutableStateOf(LatLng(0.0, 0.0)) }
+  var newRadius by remember { mutableStateOf(0.0) }
+
+  var isMapLoaded by remember { mutableStateOf(false) }
+
+  var markerPopupVisible by remember { mutableStateOf(false) }
+  var selectedMarkerId by remember { mutableStateOf(-1) }
+
+  val geoficationsRow = rememberScrollState()
+
   val cameraPositionState = rememberCameraPositionState {
     CameraPosition.fromLatLngZoom(LatLng(0.0, 0.0), 10f)
   }
@@ -161,31 +163,11 @@ fun MapScreen(
     }
   }
 
-  // Fetch all active geofences from storage
-  var geofencesArray by remember { mutableStateOf(emptyList<Geofence>()) }
-  var geoficationsArray by remember { mutableStateOf(emptyList<Geofication>()) }
-
   LaunchedEffect(Unit) {
     val geofences = GeofenceUtil.getGeofences()
     geofencesArray = geofences
     geoficationsArray = GeofenceUtil.getGeofications()
   }
-
-  var tempGeofenceLocation by remember { mutableStateOf<LatLng?>(null) }
-  var tempGeofenceRadius by remember { mutableStateOf(30.0) }
-
-  var openDialog by remember { mutableStateOf(false) }
-  var openDialogGeofence by remember { mutableStateOf(false) }
-
-  var selectedPosition by remember { mutableStateOf(LatLng(0.0, 0.0)) }
-  var newRadius by remember { mutableStateOf(0.0) }
-
-  var isMapLoaded by remember { mutableStateOf(false) }
-
-  var markerPopupVisible by remember { mutableStateOf(false) }
-  var selectedMarkerId by remember { mutableStateOf(-1) }
-
-  val geoficationsRow = rememberScrollState()
 
   fun longClick(latLng: LatLng, tempGeofenceRadius: Double) {
     newRadius = tempGeofenceRadius
@@ -195,63 +177,20 @@ fun MapScreen(
 
   // Return Composable
   if (markerPopupVisible && selectedMarkerId >= 0) {
-    Dialog(onDismissRequest = { markerPopupVisible = false; openedGeofence = null }) {
-      Card(
-        modifier = Modifier
-          .fillMaxWidth()
-          .height(400.dp)
-          .padding(16.dp),
-        shape = RoundedCornerShape(16.dp)
-      ) {
-        Column(
-          modifier = Modifier.fillMaxSize(),
-          verticalArrangement = Arrangement.Center,
-          horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-          Spacer(modifier = Modifier.height(16.dp))
-          var selectedGeofenceNotifs by remember { mutableStateOf(emptyList<Geofication>()) }
-          var selectedGeofence by remember { mutableStateOf<Geofence?>(null) }
-          LaunchedEffect(Unit) {
-            selectedGeofenceNotifs = GeofenceUtil.getGeoficationByGeofence(selectedMarkerId)
-            selectedGeofence = GeofenceUtil.getGeofenceById(selectedMarkerId)
-          }
-          selectedGeofence?.let {
-            selectedGeofenceNotifs.forEach {
-              Row {
-                CircleWithColor(color = selectedGeofence!!.color.color, radius = 8.dp)
-                Spacer(modifier = Modifier.width(16.dp))
-                Text(
-                  it.message,
-                  maxLines = 1,
-                  overflow = TextOverflow.Ellipsis,
-                  style = MaterialTheme.typography.titleMedium
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-                Icon(
-                  imageVector = Icons.Filled.Delete,
-                  contentDescription = "Delete Geofication",
-                  modifier = Modifier
-                    .clickable {
-                      CoroutineScope(Dispatchers.Default).launch {
-                        GeofenceUtil.deleteGeofence(selectedMarkerId)
+    GeoficationPopup(selectedMarkerId, {
+      markerPopupVisible = false
+      openedGeofence = null
+    }, {
+      CoroutineScope(Dispatchers.Default).launch {
+        GeofenceUtil.deleteGeofence(selectedMarkerId)
 
-                        val geofences = GeofenceUtil.getGeofences()
-                        geofencesArray = geofences
+        val geofences = GeofenceUtil.getGeofences()
+        geofencesArray = geofences
 
-                      }
-                      markerPopupVisible = false
-                      openedGeofence = null
-                    }
-                )
-              }
-              Spacer(Modifier.height(8.dp))
-
-              Row { Text(selectedGeofence!!.fenceName) }
-            }
-          }
-        }
       }
-    }
+      markerPopupVisible = false
+      openedGeofence = null
+    })
   }
 
   // Move to geofence if one is selected on startup
@@ -260,18 +199,12 @@ fun MapScreen(
     selectedMarkerId = openedGeofence!!.id
     MainScope().launch {
       val geoLocation = LatLng(openedGeofence!!.latitude, openedGeofence!!.longitude)
-      
+
       cameraPositionState.position =
         CameraPosition(geoLocation, 15f, 0f, 0f)
     }
   }
 
-
-
-
-  if (openDialog) {
-    AddGeoficationPopup { openDialog = false }
-  }
   if (openDialogGeofence) {
     AddGeofencePopup(selectedPosition, newRadius) {
       CoroutineScope(Dispatchers.Default).launch {
@@ -396,7 +329,6 @@ fun MapScreen(
               ) - fence.radius
             }
           }.forEach {
-
             var fence: Geofence? = null
             var meterText = ""
             try {
@@ -420,37 +352,7 @@ fun MapScreen(
             }
 
             fence?.let { _ ->
-              AssistChip(
-                shape = CircleShape,
-                border = AssistChipDefaults.assistChipBorder(enabled = false),
-                colors = AssistChipDefaults.assistChipColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-                onClick = {
-                  MainScope().launch {
-                    cameraPositionState.animate(
-                      CameraUpdateFactory.newCameraPosition(
-                        CameraPosition(
-                          LatLng(fence.latitude, fence.longitude),
-                          15f,
-                          0f,
-                          0f
-                        )
-                      )
-                    )
-                  }
-                },
-                label = {
-                  Text(
-                    "${
-                      it.message.take(15).trim()
-                    }${if (it.message.length > 15) "..." else ""} | $meterText"
-                  )
-                },
-                leadingIcon = {
-                  CircleWithColor(
-                    color = fence.color.color,
-                    radius = 8.dp
-                  )
-                })
+              GeoficationChip(fence, it, meterText, cameraPositionState)
             }
             Spacer(Modifier.width(8.dp))
           }
@@ -464,7 +366,6 @@ fun MapScreen(
       uiSettings = uiSettings,
       properties = properties,
       onMapLongClick = {
-        println("HERE ON MAP LONG CLICK IS REGISTERED")
         Vibrate.vibrate(context, 15)
         tempGeofenceLocation = it
 
@@ -540,44 +441,19 @@ fun MapScreen(
 
       // Place each Geofence as Marker and Circle on the Map
       geofencesArray.forEach { geo ->
-        val bdf = BitmapDescriptorFactory.defaultMarker(geo.color.hue)
-
-        val mState = MarkerState(position = LatLng(geo.latitude, geo.longitude))
-        MarkerInfoWindow(
-          alpha = if (geo.active) 1.0f else 0.25f,
-          state = mState,
-          title = geo.fenceName,
-          onClick = {
-            markerPopupVisible = true
-            selectedMarkerId = geo.id
-            MainScope().launch {
-              cameraPositionState.animate(
-                CameraUpdateFactory.newCameraPosition(
-                  CameraPosition(
-                    LatLng(geo.latitude, geo.longitude),
-                    15f,
-                    0f,
-                    0f
-                  )
+        MarkerCircle(geo) {
+          markerPopupVisible = true
+          selectedMarkerId = geo.id
+          MainScope().launch {
+            cameraPositionState.animate(
+              CameraUpdateFactory.newCameraPosition(
+                CameraPosition(
+                  LatLng(geo.latitude, geo.longitude), 15f, 0f, 0f
                 )
               )
-            }
-            false
-          },
-          icon = bdf,
-          content = { _ ->
-            Text("")
+            )
           }
-
-        )
-        Circle(
-          center = LatLng(geo.latitude, geo.longitude),
-          radius = geo.radius.toDouble(),
-          strokeColor = if (geo.active) geo.color.color else geo.color.color.copy(alpha = 0.3f),
-          fillColor = if (geo.active) geo.color.color.copy(alpha = 0.25f) else geo.color.color.copy(
-            alpha = 0.1f
-          )
-        )
+        }
       }
     }
 

@@ -36,11 +36,13 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.accompanist.permissions.rememberPermissionState
+import de.tobibrtnr.geofication.ui.geofications.GeoficationsScreen
+import de.tobibrtnr.geofication.ui.map.MapScreen
+import de.tobibrtnr.geofication.ui.settings.SettingsScreen
+import de.tobibrtnr.geofication.ui.startup.PermissionScreen
 
 enum class GeoficationScreen(val title: String, val icon: ImageVector) {
   Start(title = "Map", icon = Icons.Outlined.Map),
-
-  //Geofences(title = "Geofences", icon = Icons.Outlined.Circle),
   Geofications(title = "Geofications", icon = Icons.Outlined.Notifications),
   Settings(title = "Settings", icon = Icons.Outlined.Settings)
 }
@@ -153,13 +155,6 @@ fun GeoficationApp(
             )
           }
         }
-        /*composable(route = GeoficationScreen.Geofences.name) {
-          Box(modifier = Modifier.padding(innerPadding)) {
-            GeofencesScreen(
-              modifier = Modifier.fillMaxSize()
-            )
-          }
-        }*/
         composable(route = GeoficationScreen.Geofications.name) {
           Box(modifier = Modifier.padding(innerPadding)) {
             GeoficationsScreen(

@@ -1,8 +1,7 @@
-package de.tobibrtnr.geofication.ui
+package de.tobibrtnr.geofication.ui.settings
 
 import android.app.UiModeManager
 import android.content.Context
-import android.content.res.Configuration
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatDelegate
@@ -31,13 +30,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import de.tobibrtnr.geofication.util.LogEntry
-import de.tobibrtnr.geofication.util.LogUtil
-import de.tobibrtnr.geofication.util.SettingsUtil
-import de.tobibrtnr.geofication.util.UnitUtil
+import de.tobibrtnr.geofication.util.storage.LogEntry
+import de.tobibrtnr.geofication.util.storage.LogUtil
+import de.tobibrtnr.geofication.util.storage.SettingsUtil
+import de.tobibrtnr.geofication.util.storage.UnitUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
@@ -134,14 +132,8 @@ fun SettingsScreen(
       Spacer(Modifier.width(8.dp))
       Button(onClick = {
         CoroutineScope(SupervisorJob()).launch {
-          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            uiModeManager.setApplicationNightMode(UiModeManager.MODE_NIGHT_YES)
-          } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-          }
-
-          //LogUtil.deleteAll()
-          //logEntryArray = LogUtil.getLogs()
+          LogUtil.deleteAll()
+          logEntryArray = LogUtil.getLogs()
         }
       }) {
         Text("Clear Log")

@@ -1,4 +1,4 @@
-package de.tobibrtnr.geofication.util
+package de.tobibrtnr.geofication.util.receivers
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -6,6 +6,10 @@ import android.content.Intent
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofenceStatusCodes
 import com.google.android.gms.location.GeofencingEvent
+import de.tobibrtnr.geofication.util.storage.GeofenceUtil
+import de.tobibrtnr.geofication.util.storage.LogUtil
+import de.tobibrtnr.geofication.util.misc.ServiceProvider
+import de.tobibrtnr.geofication.util.misc.sendNotification
 import kotlinx.coroutines.runBlocking
 import kotlin.concurrent.thread
 

@@ -1,4 +1,4 @@
-package de.tobibrtnr.geofication.util
+package de.tobibrtnr.geofication.util.misc
 
 import android.Manifest
 import android.app.Activity

@@ -1,4 +1,4 @@
-package de.tobibrtnr.geofication.util
+package de.tobibrtnr.geofication.util.misc
 
 import android.content.Context
 import android.os.Build

@@ -1,11 +1,10 @@
-package de.tobibrtnr.geofication.ui
+package de.tobibrtnr.geofication.ui.map
 
 import android.content.Context
 import android.location.Address
 import android.location.Geocoder
 import android.os.Build
 import android.widget.Toast
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,7 +16,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -47,16 +45,18 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.google.android.gms.maps.model.LatLng
-import de.tobibrtnr.geofication.util.Geofence
-import de.tobibrtnr.geofication.util.GeofenceUtil
-import de.tobibrtnr.geofication.util.Geofication
-import de.tobibrtnr.geofication.util.UnitUtil
+import de.tobibrtnr.geofication.ui.common.MarkerColor
+import de.tobibrtnr.geofication.ui.common.SegmentedButtons
+import de.tobibrtnr.geofication.ui.common.SegmentedRadioButtons
+import de.tobibrtnr.geofication.ui.common.CircleWithColor
+import de.tobibrtnr.geofication.util.storage.Geofence
+import de.tobibrtnr.geofication.util.storage.GeofenceUtil
+import de.tobibrtnr.geofication.util.storage.Geofication
+import de.tobibrtnr.geofication.util.storage.UnitUtil
 
 fun processInput(
   context: Context,
@@ -368,15 +368,7 @@ fun AddGeofencePopup(
   }
 }
 
-@Composable
-fun CircleWithColor(modifier: Modifier = Modifier, color: Color, radius: Dp) {
-  Box(
-    modifier = modifier
-      .size(radius * 2)
-      .clip(CircleShape)
-      .background(color)
-  )
-}
+
 
 @Composable
 fun NumericUnitTransformation() = VisualTransformation { text ->
