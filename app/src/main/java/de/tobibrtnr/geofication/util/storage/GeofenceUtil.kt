@@ -44,14 +44,15 @@ class GeofenceUtil {
     fun addGeofence(
       context: Context,
       daoGeofence: Geofence,
-      daoGeofication: Geofication? = null
+      daoGeofication: Geofication? = null,
+      forceAddGeofence: Boolean = false
     ) {
       val db = ServiceProvider.database()
       val geofencingClient = ServiceProvider.geofence()
 
       // Coroutine in order to add geofence asynchronously to storage
       CoroutineScope(SupervisorJob()).launch {
-        val newId = if (daoGeofence.id <= 0) {
+        val newId = if (daoGeofence.id <= 0 || forceAddGeofence) {
           // Add geofence to local database
           val geofenceDao = db.geofenceDao()
           geofenceDao.insert(daoGeofence).toInt()

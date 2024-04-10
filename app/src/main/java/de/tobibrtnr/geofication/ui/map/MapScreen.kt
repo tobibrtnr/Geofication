@@ -177,7 +177,7 @@ fun MapScreen(
 
   // Return Composable
   if (markerPopupVisible && selectedMarkerId >= 0) {
-    GeoficationPopup(selectedMarkerId, {
+    EditGeoficationPopup(selectedMarkerId, {
       markerPopupVisible = false
       openedGeofence = null
     }, {

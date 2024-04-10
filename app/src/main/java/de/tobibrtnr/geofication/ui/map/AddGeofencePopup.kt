@@ -53,10 +53,12 @@ import de.tobibrtnr.geofication.ui.common.MarkerColor
 import de.tobibrtnr.geofication.ui.common.SegmentedButtons
 import de.tobibrtnr.geofication.ui.common.SegmentedRadioButtons
 import de.tobibrtnr.geofication.ui.common.CircleWithColor
+import de.tobibrtnr.geofication.util.misc.NumericUnitTransformation
 import de.tobibrtnr.geofication.util.storage.Geofence
 import de.tobibrtnr.geofication.util.storage.GeofenceUtil
 import de.tobibrtnr.geofication.util.storage.Geofication
 import de.tobibrtnr.geofication.util.storage.UnitUtil
+import kotlin.math.roundToInt
 
 fun processInput(
   context: Context,
@@ -311,7 +313,7 @@ fun AddGeofencePopup(
           modifier = Modifier.fillMaxWidth()
         ) {
           Text(
-            text = "${delay.toInt()} minutes",
+            text = "${delay.roundToInt()} minutes",
             modifier = Modifier.padding(start = 16.dp)
           )
 
@@ -353,7 +355,7 @@ fun AddGeofencePopup(
                 message,
                 flags,
                 onTrigger,
-                delay.toInt()
+                delay.roundToInt()
               )
               onDismissRequest()
             },
@@ -366,27 +368,6 @@ fun AddGeofencePopup(
       }
     }
   }
-}
-
-
-
-@Composable
-fun NumericUnitTransformation() = VisualTransformation { text ->
-  TransformedText(
-    text = buildAnnotatedString {
-      append(text)
-      append(" ${UnitUtil.distanceUnit()}")
-    },
-    offsetMapping = object : OffsetMapping {
-      override fun originalToTransformed(offset: Int): Int {
-        return offset
-      }
-
-      override fun transformedToOriginal(offset: Int): Int {
-        return if (offset <= text.length) offset else text.length
-      }
-    }
-  )
 }
 
 fun getLocationName(address: Address): String {

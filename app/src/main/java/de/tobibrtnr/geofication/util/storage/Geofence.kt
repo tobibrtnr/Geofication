@@ -20,9 +20,9 @@ data class Geofence(
   val fenceName: String,
   val latitude: Double,
   val longitude: Double,
-  val radius: Float,
+  var radius: Float,
 
-  val color: MarkerColor,
+  var color: MarkerColor,
   val active: Boolean,
   val triggerCount: Int
 )
@@ -40,12 +40,12 @@ data class Geofication(
   val id: Int = 0,
   @ColumnInfo(index = true) var fenceid: Int,
 
-  val message: String,
-  val flags: Int,
-  val delay: Int,
+  var message: String,
+  var flags: Int,
+  var delay: Int,
   val repeat: Boolean,
   val active: Boolean,
-  val onTrigger: Int,
+  var onTrigger: Int,
   val triggerCount: Int
 )
 
