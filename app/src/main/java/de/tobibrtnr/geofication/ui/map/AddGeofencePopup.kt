@@ -39,11 +39,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.OffsetMapping
-import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -284,7 +281,7 @@ fun AddGeofencePopup(
           modifier = Modifier.padding(start = 16.dp)
         )
 
-        SegmentedButtons("entering", "exiting") { flags = it }
+        SegmentedButtons("entering", "exiting", { flags = it })
 
         Text(
           text = "Behavior after triggering",

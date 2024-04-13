@@ -208,13 +208,13 @@ class GeofenceUtil {
     /**
      * Set active value for Geofication, also set Geofence active state
      */
-    suspend fun setNotifActive(fenceid: Int, isActive: Boolean) {
+    suspend fun setNotifActive(notifId: Int, isActive: Boolean) {
       withContext(Dispatchers.IO) {
         val db = ServiceProvider.database()
         val geoDao = db.geoficationDao()
-        geoDao.setActive(isActive, fenceid)
+        geoDao.setActive(isActive, notifId)
 
-        val geofication = geoDao.loadById(fenceid)
+        val geofication = geoDao.loadById(notifId)
         val geofenceDao = db.geofenceDao()
         geofenceDao.setActive(isActive, geofication.fenceid)
 

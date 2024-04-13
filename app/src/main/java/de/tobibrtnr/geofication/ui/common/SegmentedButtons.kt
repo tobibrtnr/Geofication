@@ -27,8 +27,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun SegmentedButtons(opt1: String, opt2: String, onValueChange: (List<String>) -> Unit) {
-  var selectedOptions by remember { mutableStateOf(listOf(opt1)) }
+fun SegmentedButtons(opt1: String, opt2: String, onValueChange: (List<String>) -> Unit, flags: Int = 1) {
+println("hello")
+
+  val initialList = mutableListOf<String>()
+  if(flags == 1 || flags == 3) {
+    initialList.add(opt1)
+  }
+  if(flags == 2 || flags == 3) {
+    initialList.add(opt2)
+  }
+
+  val selectedOptions by remember { mutableStateOf(initialList) }
 
   Row(
     modifier = Modifier
@@ -108,5 +118,5 @@ fun SegmentedButton(
 @Preview(showBackground = true)
 @Composable
 fun SegmentedButtonsPreview() {
-  SegmentedButtons(opt1 = "entering", opt2 = "exiting") {}
+  SegmentedButtons(opt1 = "entering", opt2 = "exiting", onValueChange = {})
 }

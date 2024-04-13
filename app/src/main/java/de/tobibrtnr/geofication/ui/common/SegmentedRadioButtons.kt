@@ -23,8 +23,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun SegmentedRadioButtons(opt1: String, opt2: String, opt3: String, onValueChange: (Int) -> Unit) {
-  var selectedOption by remember { mutableStateOf(1) }
+fun SegmentedRadioButtons(opt1: String, opt2: String, opt3: String, onValueChange: (Int) -> Unit, onTrigger: Int = 1) {
+  var selectedOption by remember { mutableStateOf(onTrigger) }
 
   Row(
     modifier = Modifier
@@ -100,5 +100,5 @@ fun SegmentedRadioButton(
 @Preview(showBackground = true)
 @Composable
 fun SegmentedRadioButtonsPreview() {
-  SegmentedRadioButtons(opt1 = "do nothing", opt2 = "deactivate", opt3 = "deactivate") {}
+  SegmentedRadioButtons(opt1 = "do nothing", opt2 = "deactivate", opt3 = "deactivate", {})
 }

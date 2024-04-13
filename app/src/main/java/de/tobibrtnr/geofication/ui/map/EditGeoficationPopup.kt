@@ -1,10 +1,6 @@
 package de.tobibrtnr.geofication.ui.map
 
 import android.content.Context
-import android.location.Address
-import android.location.Geocoder
-import android.os.Build
-import android.widget.Toast
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -45,16 +41,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.OffsetMapping
-import androidx.compose.ui.text.input.TransformedText
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.google.android.gms.maps.model.LatLng
 import de.tobibrtnr.geofication.ui.common.MarkerColor
 import de.tobibrtnr.geofication.ui.common.SegmentedButtons
 import de.tobibrtnr.geofication.ui.common.SegmentedRadioButtons
@@ -63,9 +54,7 @@ import de.tobibrtnr.geofication.util.misc.NumericUnitTransformation
 import de.tobibrtnr.geofication.util.storage.Geofence
 import de.tobibrtnr.geofication.util.storage.GeofenceUtil
 import de.tobibrtnr.geofication.util.storage.Geofication
-import de.tobibrtnr.geofication.util.storage.UnitUtil
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
@@ -75,6 +64,11 @@ fun processEdit(
   geofence: Geofence,
   geofication: Geofication
 ) {
+
+
+  CoroutineScope(SupervisorJob()).launch {
+    GeofenceUtil.setNotifActive(geofication.id, geofication.active)
+  }
 
   // TODO if Geofence is edited, it is immediately triggered
   GeofenceUtil.addGeofence(
@@ -105,6 +99,10 @@ fun EditGeoficationPopup(
 
     initialGeofication = selectedGeofication
     initialGeofence = selectedGeofence
+
+    println("EDIT GEOFICATION")
+    println(selectedGeofence)
+    println(selectedGeofication)
   }
 
   var colorExpanded by remember { mutableStateOf(false) }
@@ -276,10 +274,10 @@ fun EditGeoficationPopup(
             modifier = Modifier.padding(start = 16.dp)
           )
 
-          SegmentedButtons("entering", "exiting") {
+          SegmentedButtons("entering", "exiting", {
             selectedGeofication = selectedGeofication!!.copy(flags = getFlagsFromList(it))
             inputValid = isInputValid()
-          }
+          }, selectedGeofication!!.flags)
 
           Text(
             text = "Behavior after triggering",
@@ -294,7 +292,8 @@ fun EditGeoficationPopup(
             onValueChange = {
               selectedGeofication = selectedGeofication!!.copy(onTrigger = it)
               inputValid = isInputValid()
-            }
+            },
+            onTrigger = selectedGeofication!!.onTrigger
           )
 
           Text(
