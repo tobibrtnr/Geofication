@@ -23,7 +23,7 @@ data class Geofence(
   var radius: Float,
 
   var color: MarkerColor,
-  val active: Boolean,
+  var active: Boolean,
   val triggerCount: Int
 )
 

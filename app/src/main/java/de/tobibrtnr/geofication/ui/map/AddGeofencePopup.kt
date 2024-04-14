@@ -281,7 +281,7 @@ fun AddGeofencePopup(
           modifier = Modifier.padding(start = 16.dp)
         )
 
-        SegmentedButtons("entering", "exiting", { flags = it })
+        SegmentedButtons("entering", "exiting", { flags = it.toList() }, getFlagsFromList(flags))
 
         Text(
           text = "Behavior after triggering",

@@ -65,10 +65,7 @@ fun processEdit(
   geofication: Geofication
 ) {
 
-
-  CoroutineScope(SupervisorJob()).launch {
-    GeofenceUtil.setNotifActive(geofication.id, geofication.active)
-  }
+  geofence.active = geofication.active
 
   // TODO if Geofence is edited, it is immediately triggered
   GeofenceUtil.addGeofence(
@@ -93,20 +90,23 @@ fun EditGeoficationPopup(
 
   var selectedGeofication by remember { mutableStateOf<Geofication?>(null) }
   var selectedGeofence by remember { mutableStateOf<Geofence?>(null) }
+
+  var enabled by remember { mutableStateOf(false) }
+  var colorExpanded by remember { mutableStateOf(false) }
+  var inputValid by remember { mutableStateOf(false) }
+
   LaunchedEffect(Unit) {
     selectedGeofication = GeofenceUtil.getGeoficationByGeofence(selectedMarkerId)[0]
     selectedGeofence = GeofenceUtil.getGeofenceById(selectedMarkerId)
 
     initialGeofication = selectedGeofication
     initialGeofence = selectedGeofence
+    enabled = selectedGeofication!!.active
 
     println("EDIT GEOFICATION")
     println(selectedGeofence)
     println(selectedGeofication)
   }
-
-  var colorExpanded by remember { mutableStateOf(false) }
-  var inputValid by remember { mutableStateOf(false) }
 
   // Check if input is valid: Geofence or Geofication attribute changed + all inputs valid
   fun isInputValid(): Boolean {

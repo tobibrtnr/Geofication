@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -28,8 +29,6 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun SegmentedButtons(opt1: String, opt2: String, onValueChange: (List<String>) -> Unit, flags: Int = 1) {
-println("hello")
-
   val initialList = mutableListOf<String>()
   if(flags == 1 || flags == 3) {
     initialList.add(opt1)
@@ -60,7 +59,7 @@ println("hello")
         onValueChange(selectedOptions)
       },
       shape = RoundedCornerShape(topStartPercent = 50, bottomStartPercent = 50),
-      icon = Icons.Filled.ArrowForward
+      icon = Icons.AutoMirrored.Filled.ArrowForward
     )
     SegmentedButton(
       option = opt2,
