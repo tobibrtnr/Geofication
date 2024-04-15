@@ -53,49 +53,42 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
 
         runBlocking {
           // Check if geofence is active
-          val geofenceObject = GeofenceUtil.getGeofenceById(geofence.requestId.toInt())
-          if (!geofenceObject.active) return@runBlocking
+          val tFence = GeofenceUtil.getGeofenceById(geofence.requestId.toInt())
+          if (!tFence.active) return@runBlocking
 
           GeofenceUtil.incrementFenceTriggerCount(geofence.requestId.toInt())
 
           val geofications = GeofenceUtil.getGeoficationByGeofence(geofence.requestId.toInt())
 
-          var message = ""
-          geofications.forEach {
-            LogUtil.addLog(
-              "Geofence ${it.id}\n" +
-                  "Triggered? ${(it.flags == geofenceTransition || it.flags == 3) && it.active}"
-            )
-            // If the flags equals the triggered one or is both, and the geofication is active:
-            if ((it.flags == geofenceTransition || it.flags == 3) && it.active) {
-              GeofenceUtil.incrementNotifTriggerCount(it.id)
-              message += "${it.message}, "
-              delay = it.delay
-            }
-
-            when (it.onTrigger) {
-              1 -> GeofenceUtil.setNotifActive(it.id, false)
-              2 -> GeofenceUtil.deleteGeofence(geofenceObject.id)
-            }
+          if (geofications.isEmpty()) {
+            return@runBlocking
           }
-          message = message.dropLast(2)
 
-          if (message.isNotEmpty()) {
+          val tNotif = geofications[0]
 
-            LogUtil.addLog("Attempt to send Notification with message \"$message\", \"${geofenceObject.fenceName}\"")
+          // If the flags equals the triggered one or is both, and the geofication is active:
+          if ((tNotif.flags == geofenceTransition || tNotif.flags == 3) && tNotif.active) {
+            GeofenceUtil.incrementNotifTriggerCount(tNotif.id)
+            delay = tNotif.delay
+          }
 
-            thread {
-              // x minutes in ms
-              Thread.sleep((delay * 60 * 1000).toLong())
+          when (tNotif.onTrigger) {
+            1 -> GeofenceUtil.setNotifActive(tNotif.id, false)
+            2 -> GeofenceUtil.deleteGeofence(tFence.id)
+          }
 
-              sendNotification(
-                context,
-                message,
-                geofenceObject.fenceName
-              )
-            }
-          } else {
-            println("No context for notification given.")
+          LogUtil.addLog("Attempt to send Notification \"${tNotif.message}\", \"${tFence.fenceName}\"")
+
+          thread {
+            // x minutes in ms
+            // TODO does not work on real device
+            Thread.sleep((delay * 60 * 1000).toLong())
+
+            sendNotification(
+              context,
+              tFence,
+              tNotif
+            )
           }
         }
       }

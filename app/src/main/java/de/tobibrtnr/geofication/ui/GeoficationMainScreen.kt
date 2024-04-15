@@ -50,9 +50,9 @@ enum class GeoficationScreen(val title: String, val icon: ImageVector) {
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun GeoficationApp(
+  openGeoId: Int,
   navController: NavHostController = rememberNavController()
 ) {
-
   var navigationSelectedItem by remember {
     mutableStateOf(0)
   }
@@ -132,7 +132,10 @@ fun GeoficationApp(
           route = "${GeoficationScreen.Start.name}/{openGeofence}",
           arguments = listOf(navArgument("openGeofence") { defaultValue = 0 })
         ) { backStackEntry ->
-          val openGeofence = backStackEntry.arguments?.getInt("openGeofence", 0)
+          var openGeofence = backStackEntry.arguments?.getInt("openGeofence", 0)
+          if(openGeofence == 0 && openGeoId != 1) {
+            openGeofence = openGeoId
+          }
           Box(
             modifier = Modifier.padding(
               innerPadding.calculateStartPadding(ld),

@@ -217,9 +217,6 @@ class GeofenceUtil {
         val geofication = geoDao.loadById(notifId)
         val geofenceDao = db.geofenceDao()
         geofenceDao.setActive(isActive, geofication.fenceid)
-
-        println("Set Notif Active: $notifId, ${geofication.fenceid}, $isActive")
-
       }
     }
   }

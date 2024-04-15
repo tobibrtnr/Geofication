@@ -30,6 +30,15 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name=".util.receivers.NotificationReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="DISABLE_ACTION" />
+                <action android:name="DELETE_ACTION" />
+            </intent-filter>
+        </receiver>
+
         <receiver android:name=".util.receivers.BootCompletedReceiver"
             android:exported="false"
             android:enabled="true"

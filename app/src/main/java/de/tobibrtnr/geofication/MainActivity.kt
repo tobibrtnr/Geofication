@@ -21,9 +21,11 @@ class MainActivity : ComponentActivity() {
 
     UnitUtil.init()
 
+    val openGeoId = intent.getIntExtra("openGeoId", -1)
+
     setContent {
       GeoficationTheme {
-        GeoficationApp()
+        GeoficationApp(openGeoId = openGeoId)
       }
     }
   }
