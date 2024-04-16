@@ -134,6 +134,9 @@ fun MapScreen(
     CameraPosition.fromLatLngZoom(LatLng(0.0, 0.0), 10f)
   }
 
+  val searchInputState = remember { mutableStateOf("") }
+  var searchInput by searchInputState
+
   var currentLocation by remember { mutableStateOf(LatLng(0.0, 0.0)) }
 
   // If location permission is given, get it and set the camera position to it
@@ -305,60 +308,78 @@ fun MapScreen(
         LocationSearchBar(
           modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = 16.dp),
+          input = searchInputState
         ) {
+          searchInput = ""
           MainScope().launch {
             cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(it, 15f))
           }
         }
-        Row(Modifier.horizontalScroll(geoficationsRow)) {
-          Spacer(Modifier.width(16.dp))
-          geoficationsArray.filter {
-            it.active
-          }.sortedBy {
-            val fence = geofencesArray.firstOrNull() { it2 ->
-              it2.id == it.fenceid
-            }
 
-            if (fence == null) {
-              Double.MAX_VALUE
-            } else {
-              SphericalUtil.computeDistanceBetween(
-                LatLng(fence.latitude, fence.longitude),
-                currentLocation
-              ) - fence.radius
+        if (searchInput.isNotEmpty()) {
+          SearchResultList(searchInputState, searchGlobally = { query ->
+            searchLocation(query, context) {
+              searchInput = ""
+              MainScope().launch {
+                cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(it, 15f))
+              }
             }
-          }.forEach {
-            var fence: Geofence? = null
-            var meterText = ""
-            try {
-              fence = geofencesArray.first { it2 ->
+          }, goToLocation = { lat, lng ->
+            searchInput = ""
+            MainScope().launch {
+              cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), 15f))
+            }
+          })
+        } else {
+          Row(Modifier.horizontalScroll(geoficationsRow)) {
+            Spacer(Modifier.width(16.dp))
+            geoficationsArray.filter {
+              it.active
+            }.sortedBy {
+              val fence = geofencesArray.firstOrNull() { it2 ->
                 it2.id == it.fenceid
               }
 
-              val distance = (SphericalUtil.computeDistanceBetween(
-                LatLng(fence.latitude, fence.longitude),
-                currentLocation
-              ) - fence.radius).roundToInt()
-
-              meterText =
-                if (distance < 0) {
-                  "✅"
-                } else {
-                  UnitUtil.appendUnit(distance)
+              if (fence == null) {
+                Double.MAX_VALUE
+              } else {
+                SphericalUtil.computeDistanceBetween(
+                  LatLng(fence.latitude, fence.longitude),
+                  currentLocation
+                ) - fence.radius
+              }
+            }.forEach {
+              var fence: Geofence? = null
+              var meterText = ""
+              try {
+                fence = geofencesArray.first { it2 ->
+                  it2.id == it.fenceid
                 }
-            } catch (e: NoSuchElementException) {
-              println("no such element exception")
-            }
 
-            fence?.let { _ ->
-              GeoficationChip(fence, it, meterText, cameraPositionState)
+                val distance = (SphericalUtil.computeDistanceBetween(
+                  LatLng(fence.latitude, fence.longitude),
+                  currentLocation
+                ) - fence.radius).roundToInt()
+
+                meterText =
+                  if (distance < 0) {
+                    "✅"
+                  } else {
+                    UnitUtil.appendUnit(distance)
+                  }
+              } catch (e: NoSuchElementException) {
+                println("no such element exception")
+              }
+
+              fence?.let { _ ->
+                GeoficationChip(fence, it, meterText, cameraPositionState)
+              }
+              Spacer(Modifier.width(8.dp))
             }
             Spacer(Modifier.width(8.dp))
           }
-          Spacer(Modifier.width(8.dp))
         }
-
       }
     }
 

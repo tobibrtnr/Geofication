@@ -219,5 +219,16 @@ class GeofenceUtil {
         geofenceDao.setActive(isActive, geofication.fenceid)
       }
     }
+
+    /**
+     * Search for a query that matches the Geofication message or the geofence name.
+     */
+    suspend fun searchGeofications(query: String): List<GeoficationGeofence> {
+      return withContext(Dispatchers.IO) {
+        val db = ServiceProvider.database()
+        val geoDao = db.geoficationDao()
+        geoDao.searchGeofications(query)
+      }
+    }
   }
 }

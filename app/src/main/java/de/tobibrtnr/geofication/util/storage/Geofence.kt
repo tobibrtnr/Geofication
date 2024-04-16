@@ -10,7 +10,18 @@ import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.RoomDatabase
+import androidx.room.Transaction
 import de.tobibrtnr.geofication.ui.common.MarkerColor
+
+data class GeoficationGeofence(
+  val message: String,
+  val active: Boolean,
+
+  val fenceName: String,
+  val latitude: Double,
+  val longitude: Double,
+  var radius: Float,
+)
 
 @Entity
 data class Geofence(
@@ -128,6 +139,10 @@ interface GeoficationDao {
 
   @Query("UPDATE geofication SET active = 0 WHERE fenceid = :fenceid")
   fun deactivateAll(fenceid: Int)
+
+  @Transaction
+  @Query("SELECT geofication.message, geofication.active, geofence.fenceName, geofence.latitude, geofence.longitude, geofence.radius FROM geofication INNER JOIN geofence ON geofication.fenceId = geofence.id WHERE geofication.message LIKE '%' || :query || '%' OR geofence.fenceName LIKE '%' || :query || '%'")
+  fun searchGeofications(query: String): List<GeoficationGeofence>
 }
 
 @Dao
@@ -151,7 +166,10 @@ interface SettingsDao {
   fun getSetting(name: String): ByteArray
 }
 
-@Database(entities = [Geofence::class, Geofication::class, LogEntry::class, Setting::class], version = 1)
+@Database(
+  entities = [Geofence::class, Geofication::class, LogEntry::class, Setting::class],
+  version = 1
+)
 abstract class AppDatabase : RoomDatabase() {
   abstract fun geofenceDao(): GeofenceDao
   abstract fun geoficationDao(): GeoficationDao
