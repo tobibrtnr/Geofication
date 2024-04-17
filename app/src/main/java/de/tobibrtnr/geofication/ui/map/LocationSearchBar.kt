@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -31,11 +32,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.LatLng
 
 @Composable
-fun LocationSearchBar(modifier: Modifier = Modifier, input: MutableState<String>, callback: (LatLng) -> Unit) {
+fun LocationSearchBar(
+  modifier: Modifier = Modifier,
+  input: MutableState<String>,
+  callback: (LatLng) -> Unit
+) {
 
   val context = LocalContext.current
   val keyboardController = LocalSoftwareKeyboardController.current
@@ -44,39 +50,34 @@ fun LocationSearchBar(modifier: Modifier = Modifier, input: MutableState<String>
   var locationName by input
 
 
-  Box(
-    Modifier
-      .fillMaxWidth()
-      .wrapContentHeight()
-  ) {
-    TextField(
-      value = locationName,
-      leadingIcon = { Icon(Icons.Outlined.Search, contentDescription = "Search location") },
-      onValueChange = { locationName = it },
-      placeholder = { Text(text = "Search location or Geofication") },
-      modifier = modifier/*.clip(CircleShape)*/
-        .border(1.dp, Color.LightGray, CircleShape)
-        .shadow(elevation = 16.dp, shape = CircleShape),
-      //.padding(3.dp)
-      //textStyle = TextStyle(color = Color.Black, fontSize = 15.sp),
-      colors = TextFieldDefaults.colors(
-        focusedIndicatorColor = Color.Transparent,
-        unfocusedIndicatorColor = Color.Transparent,
-        disabledIndicatorColor = Color.Transparent
-      ),
-      singleLine = true,
-      keyboardOptions = KeyboardOptions(
-        imeAction = ImeAction.Search
-      ),
-      keyboardActions = KeyboardActions(
-        onSearch = {
-          keyboardController?.hide()
-          focusManager.clearFocus()
-          searchLocation(locationName, context, callback)
-        }
-      )
+  TextField(
+    value = locationName,
+    leadingIcon = { Icon(Icons.Outlined.Search, contentDescription = "Search location") },
+    onValueChange = { locationName = it },
+    placeholder = { Text(text = "Search location or Geofication", maxLines = 1, overflow = TextOverflow.Ellipsis) },
+    modifier = modifier/*.clip(CircleShape)*/
+      .border(1.dp, Color.LightGray, RoundedCornerShape(topStartPercent = 50, bottomStartPercent = 50))
+      .shadow(elevation = 16.dp, shape = RoundedCornerShape(topStartPercent = 50, bottomStartPercent = 50)),
+    //.padding(3.dp)
+    //textStyle = TextStyle(color = Color.Black, fontSize = 15.sp),
+    shape = RoundedCornerShape(topStartPercent = 50, bottomStartPercent = 50),
+    colors = TextFieldDefaults.colors(
+      focusedIndicatorColor = Color.Transparent,
+      unfocusedIndicatorColor = Color.Transparent,
+      disabledIndicatorColor = Color.Transparent
+    ),
+    singleLine = true,
+    keyboardOptions = KeyboardOptions(
+      imeAction = ImeAction.Search
+    ),
+    keyboardActions = KeyboardActions(
+      onSearch = {
+        keyboardController?.hide()
+        focusManager.clearFocus()
+        searchLocation(locationName, context, callback)
+      }
     )
-  }
+  )
 }
 
 fun searchLocation(locString: String, context: Context, callback: (LatLng) -> Unit) {
