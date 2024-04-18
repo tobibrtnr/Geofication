@@ -40,11 +40,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -120,6 +124,12 @@ fun MapScreen(
     )
   }
 
+  // TextField Focus (search bar)
+  val focusRequester by remember { mutableStateOf(FocusRequester()) }
+  val focusManager = LocalFocusManager.current
+
+  var resultsShown by remember { mutableStateOf(false) }
+
   // Fetch all active geofences from storage
   var geofencesArray by remember { mutableStateOf(emptyList<Geofence>()) }
   var geoficationsArray by remember { mutableStateOf(emptyList<Geofication>()) }
@@ -187,6 +197,11 @@ fun MapScreen(
     openDialogGeofence = true
   }
 
+  fun removeFocusFromSearchBar() {
+    focusManager.clearFocus()
+    resultsShown = false
+  }
+
   // Return Composable
   if (markerPopupVisible && selectedMarkerId >= 0) {
     EditGeoficationPopup(selectedMarkerId, {
@@ -236,6 +251,7 @@ fun MapScreen(
       Column {
         FloatingActionButton(
           onClick = {
+            removeFocusFromSearchBar()
             MainScope().launch {
               // Asynchronously set the position of the map camera to current position
               val locationClient = ServiceProvider.location()
@@ -282,6 +298,7 @@ fun MapScreen(
                 MapType.NORMAL
               }
             )
+            removeFocusFromSearchBar()
           },
         ) {
           Icon(
@@ -316,26 +333,33 @@ fun MapScreen(
       Column {
         Row(modifier = Modifier.padding(horizontal = 16.dp)) {
           LocationSearchBar(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+              .weight(1f)
+              .focusRequester(focusRequester)
+              .onFocusChanged {
+                if (it.isFocused) {
+                  resultsShown = true
+                }
+              },
             input = searchInputState
           ) {
-            searchInput = ""
+            removeFocusFromSearchBar()
             MainScope().launch {
               cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(it, 15f))
             }
           }
-          DropdownInfoButton(searchInputState)
+          DropdownInfoButton(searchInputState) { removeFocusFromSearchBar() }
         }
-        if (searchInput.isNotEmpty()) {
+        if (resultsShown) {
           SearchResultList(searchInputState, searchGlobally = { query ->
             searchLocation(query, context) {
-              searchInput = ""
+              removeFocusFromSearchBar()
               MainScope().launch {
                 cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(it, 15f))
               }
             }
           }, goToLocation = { lat, lng ->
-            searchInput = ""
+            removeFocusFromSearchBar()
             MainScope().launch {
               cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), 15f))
             }
@@ -395,6 +419,9 @@ fun MapScreen(
     GoogleMap(
       uiSettings = uiSettings,
       properties = properties,
+      onMapClick = {
+        removeFocusFromSearchBar()
+      },
       onMapLongClick = {
         Vibrate.vibrate(context, 15)
         tempGeofenceLocation = it

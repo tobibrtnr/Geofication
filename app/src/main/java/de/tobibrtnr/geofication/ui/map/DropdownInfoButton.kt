@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun DropdownInfoButton(inputState: MutableState<String>) {
+fun DropdownInfoButton(inputState: MutableState<String>, rmFocus: () -> Unit) {
   val th = 56
   var input by inputState
 
@@ -91,6 +91,7 @@ fun DropdownInfoButton(inputState: MutableState<String>) {
           .fillMaxHeight()
           .clickable {
             showMenu = true
+            rmFocus()
           },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center

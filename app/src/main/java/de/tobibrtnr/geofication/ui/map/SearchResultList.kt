@@ -43,7 +43,11 @@ fun SearchResultList(
   var results by remember { mutableStateOf(emptyList<GeoficationGeofence>()) }
 
   LaunchedEffect(queryString) {
-    results = GeofenceUtil.searchGeofications(queryString.trim())
+    results = if (queryString.isNotEmpty()) {
+      GeofenceUtil.searchGeofications(queryString.trim())
+    } else {
+      emptyList()
+    }
   }
 
   Column(
@@ -53,7 +57,7 @@ fun SearchResultList(
 
     if (queryString.isNotEmpty() && results.isEmpty()) {
       NoResultCard()
-    } else {
+    } else if (results.isNotEmpty()) {
       SearchResultsCard(results = results, goToLocation)
     }
     SearchLocationCard(queryString, searchGlobally)
