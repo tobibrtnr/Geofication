@@ -12,6 +12,7 @@ import androidx.room.Query
 import androidx.room.RoomDatabase
 import androidx.room.Transaction
 import de.tobibrtnr.geofication.ui.common.MarkerColor
+import kotlinx.coroutines.flow.Flow
 
 data class GeoficationGeofence(
   val message: String,
@@ -98,6 +99,9 @@ interface GeofenceDao {
   @Query("SELECT * FROM geofence")
   fun getAll(): List<Geofence>
 
+  @Query("SELECT * FROM geofence")
+  fun getAllFlow(): Flow<List<Geofence>>
+
   @Query("SELECT * FROM geofence WHERE id = :geoId")
   fun loadById(geoId: Int): Geofence
 
@@ -118,6 +122,9 @@ interface GeofenceDao {
 interface GeoficationDao {
   @Query("SELECT * FROM geofication")
   fun getAll(): List<Geofication>
+
+  @Query("SELECT * FROM geofication")
+  fun getAllFlow(): Flow<List<Geofication>>
 
   @Query("SELECT * FROM geofication WHERE id = :geoId")
   fun loadById(geoId: Int): Geofication

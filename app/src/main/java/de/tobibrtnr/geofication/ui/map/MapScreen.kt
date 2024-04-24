@@ -34,6 +34,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,6 +54,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -76,6 +79,7 @@ import de.tobibrtnr.geofication.util.storage.UnitUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
@@ -85,7 +89,8 @@ import kotlin.math.roundToInt
 fun MapScreen(
   modifier: Modifier = Modifier,
   topPadding: Dp,
-  openGeoId: Int?
+  openGeoId: Int?,
+  mapViewModel: MapViewModel = viewModel()
 ) {
 
   var uiSettings by remember {
@@ -130,9 +135,14 @@ fun MapScreen(
 
   var resultsShown by remember { mutableStateOf(false) }
 
+  // Use mapState for holding data
+  //val mapState by mapViewModel.uiState.collectAsState()
+  val geofencesArray by mapViewModel.geofencesArray.collectAsStateWithLifecycle()
+  val geoficationsArray by mapViewModel.geoficationsArray.collectAsStateWithLifecycle()
+
   // Fetch all active geofences from storage
-  var geofencesArray by remember { mutableStateOf(emptyList<Geofence>()) }
-  var geoficationsArray by remember { mutableStateOf(emptyList<Geofication>()) }
+  //var geofencesArray by remember { mutableStateOf(emptyList<Geofence>()) }
+  //var geoficationsArray by remember { mutableStateOf(emptyList<Geofication>()) }
 
   var tempGeofenceLocation by remember { mutableStateOf<LatLng?>(null) }
   var tempGeofenceRadius by remember { mutableStateOf(30.0) }
@@ -185,12 +195,6 @@ fun MapScreen(
     }
   }
 
-  LaunchedEffect(Unit) {
-    val geofences = GeofenceUtil.getGeofences()
-    geofencesArray = geofences
-    geoficationsArray = GeofenceUtil.getGeofications()
-  }
-
   fun longClick(latLng: LatLng, tempGeofenceRadius: Double) {
     newRadius = tempGeofenceRadius
     selectedPosition = latLng
@@ -210,10 +214,6 @@ fun MapScreen(
     }, {
       CoroutineScope(Dispatchers.Default).launch {
         GeofenceUtil.deleteGeofence(selectedMarkerId)
-
-        val geofences = GeofenceUtil.getGeofences()
-        geofencesArray = geofences
-
       }
       markerPopupVisible = false
       openedGeofence = null
@@ -234,10 +234,6 @@ fun MapScreen(
 
   if (openDialogGeofence) {
     AddGeofencePopup(selectedPosition, newRadius) {
-      CoroutineScope(Dispatchers.Default).launch {
-        val geofences = GeofenceUtil.getGeofences()
-        geofencesArray = geofences
-      }
       openDialogGeofence = false
     }
   }

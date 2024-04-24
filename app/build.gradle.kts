@@ -50,22 +50,26 @@ android {
 }
 
 dependencies {
-  implementation("com.google.maps.android:maps-compose:4.3.3")
+  implementation("com.google.maps.android:maps-compose:4.4.0")
   // Optionally, you can include the Compose utils library
-  implementation("com.google.maps.android:maps-compose-utils:4.3.3")
+  implementation("com.google.maps.android:maps-compose-utils:4.4.0")
   // Optionally, you can include the widgets library for ScaleBar, etc.
-  implementation("com.google.maps.android:maps-compose-widgets:4.3.3")
+  implementation("com.google.maps.android:maps-compose-widgets:4.4.0")
 
-  implementation("androidx.core:core-ktx:1.12.0")
+  // lifecycle aware view model
+  // https://developer.android.com/codelabs/basic-android-kotlin-compose-viewmodel-and-state#4
+  implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+
+  implementation("androidx.core:core-ktx:1.13.0")
   implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
-  implementation("androidx.activity:activity-compose:1.8.2")
-  implementation("androidx.activity:activity-ktx:1.8.2")
+  implementation("androidx.activity:activity-compose:1.9.0")
+  implementation("androidx.activity:activity-ktx:1.9.0")
   implementation(platform("androidx.compose:compose-bom:2024.04.00"))
-  implementation("androidx.compose.ui:ui:1.6.5")
-  implementation("androidx.compose.ui:ui-graphics:1.6.5")
-  implementation("androidx.compose.ui:ui-tooling-preview:1.6.5")
+  implementation("androidx.compose.ui:ui:1.6.6")
+  implementation("androidx.compose.ui:ui-graphics:1.6.6")
+  implementation("androidx.compose.ui:ui-tooling-preview:1.6.6")
   implementation("androidx.compose.material3:material3:1.2.1")
-  implementation("androidx.compose.material:material-icons-extended:1.6.5")
+  implementation("androidx.compose.material:material-icons-extended:1.6.6")
 
   implementation("com.google.android.gms:play-services-maps:18.2.0")
 
