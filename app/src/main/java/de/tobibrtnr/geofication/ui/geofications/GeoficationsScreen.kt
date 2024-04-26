@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import de.tobibrtnr.geofication.ui.GeoficationScreen
 import de.tobibrtnr.geofication.ui.common.CircleWithColor
+import de.tobibrtnr.geofication.ui.common.DeleteConfirmPopup
 import de.tobibrtnr.geofication.util.storage.Geofence
 import de.tobibrtnr.geofication.util.storage.GeofenceUtil
 import de.tobibrtnr.geofication.util.storage.Geofication
@@ -83,6 +84,7 @@ fun GeoficationsScreen(
 
 @Composable
 fun ListItem(geofication: Geofication, navController: NavController, refreshData: suspend () -> Unit) {
+  var deletePopupVisible by remember { mutableStateOf(false) }
 
   var geofence by remember { mutableStateOf<Geofence?>(null) }
   LaunchedEffect(Unit) {
@@ -90,6 +92,19 @@ fun ListItem(geofication: Geofication, navController: NavController, refreshData
   }
 
   if (geofence != null) {
+
+    if (deletePopupVisible) {
+      DeleteConfirmPopup(
+        onConfirm = {
+          CoroutineScope(Dispatchers.Default).launch {
+            GeofenceUtil.deleteGeofence(geofence!!.id)
+            refreshData()
+          }
+        },
+        onCancel = { deletePopupVisible = false }
+      )
+    }
+
     Card(
       colors = CardDefaults.cardColors(),
       onClick = {
@@ -134,9 +149,13 @@ fun ListItem(geofication: Geofication, navController: NavController, refreshData
               modifier = Modifier
                 .size(32.dp)
                 .clickable {
-                  CoroutineScope(Dispatchers.Default).launch {
-                    GeofenceUtil.deleteGeofence(geofence!!.id)
-                    refreshData()
+                  if (geofication.active) {
+                    deletePopupVisible = true
+                  } else {
+                    CoroutineScope(Dispatchers.Default).launch {
+                      GeofenceUtil.deleteGeofence(geofence!!.id)
+                      refreshData()
+                    }
                   }
                 }
             )

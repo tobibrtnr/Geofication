@@ -50,6 +50,7 @@ import de.tobibrtnr.geofication.ui.common.MarkerColor
 import de.tobibrtnr.geofication.ui.common.SegmentedButtons
 import de.tobibrtnr.geofication.ui.common.SegmentedRadioButtons
 import de.tobibrtnr.geofication.ui.common.CircleWithColor
+import de.tobibrtnr.geofication.ui.common.DeleteConfirmPopup
 import de.tobibrtnr.geofication.util.misc.NumericUnitTransformation
 import de.tobibrtnr.geofication.util.storage.Geofence
 import de.tobibrtnr.geofication.util.storage.GeofenceUtil
@@ -95,6 +96,8 @@ fun EditGeoficationPopup(
   var colorExpanded by remember { mutableStateOf(false) }
   var inputValid by remember { mutableStateOf(false) }
 
+  var deletePopupVisible by remember { mutableStateOf(false) }
+
   LaunchedEffect(Unit) {
     selectedGeofication = GeofenceUtil.getGeoficationByGeofence(selectedMarkerId)[0]
     selectedGeofence = GeofenceUtil.getGeofenceById(selectedMarkerId)
@@ -102,10 +105,6 @@ fun EditGeoficationPopup(
     initialGeofication = selectedGeofication
     initialGeofence = selectedGeofence
     enabled = selectedGeofication!!.active
-
-    println("EDIT GEOFICATION")
-    println(selectedGeofence)
-    println(selectedGeofication)
   }
 
   // Check if input is valid: Geofence or Geofication attribute changed + all inputs valid
@@ -122,6 +121,12 @@ fun EditGeoficationPopup(
 
   // UI
   if (selectedGeofence != null && selectedGeofication != null) {
+    if (deletePopupVisible) {
+      DeleteConfirmPopup(
+        onConfirm = { onDeleteRequest() },
+        onCancel = { deletePopupVisible = false }
+      )
+    }
     Dialog(
       onDismissRequest = { onDismissRequest() },
       properties = DialogProperties(usePlatformDefaultWidth = false)
@@ -167,7 +172,11 @@ fun EditGeoficationPopup(
                 modifier = Modifier
                   .size(32.dp)
                   .clickable {
-                    onDeleteRequest()
+                    if (selectedGeofence!!.active) {
+                      deletePopupVisible = true
+                    } else {
+                      onDeleteRequest()
+                    }
                   }
               )
 
@@ -236,7 +245,8 @@ fun EditGeoficationPopup(
             singleLine = true,
             value = selectedGeofence!!.fenceName,
             onValueChange = {
-              selectedGeofence = selectedGeofence!!.copy(fenceName = it)//.take(max) for max name length
+              selectedGeofence =
+                selectedGeofence!!.copy(fenceName = it)//.take(max) for max name length
               inputValid = isInputValid()
             }
           )
