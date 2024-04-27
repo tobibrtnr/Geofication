@@ -46,14 +46,12 @@ class MapViewModel : ViewModel() {
     viewModelScope.launch {
       database.geoficationDao().getAllFlow().flowOn(Dispatchers.Default)
         .collect { list ->
-          println("$list \n\n\n\n\n\n")
           _geoficationsArray.update { list }
         }
     }
     viewModelScope.launch {
       database.geofenceDao().getAllFlow().flowOn(Dispatchers.IO)
         .collect { list ->
-          println("$list \n\n\n\n\n\n")
           _geofencesArray.update { list }
         }
     }

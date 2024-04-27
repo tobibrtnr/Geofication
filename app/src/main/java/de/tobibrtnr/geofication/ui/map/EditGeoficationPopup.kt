@@ -123,7 +123,10 @@ fun EditGeoficationPopup(
   if (selectedGeofence != null && selectedGeofication != null) {
     if (deletePopupVisible) {
       DeleteConfirmPopup(
-        onConfirm = { onDeleteRequest() },
+        onConfirm = {
+          deletePopupVisible = false
+          onDeleteRequest()
+        },
         onCancel = { deletePopupVisible = false }
       )
     }

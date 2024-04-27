@@ -24,6 +24,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,10 +35,12 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import de.tobibrtnr.geofication.ui.GeoficationScreen
 import de.tobibrtnr.geofication.ui.common.CircleWithColor
 import de.tobibrtnr.geofication.ui.common.DeleteConfirmPopup
+import de.tobibrtnr.geofication.ui.map.MapViewModel
 import de.tobibrtnr.geofication.util.storage.Geofence
 import de.tobibrtnr.geofication.util.storage.GeofenceUtil
 import de.tobibrtnr.geofication.util.storage.Geofication
@@ -49,19 +52,11 @@ import kotlinx.coroutines.launch
 @Composable
 fun GeoficationsScreen(
   modifier: Modifier = Modifier,
-  navController: NavController
+  navController: NavController,
+  geoViewModel: GeoficationsViewModel = viewModel()
 ) {
 
-  var geoficationsArray by remember { mutableStateOf(emptyList<Geofication>()) }
-
-  @Composable
-  fun refreshGeofications() {
-    LaunchedEffect(Unit) {
-      val geofications = GeofenceUtil.getGeofications()
-      geoficationsArray = geofications
-    }
-  }
-  refreshGeofications()
+  val geoficationsArray by geoViewModel.geoficationsArray.collectAsState()
 
   // UI
   Column(modifier = Modifier.padding(horizontal = 16.dp)) {
@@ -72,33 +67,28 @@ fun GeoficationsScreen(
 
     LazyColumn {
       items(geoficationsArray) {
-        ListItem(it, navController = navController) {
-          val geofications = GeofenceUtil.getGeofications()
-          geoficationsArray = geofications
-        }
+        ListItem(it, navController = navController)
       }
-
     }
   }
 }
 
 @Composable
-fun ListItem(geofication: Geofication, navController: NavController, refreshData: suspend () -> Unit) {
+fun ListItem(geofication: Geofication, navController: NavController) {
   var deletePopupVisible by remember { mutableStateOf(false) }
 
   var geofence by remember { mutableStateOf<Geofence?>(null) }
-  LaunchedEffect(Unit) {
+  LaunchedEffect(geofication) {
     geofence = GeofenceUtil.getGeofenceById(geofication.fenceid)
   }
 
   if (geofence != null) {
-
     if (deletePopupVisible) {
       DeleteConfirmPopup(
         onConfirm = {
+          deletePopupVisible = false
           CoroutineScope(Dispatchers.Default).launch {
             GeofenceUtil.deleteGeofence(geofence!!.id)
-            refreshData()
           }
         },
         onCancel = { deletePopupVisible = false }
@@ -139,7 +129,6 @@ fun ListItem(geofication: Geofication, navController: NavController, refreshData
             Switch(checked = geofication.active, onCheckedChange = {
               CoroutineScope(SupervisorJob()).launch {
                 GeofenceUtil.setNotifActive(geofication.id, it)
-                refreshData()
               }
             })
 
@@ -154,7 +143,6 @@ fun ListItem(geofication: Geofication, navController: NavController, refreshData
                   } else {
                     CoroutineScope(Dispatchers.Default).launch {
                       GeofenceUtil.deleteGeofence(geofence!!.id)
-                      refreshData()
                     }
                   }
                 }

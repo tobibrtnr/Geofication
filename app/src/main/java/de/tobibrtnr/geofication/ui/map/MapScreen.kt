@@ -126,13 +126,8 @@ fun MapScreen(
   var resultsShown by remember { mutableStateOf(false) }
 
   // Use mapState for holding data
-  //val mapState by mapViewModel.uiState.collectAsState()
   val geofencesArray by mapViewModel.geofencesArray.collectAsState()
   val geoficationsArray by mapViewModel.geoficationsArray.collectAsState()
-
-  // Fetch all active geofences from storage
-  //var geofencesArray by remember { mutableStateOf(emptyList<Geofence>()) }
-  //var geoficationsArray by remember { mutableStateOf(emptyList<Geofication>()) }
 
   var tempGeofenceLocation by remember { mutableStateOf<LatLng?>(null) }
   var tempGeofenceRadius by remember { mutableStateOf(30.0) }
@@ -154,7 +149,6 @@ fun MapScreen(
   }
 
   val searchInputState = remember { mutableStateOf("") }
-  var searchInput by searchInputState
 
   var currentLocation by remember { mutableStateOf(LatLng(0.0, 0.0)) }
 
@@ -238,29 +232,35 @@ fun MapScreen(
         FloatingActionButton(
           onClick = {
             removeFocusFromSearchBar()
-            MainScope().launch {
-              // Asynchronously set the position of the map camera to current position
-              val locationClient = ServiceProvider.location()
-              val location = locationClient.lastLocation.await()
 
-              if (location == null) {
-                println("location is null!?")
-                return@launch
-              }
+            if (SphericalUtil.computeDistanceBetween(
+                cameraPositionState.position.target,
+                currentLocation
+            ) > 0.1) {
+              MainScope().launch {
+                // Asynchronously set the position of the map camera to current position
+                val locationClient = ServiceProvider.location()
+                val location = locationClient.lastLocation.await()
 
-              currentLocation = LatLng(location.latitude, location.longitude)
+                if (location == null) {
+                  println("location is null!?")
+                  return@launch
+                }
 
-              // Update the camera position state with the current location
-              cameraPositionState.animate(
-                CameraUpdateFactory.newCameraPosition(
-                  CameraPosition(
-                    currentLocation,
-                    15f,
-                    0f,
-                    0f
+                currentLocation = LatLng(location.latitude, location.longitude)
+
+                // Update the camera position state with the current location
+                cameraPositionState.animate(
+                  CameraUpdateFactory.newCameraPosition(
+                    CameraPosition(
+                      currentLocation,
+                      15f,
+                      0f,
+                      0f
+                    )
                   )
                 )
-              )
+              }
             }
           },
           shape = CircleShape
