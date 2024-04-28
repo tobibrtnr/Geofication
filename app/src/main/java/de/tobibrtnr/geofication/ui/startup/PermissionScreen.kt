@@ -15,8 +15,13 @@ import androidx.compose.material.icons.outlined.TaskAlt
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -34,14 +39,33 @@ fun PermissionScreen(
   notifState: PermissionState,
   callback: () -> Unit
 ) {
+  var dialogInfoIndex by remember { mutableStateOf(-1) }
+
+  val infoDialogContent: List<Pair<String, String>> = listOf(
+    "Notifications" to "The notification permission is needed in order to send you a message when you enter or exit your specified geofence.",
+    "General Location" to "The general location permission allows the app to track your location. This is needed to check when you enter or exit your geofences.",
+    "Background Location" to "The background location permission is needed in order for the app to also work when it is closed. If another window opens on click on the button, please select \"Allow all the time\"."
+  )
+
+  if (dialogInfoIndex >= 0) {
+    InfoDialog(
+      title = infoDialogContent[dialogInfoIndex].first,
+      text = infoDialogContent[dialogInfoIndex].second
+    ) {
+      dialogInfoIndex = -1
+    }
+  }
+
   Box(
     modifier = Modifier
       .fillMaxSize()
       .padding(50.dp)
   ) {
     Column {
-      Text("Welcome to Geofication!\nPlease allow all required permissions.")
-      Spacer(Modifier.height(8.dp))
+      Spacer(Modifier.height(32.dp))
+      Text("Welcome to Geofication!", style = MaterialTheme.typography.titleLarge)
+      Text("Please allow all required permissions.")
+      Spacer(Modifier.height(48.dp))
       Row {
         Button(onClick = {
           MainScope().launch {
@@ -49,17 +73,18 @@ fun PermissionScreen(
           }
         }) {
           Icon(
-            imageVector = if(notifState.status.isGranted) Icons.Outlined.TaskAlt else Icons.Outlined.Circle,
+            imageVector = if (notifState.status.isGranted) Icons.Outlined.TaskAlt else Icons.Outlined.Circle,
             contentDescription = "Permission Status"
           )
           Spacer(Modifier.width(4.dp))
           Text("Notification permission")
         }
         Spacer(Modifier.width(4.dp))
-        IconButton(onClick = { /*TODO*/ }) {
+        IconButton(onClick = {
+          dialogInfoIndex = 0
+        }) {
           Icon(
-            imageVector = Icons.Outlined.Info,
-            contentDescription = "Show info"
+            imageVector = Icons.Outlined.Info, contentDescription = "Show info"
           )
         }
       }
@@ -71,49 +96,47 @@ fun PermissionScreen(
           }
         }) {
           Icon(
-            imageVector = if(locState.allPermissionsGranted) Icons.Outlined.TaskAlt else Icons.Outlined.Circle,
+            imageVector = if (locState.allPermissionsGranted) Icons.Outlined.TaskAlt else Icons.Outlined.Circle,
             contentDescription = "Permission Status"
           )
           Spacer(Modifier.width(4.dp))
           Text("General location permission")
         }
         Spacer(Modifier.width(4.dp))
-        IconButton(onClick = { /*TODO*/ }) {
+        IconButton(onClick = {
+          dialogInfoIndex = 1
+        }) {
           Icon(
-            imageVector = Icons.Outlined.Info,
-            contentDescription = "Show info"
+            imageVector = Icons.Outlined.Info, contentDescription = "Show info"
           )
         }
       }
       Spacer(Modifier.height(8.dp))
       Row {
-        Button(
-          enabled = locState.allPermissionsGranted,
-          onClick = {
+        Button(enabled = locState.allPermissionsGranted, onClick = {
           MainScope().launch {
             bgState.launchPermissionRequest()
           }
         }) {
           Icon(
-            imageVector = if(bgState.status.isGranted) Icons.Outlined.TaskAlt else Icons.Outlined.Circle,
+            imageVector = if (bgState.status.isGranted) Icons.Outlined.TaskAlt else Icons.Outlined.Circle,
             contentDescription = "Permission Status"
           )
           Spacer(Modifier.width(4.dp))
           Text("Background location permission")
         }
         Spacer(Modifier.width(4.dp))
-        IconButton(onClick = { /*TODO*/ }) {
+        IconButton(onClick = {
+          dialogInfoIndex = 2
+        }) {
           Icon(
-            imageVector = Icons.Outlined.Info,
-            contentDescription = "Show info"
+            imageVector = Icons.Outlined.Info, contentDescription = "Show info"
           )
         }
       }
       Spacer(Modifier.height(16.dp))
-      Button(
-        enabled = notifState.status.isGranted && locState.allPermissionsGranted && bgState.status.isGranted,
-        onClick = { callback() }
-      ) {
+      Button(enabled = notifState.status.isGranted && locState.allPermissionsGranted && bgState.status.isGranted,
+        onClick = { callback() }) {
         Text("Continue")
       }
     }
