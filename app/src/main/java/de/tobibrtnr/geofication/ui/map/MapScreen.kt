@@ -3,6 +3,9 @@ package de.tobibrtnr.geofication.ui.map
 import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Point
+import android.location.Address
+import android.location.Geocoder
+import android.os.Build
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -80,6 +83,7 @@ fun MapScreen(
   modifier: Modifier = Modifier,
   topPadding: Dp,
   openGeoId: Int?,
+  intentQuery: String,
   mapViewModel: MapViewModel = viewModel()
 ) {
 
@@ -97,11 +101,12 @@ fun MapScreen(
 
   val context = LocalContext.current
 
-  val tmpGeofenceOpen = runBlocking {
-    if (openGeoId != null && openGeoId > 0) GeofenceUtil.getGeofenceById(openGeoId) else null
-  }
+  var openedGeofence by remember { mutableStateOf<Geofence?>(null) }
 
-  var openedGeofence by remember { mutableStateOf(tmpGeofenceOpen) }
+  LaunchedEffect(Unit) {
+    openedGeofence =
+      if (openGeoId != null && openGeoId > 0) GeofenceUtil.getGeofenceById(openGeoId) else null
+  }
 
   val mapStyleOptions = if (isSystemInDarkTheme()) MapStyleOptions.loadRawResourceStyle(
     context,
@@ -190,6 +195,43 @@ fun MapScreen(
     resultsShown = false
   }
 
+  LaunchedEffect(Unit) {
+    if (intentQuery.isNotEmpty()) {
+      val geocoder = Geocoder(context)
+
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        // Implementation of GeocodeListener
+        val listener = object : Geocoder.GeocodeListener {
+          override fun onGeocode(p0: MutableList<Address>) {
+            if (p0.isNotEmpty()) {
+              handleAddresses(p0) {
+                MainScope().launch {
+                  cameraPositionState.position =
+                    CameraPosition(it, 15f, 0f, 0f)
+                }
+              }
+            }
+          }
+
+          override fun onError(errorMessage: String?) {
+            println(errorMessage)
+          }
+        }
+        geocoder.getFromLocationName(intentQuery, 1, listener)
+      } else {
+        val addresses = geocoder.getFromLocationName(intentQuery, 1)
+        if (addresses != null) {
+          handleAddresses(addresses) {
+            MainScope().launch {
+              cameraPositionState.position =
+                CameraPosition(it, 15f, 0f, 0f)
+            }
+          }
+        }
+      }
+    }
+  }
+
   // Return Composable
   if (markerPopupVisible && selectedMarkerId >= 0) {
     EditGeoficationPopup(selectedMarkerId, {
@@ -236,7 +278,8 @@ fun MapScreen(
             if (SphericalUtil.computeDistanceBetween(
                 cameraPositionState.position.target,
                 currentLocation
-            ) > 0.1) {
+              ) > 0.1
+            ) {
               MainScope().launch {
                 // Asynchronously set the position of the map camera to current position
                 val locationClient = ServiceProvider.location()
@@ -327,27 +370,36 @@ fun MapScreen(
                   resultsShown = true
                 }
               },
-            input = searchInputState
-          ) {
-            removeFocusFromSearchBar()
-            MainScope().launch {
-              cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(it, 15f))
-            }
-          }
-          DropdownInfoButton(searchInputState) { removeFocusFromSearchBar() }
-        }
-        if (resultsShown) {
-          SearchResultList(searchInputState, searchGlobally = { query ->
-            searchLocation(query, context) {
+            input = searchInputState,
+            callback = {
               removeFocusFromSearchBar()
               MainScope().launch {
                 cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(it, 15f))
               }
-            }
+            }, clearFocus = {
+              removeFocusFromSearchBar()
+            })
+          DropdownInfoButton(searchInputState) { removeFocusFromSearchBar() }
+        }
+        if (resultsShown) {
+          SearchResultList(searchInputState, searchGlobally = { query ->
+            searchLocation(query, context, callback = {
+              removeFocusFromSearchBar()
+              MainScope().launch {
+                cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(it, 15f))
+              }
+            }, clearFocus = {
+              removeFocusFromSearchBar()
+            })
           }, goToLocation = { lat, lng ->
             removeFocusFromSearchBar()
             MainScope().launch {
-              cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), 15f))
+              cameraPositionState.animate(
+                CameraUpdateFactory.newLatLngZoom(
+                  LatLng(lat, lng),
+                  15f
+                )
+              )
             }
           })
         } else {

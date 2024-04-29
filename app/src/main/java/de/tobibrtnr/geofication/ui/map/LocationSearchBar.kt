@@ -5,6 +5,7 @@ import android.location.Address
 import android.location.Geocoder
 import android.location.Geocoder.GeocodeListener
 import android.os.Build
+import android.widget.Toast
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -35,12 +36,15 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.LatLng
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun LocationSearchBar(
   modifier: Modifier = Modifier,
   input: MutableState<String>,
-  callback: (LatLng) -> Unit
+  callback: (LatLng) -> Unit,
+  clearFocus: () -> Unit
 ) {
 
   val context = LocalContext.current
@@ -49,15 +53,27 @@ fun LocationSearchBar(
 
   var locationName by input
 
-
   TextField(
     value = locationName,
     leadingIcon = { Icon(Icons.Outlined.Search, contentDescription = "Search location") },
     onValueChange = { locationName = it },
-    placeholder = { Text(text = "Search location or Geofication", maxLines = 1, overflow = TextOverflow.Ellipsis) },
+    placeholder = {
+      Text(
+        text = "Search location or Geofication",
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis
+      )
+    },
     modifier = modifier/*.clip(CircleShape)*/
-      .border(1.dp, Color.LightGray, RoundedCornerShape(topStartPercent = 50, bottomStartPercent = 50))
-      .shadow(elevation = 16.dp, shape = RoundedCornerShape(topStartPercent = 50, bottomStartPercent = 50)),
+      .border(
+        1.dp,
+        Color.LightGray,
+        RoundedCornerShape(topStartPercent = 50, bottomStartPercent = 50)
+      )
+      .shadow(
+        elevation = 16.dp,
+        shape = RoundedCornerShape(topStartPercent = 50, bottomStartPercent = 50)
+      ),
     //.padding(3.dp)
     //textStyle = TextStyle(color = Color.Black, fontSize = 15.sp),
     shape = RoundedCornerShape(topStartPercent = 50, bottomStartPercent = 50),
@@ -74,13 +90,18 @@ fun LocationSearchBar(
       onSearch = {
         keyboardController?.hide()
         focusManager.clearFocus()
-        searchLocation(locationName, context, callback)
+        searchLocation(locationName, context, callback, clearFocus)
       }
     )
   )
 }
 
-fun searchLocation(locString: String, context: Context, callback: (LatLng) -> Unit) {
+fun searchLocation(
+  locString: String,
+  context: Context,
+  callback: (LatLng) -> Unit,
+  clearFocus: () -> Unit
+) {
 
   if (locString.isNotEmpty()) {
     val geocoder = Geocoder(context)
@@ -89,7 +110,11 @@ fun searchLocation(locString: String, context: Context, callback: (LatLng) -> Un
       // Implementation of GeocodeListener
       val listener = object : GeocodeListener {
         override fun onGeocode(p0: MutableList<Address>) {
-          handleAddresses(p0, callback)
+          if (p0.isEmpty()) {
+            showNoResultsToast(context, clearFocus)
+          } else {
+            handleAddresses(p0, callback)
+          }
         }
 
         override fun onError(errorMessage: String?) {
@@ -101,13 +126,23 @@ fun searchLocation(locString: String, context: Context, callback: (LatLng) -> Un
       val addresses = geocoder.getFromLocationName(locString, 1)
       if (addresses != null) {
         handleAddresses(addresses, callback)
+      } else {
+        showNoResultsToast(context, clearFocus)
       }
     }
 
   }
 }
 
-private fun handleAddresses(addresses: List<Address>, callback: (LatLng) -> Unit) {
+private fun showNoResultsToast(context: Context, clearFocus: () -> Unit) {
+  MainScope().launch {
+    Toast.makeText(context, "No global location found for your given search query.", Toast.LENGTH_SHORT)
+      .show()
+  }
+  clearFocus()
+}
+
+fun handleAddresses(addresses: List<Address>, callback: (LatLng) -> Unit) {
   if (addresses.isNotEmpty()) {
 
     val address = addresses[0]

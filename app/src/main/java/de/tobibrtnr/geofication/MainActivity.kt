@@ -1,5 +1,6 @@
 package de.tobibrtnr.geofication
 
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -16,6 +17,20 @@ class MainActivity : ComponentActivity() {
 
     super.onCreate(savedInstanceState)
 
+    var intentQuery = ""
+    val uri: Uri? = intent.data
+    uri?.let {
+      if(uri.scheme == "geo") {
+        val query = uri.query
+        val ssp = uri.schemeSpecificPart
+        if(query != null && query.startsWith("q=")) {
+          intentQuery = query.substring(2).split("(")[0]
+        } else if (ssp != null) {
+          intentQuery = ssp.split("?")[0]
+        }
+      }
+    }
+
     MapsInitializer.initialize(this)
     ServiceProvider.setInstance(this)
 
@@ -25,7 +40,7 @@ class MainActivity : ComponentActivity() {
 
     setContent {
       GeoficationTheme {
-        GeoficationApp(openGeoId = openGeoId)
+        GeoficationApp(openGeoId = openGeoId, intentQuery = intentQuery)
       }
     }
   }

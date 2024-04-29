@@ -51,6 +51,7 @@ enum class GeoficationScreen(val title: String, val icon: ImageVector) {
 @Composable
 fun GeoficationApp(
   openGeoId: Int,
+  intentQuery: String,
   navController: NavHostController = rememberNavController()
 ) {
   var navigationSelectedItem by remember {
@@ -147,7 +148,8 @@ fun GeoficationApp(
             MapScreen(
               modifier = Modifier.fillMaxHeight(),
               topPadding = innerPadding.calculateTopPadding(),
-              openGeofence
+              intentQuery = intentQuery,
+              openGeoId = openGeofence
             )
           }
         }
