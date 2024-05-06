@@ -62,6 +62,7 @@ import com.google.maps.android.compose.MapType
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.widgets.DisappearingScaleBar
+import com.google.maps.android.compose.widgets.ScaleBar
 import de.tobibrtnr.geofication.R
 import de.tobibrtnr.geofication.ui.common.DeleteConfirmPopup
 import de.tobibrtnr.geofication.ui.common.MarkerColor
@@ -552,7 +553,7 @@ fun MapScreen(
       }
     }
 
-    DisappearingScaleBar(
+    ScaleBar(
       modifier = Modifier
         .padding(bottom = 10.dp, end = 105.dp)
         .align(Alignment.BottomEnd),
