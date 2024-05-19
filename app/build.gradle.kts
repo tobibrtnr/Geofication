@@ -50,18 +50,18 @@ android {
 }
 
 dependencies {
-  implementation("com.google.maps.android:maps-compose:4.4.2")
+  implementation("com.google.maps.android:maps-compose:5.0.1")
   // Optionally, you can include the Compose utils library
-  implementation("com.google.maps.android:maps-compose-utils:4.4.2")
+  implementation("com.google.maps.android:maps-compose-utils:5.0.1")
   // Optionally, you can include the widgets library for ScaleBar, etc.
-  implementation("com.google.maps.android:maps-compose-widgets:4.4.2")
+  implementation("com.google.maps.android:maps-compose-widgets:5.0.1")
 
   // lifecycle aware view model
   // https://developer.android.com/codelabs/basic-android-kotlin-compose-viewmodel-and-state#4
-  implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+  implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
 
   implementation("androidx.core:core-ktx:1.13.1")
-  implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+  implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.0")
   implementation("androidx.activity:activity-compose:1.9.0")
   implementation("androidx.activity:activity-ktx:1.9.0")
   implementation(platform("androidx.compose:compose-bom:2024.04.00"))

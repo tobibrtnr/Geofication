@@ -8,7 +8,7 @@ import kotlinx.coroutines.launch
 class SettingsUtil {
   companion object {
 
-    private var themeMode: String = "auto";
+    private var themeMode: String = "auto"
 
     fun init() {
       CoroutineScope(SupervisorJob()).launch {
@@ -24,7 +24,7 @@ class SettingsUtil {
     }
 
     fun getThemeMode(): String {
-      return themeMode;
+      return themeMode
     }
 
     fun setThemeMode(new: String) {
