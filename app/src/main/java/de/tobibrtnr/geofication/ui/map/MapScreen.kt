@@ -50,6 +50,11 @@ import androidx.compose.ui.zIndex
 import androidx.core.app.ActivityCompat
 //import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -66,6 +71,7 @@ import com.google.maps.android.compose.widgets.ScaleBar
 import de.tobibrtnr.geofication.R
 import de.tobibrtnr.geofication.ui.common.DeleteConfirmPopup
 import de.tobibrtnr.geofication.ui.common.MarkerColor
+import de.tobibrtnr.geofication.ui.infos.FaqScreen
 import de.tobibrtnr.geofication.util.misc.ServiceProvider
 import de.tobibrtnr.geofication.util.misc.Vibrate
 import de.tobibrtnr.geofication.util.storage.Geofence
@@ -85,9 +91,35 @@ fun MapScreen(
   topPadding: Dp,
   openGeoId: Int?,
   intentQuery: String,
-  mapViewModel: MapViewModel = viewModel()
+  mapViewModel: MapViewModel = viewModel(),
 ) {
+  val mapNavController = rememberNavController()
 
+  NavHost(navController = mapNavController, startDestination = "mapMain") {
+    composable("mapMain") { MapScreenMain(
+      topPadding = topPadding,
+      openGeoId = openGeoId,
+      intentQuery = intentQuery,
+      mapViewModel = mapViewModel,
+      navController = mapNavController
+    ) }
+    composable("faq") {
+      FaqScreen(
+        navController = mapNavController
+      )
+    }
+  }
+}
+
+@Composable
+fun MapScreenMain(
+  modifier: Modifier = Modifier,
+  topPadding: Dp,
+  openGeoId: Int?,
+  intentQuery: String,
+  mapViewModel: MapViewModel,
+  navController: NavHostController
+) {
   var uiSettings by remember {
     mutableStateOf(
       MapUiSettings(
@@ -380,7 +412,7 @@ fun MapScreen(
             }, clearFocus = {
               removeFocusFromSearchBar()
             })
-          DropdownInfoButton(searchInputState) { removeFocusFromSearchBar() }
+          DropdownInfoButton(searchInputState, navController) { removeFocusFromSearchBar() }
         }
         if (resultsShown) {
           SearchResultList(searchInputState, searchGlobally = { query ->

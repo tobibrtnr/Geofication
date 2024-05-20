@@ -38,9 +38,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 
 @Composable
-fun DropdownInfoButton(inputState: MutableState<String>, rmFocus: () -> Unit) {
+fun DropdownInfoButton(
+  inputState: MutableState<String>,
+  navController: NavHostController,
+  rmFocus: () -> Unit
+) {
   val th = 56
   var input by inputState
 
@@ -110,9 +115,9 @@ fun DropdownInfoButton(inputState: MutableState<String>, rmFocus: () -> Unit) {
         DropdownMenuItem(
           onClick = {
             showMenu = false
-            println("TODO open Popup")
+            navController.navigate("faq")
           },
-          text = { Text("About & Help") }
+          text = { Text("About, Help, FAQ") }
         )
         DropdownMenuItem(
           onClick = {
