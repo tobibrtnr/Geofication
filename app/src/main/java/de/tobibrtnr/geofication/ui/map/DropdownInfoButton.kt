@@ -122,14 +122,14 @@ fun DropdownInfoButton(
         DropdownMenuItem(
           onClick = {
             showMenu = false
-            println("TODO open Popup")
+            navController.navigate("support")
           },
           text = { Text("Support the Developer") }
         )
         DropdownMenuItem(
           onClick = {
             showMenu = false
-            println("TODO open Popup")
+            navController.navigate("feedback")
           },
           text = { Text("Send Feedback") }
         )

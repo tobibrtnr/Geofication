@@ -72,6 +72,8 @@ import de.tobibrtnr.geofication.R
 import de.tobibrtnr.geofication.ui.common.DeleteConfirmPopup
 import de.tobibrtnr.geofication.ui.common.MarkerColor
 import de.tobibrtnr.geofication.ui.infos.FaqScreen
+import de.tobibrtnr.geofication.ui.infos.FeedbackScreen
+import de.tobibrtnr.geofication.ui.infos.SupportScreen
 import de.tobibrtnr.geofication.util.misc.ServiceProvider
 import de.tobibrtnr.geofication.util.misc.Vibrate
 import de.tobibrtnr.geofication.util.storage.Geofence
@@ -105,6 +107,16 @@ fun MapScreen(
     ) }
     composable("faq") {
       FaqScreen(
+        navController = mapNavController
+      )
+    }
+    composable("support") {
+      SupportScreen(
+        navController = mapNavController
+      )
+    }
+    composable("feedback") {
+      FeedbackScreen(
         navController = mapNavController
       )
     }
