@@ -1,5 +1,6 @@
 package de.tobibrtnr.geofication.util.storage
 
+import android.content.Context
 import de.tobibrtnr.geofication.util.misc.ServiceProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -8,17 +9,20 @@ import kotlinx.coroutines.launch
 class UnitUtil {
   companion object {
 
+    // true is meter, false is foot
     private var currentUnit: Boolean = true
 
-    fun init() {
+    fun init(context: Context) {
       CoroutineScope(SupervisorJob()).launch {
         currentUnit = try {
           val db = ServiceProvider.database()
           val setDao = db.settingsDao()
           setDao.getSetting("unit")[0].toInt() != 0
         } catch (e: NullPointerException) {
-          // Setting does not exist yet
-          true
+          val locale = context.resources.configuration.locales[0]
+          val imperialCountries = setOf("US", "LR", "MM")
+
+          !imperialCountries.contains(locale.country)
         }
       }
     }

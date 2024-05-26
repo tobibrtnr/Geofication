@@ -34,7 +34,7 @@ class MainActivity : ComponentActivity() {
     MapsInitializer.initialize(this)
     ServiceProvider.setInstance(this)
 
-    UnitUtil.init()
+    UnitUtil.init(this)
 
     val openGeoId = intent.getIntExtra("openGeoId", -1)
 
