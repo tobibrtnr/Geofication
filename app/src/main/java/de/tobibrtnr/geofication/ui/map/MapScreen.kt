@@ -45,6 +45,7 @@ import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -359,7 +360,7 @@ fun MapScreenMain(
                 currentLocation
               ) < 0.1
             ) Icons.Filled.MyLocation else Icons.Filled.LocationSearching,
-            contentDescription = "Get location"
+            contentDescription = stringResource(R.string.get_location)
           )
         }
         Spacer(modifier = Modifier.height(8.dp))
@@ -377,7 +378,7 @@ fun MapScreenMain(
         ) {
           Icon(
             if (properties.mapType == MapType.NORMAL) Icons.Filled.Satellite else Icons.Filled.Map,
-            contentDescription = "Switch Map Type"
+            contentDescription = stringResource(R.string.switch_map_type)
           )
         }
       }
@@ -537,13 +538,16 @@ fun MapScreenMain(
                               it.position.y.toInt()
                             )
                           )
-                          tempGeofenceRadius =
+                          var newTempGeofenceRadius =
                             SphericalUtil.computeDistanceBetween(
                               tempGeofenceLocation,
                               pointerLocation
                             )
-                          if (tempGeofenceRadius < 30.0) tempGeofenceRadius = 30.0
-                          Vibrate.vibrate(context, 1)
+                          if (newTempGeofenceRadius < 30.0) newTempGeofenceRadius = 30.0
+                          if (Math.abs(newTempGeofenceRadius - tempGeofenceRadius) > 3) {
+                            Vibrate.vibrate(context, 1)
+                          }
+                          tempGeofenceRadius = newTempGeofenceRadius
                         }
                       }
                     }

@@ -7,18 +7,23 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import de.tobibrtnr.geofication.R
 
 @Composable
 fun DeleteConfirmPopup(onConfirm: () -> Unit, onCancel: () -> Unit) {
   AlertDialog(
     icon = {
-      Icon(Icons.AutoMirrored.Outlined.HelpOutline, contentDescription = "Question Mark Icon")
+      Icon(
+        Icons.AutoMirrored.Outlined.HelpOutline,
+        contentDescription = stringResource(R.string.question_mark_icon)
+      )
     },
     title = {
-      Text(text = "Geofication is active")
+      Text(text = stringResource(R.string.geofication_is_active))
     },
     text = {
-      Text(text = "This Geofication is still active. Are you sure you want to delete it?")
+      Text(text = stringResource(R.string.geofication_still_active))
     },
     onDismissRequest = {
       onCancel()
@@ -29,7 +34,7 @@ fun DeleteConfirmPopup(onConfirm: () -> Unit, onCancel: () -> Unit) {
           onConfirm()
         }
       ) {
-        Text("Delete")
+        Text(stringResource(R.string.delete))
       }
     },
     dismissButton = {
@@ -38,7 +43,7 @@ fun DeleteConfirmPopup(onConfirm: () -> Unit, onCancel: () -> Unit) {
           onCancel()
         }
       ) {
-        Text("Cancel")
+        Text(stringResource(R.string.cancel))
       }
     }
   )

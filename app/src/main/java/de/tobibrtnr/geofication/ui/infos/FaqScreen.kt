@@ -31,38 +31,45 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import de.tobibrtnr.geofication.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FaqScreen(navController: NavHostController) {
 
   val faqList = listOf(
-    "How does the App work?" to "Geofication uses the geofence feature of Google Play Services. This allows the creation and handling of geofences in a very energy efficient and precise way.",
-    "The notifications appear delayed or not at all." to "If this is the case, please check your system settings. Google Play Services have to be enabled and location enhancement needs to be activated. Also, having a kind of energy saving mode activated will impact the performance of the app, leading to geofences not being triggered in the worst case.",
-    "Are there any limitations to the geofences?" to "Because of restrictions from the Google Play Services, a maximum of 100 geofences is allowed."
+    stringResource(R.string.faq_1_q) to stringResource(R.string.faq_1_a),
+    stringResource(R.string.faq_2_q) to stringResource(R.string.faq_2_a),
+    stringResource(R.string.faq_3_q) to stringResource(R.string.faq_3_a)
   )
   Scaffold(
     topBar = {
-      TopAppBar(title = { Text("About, Help, FAQ") },
+      TopAppBar(title = { Text(stringResource(R.string.about_help_faq)) },
         navigationIcon = {
           IconButton(onClick = { navController.navigateUp() }) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+            Icon(
+              Icons.AutoMirrored.Filled.ArrowBack,
+              contentDescription = stringResource(R.string.back)
+            )
           }
         }
       )
     }
   ) {
 
-    Box(modifier = Modifier
-      .padding(start = 16.dp, end = 16.dp)
-      .padding(it)) {
+    Box(
+      modifier = Modifier
+        .padding(start = 16.dp, end = 16.dp)
+        .padding(it)
+    ) {
       Column {
         Text(
-          text = "Here you can find further information about the app.",
+          text = stringResource(R.string.further_information),
           modifier = Modifier.padding(bottom = 16.dp)
         )
 

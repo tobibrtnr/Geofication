@@ -13,18 +13,23 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import de.tobibrtnr.geofication.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SupportScreen(navController: NavHostController) {
   Scaffold(
     topBar = {
-      TopAppBar(title = { Text("Support the Developer") },
+      TopAppBar(title = { Text(stringResource(R.string.support)) },
         navigationIcon = {
           IconButton(onClick = { navController.navigateUp() }) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+            Icon(
+              Icons.AutoMirrored.Filled.ArrowBack,
+              contentDescription = stringResource(R.string.back)
+            )
           }
         }
       )
@@ -38,7 +43,7 @@ fun SupportScreen(navController: NavHostController) {
     ) {
       Column {
         Text(
-          text = "If you want to support the developer, you have a couple of options:\n- Add issues or support development on the official GitHub page\n- Give feedback via the Instagram account, Google Play Store or directly in the app\n- Buy a coffee (Paypal?)\n- Watch an advertisement video\n\nThank you!",
+          text = stringResource(R.string.support_developer),
           modifier = Modifier.padding(bottom = 16.dp)
         )
       }

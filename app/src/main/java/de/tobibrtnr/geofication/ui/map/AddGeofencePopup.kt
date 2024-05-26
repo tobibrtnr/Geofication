@@ -39,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
@@ -46,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.google.android.gms.maps.model.LatLng
+import de.tobibrtnr.geofication.R
 import de.tobibrtnr.geofication.ui.common.MarkerColor
 import de.tobibrtnr.geofication.ui.common.SegmentedButtons
 import de.tobibrtnr.geofication.ui.common.SegmentedRadioButtons
@@ -72,7 +74,8 @@ fun processInput(
   val enteredFloat = try {
     radius.toFloat()
   } catch (e: NumberFormatException) {
-    Toast.makeText(context, "Invalid radius input", Toast.LENGTH_SHORT).show()
+    Toast.makeText(context, context.getString(R.string.invalid_radius_input), Toast.LENGTH_SHORT)
+      .show()
     return
   }
 
@@ -83,8 +86,6 @@ fun processInput(
   if (flagList.contains("exiting")) {
     flags += 2
   }
-
-  println("GEOFENCE NAME: $name")
 
   val newGeofence = Geofence(
     fenceName = name,
@@ -101,7 +102,7 @@ fun processInput(
     message = message,
     flags = flags,
     delay = delay,
-    repeat = true, // TODO, but not used right now
+    repeat = true, // TODO not used right now
     active = true,
     onTrigger = onTrigger,
     triggerCount = 0
@@ -120,13 +121,14 @@ fun AddGeofencePopup(
   rad: Double,
   onDismissRequest: () -> Unit,
 ) {
+  val initialName = stringResource(R.string.unnamed_geofence)
 
   val context = LocalContext.current
 
   var selectedColor by remember { mutableStateOf(MarkerColor.RED) }
   var colorExpanded by remember { mutableStateOf(false) }
   var radius by remember { mutableStateOf((rad * UnitUtil.distanceFactor()).toInt().toString()) }
-  var name by remember { mutableStateOf("Unnamed Geofence") }
+  var name by remember { mutableStateOf(initialName) }
 
   var message by remember { mutableStateOf("") }
 
@@ -144,7 +146,8 @@ fun AddGeofencePopup(
     val listener = object : Geocoder.GeocodeListener {
       override fun onGeocode(addresses: MutableList<Address>) {
         if (addresses.size > 0) {
-          name = "Geofence in ${getLocationName(addresses[0])}"
+          name =
+            context.getString(R.string.geofence_in_location, getLocationName(context, addresses[0]))
         }
       }
 
@@ -156,9 +159,9 @@ fun AddGeofencePopup(
   } else {
     val addresses = geocoder.getFromLocation(pos.latitude, pos.longitude, 1)
     name = if (addresses != null && addresses.size > 0) {
-      "Geofence in ${getLocationName(addresses[0])}"
+      context.getString(R.string.geofence_in_location, getLocationName(context, addresses[0]))
     } else {
-      "Unnamed Geofence"
+      initialName
     }
   }
 
@@ -186,7 +189,7 @@ fun AddGeofencePopup(
           modifier = Modifier.fillMaxWidth()
         ) {
           Text(
-            "New Geofication",
+            stringResource(R.string.new_geofication),
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(start = 16.dp),
             fontWeight = FontWeight.Bold
@@ -220,7 +223,7 @@ fun AddGeofencePopup(
         }
 
         Text(
-          text = "Geofication title",
+          text = stringResource(R.string.geofication_title),
           style = MaterialTheme.typography.titleLarge,
           modifier = Modifier.padding(start = 16.dp)
         )
@@ -233,7 +236,7 @@ fun AddGeofencePopup(
             .border(
               1.dp, Color(0xFF000000), CircleShape
             ),
-          placeholder = { Text("Notification message") },
+          placeholder = { Text(stringResource(R.string.notification_message)) },
           singleLine = true,
           value = message,
           onValueChange = {
@@ -244,7 +247,7 @@ fun AddGeofencePopup(
         )
 
         Text(
-          text = "Geofence radius",
+          text = stringResource(R.string.geofence_radius),
           style = MaterialTheme.typography.titleLarge,
           modifier = Modifier.padding(start = 16.dp)
         )
@@ -262,7 +265,7 @@ fun AddGeofencePopup(
           ),
           shape = MaterialTheme.shapes.medium,
           value = radius,
-          placeholder = { Text("Enter geofence radius") },
+          placeholder = { Text(stringResource(R.string.enter_geofence_radius)) },
           singleLine = true,
           onValueChange = {
             val newValue = it.filter { char ->
@@ -276,30 +279,37 @@ fun AddGeofencePopup(
         )
 
         Text(
-          text = "Trigger event",
+          text = stringResource(R.string.trigger_event),
           style = MaterialTheme.typography.titleLarge,
           modifier = Modifier.padding(start = 16.dp)
         )
 
-        SegmentedButtons("entering", "exiting", { flags = it.toList() }, getFlagsFromList(flags))
+        SegmentedButtons(
+          stringResource(R.string.entering),
+          stringResource(R.string.exiting),
+          "entering",
+          "exiting",
+          { flags = it.toList() },
+          getFlagsFromList(flags)
+        )
 
         Text(
-          text = "Behavior after triggering",
+          text = stringResource(R.string.behavior_after_triggering),
           style = MaterialTheme.typography.titleLarge,
           modifier = Modifier.padding(start = 16.dp)
         )
 
         SegmentedRadioButtons(
-          opt1 = "stay active",
-          opt2 = "disable",
-          opt3 = "delete",
+          opt1 = stringResource(R.string.stay_active),
+          opt2 = stringResource(R.string.disable),
+          opt3 = stringResource(R.string.delete),
           onValueChange = {
             onTrigger = it
           }
         )
 
         Text(
-          text = "Delay after Triggering",
+          text = stringResource(R.string.delay_after_triggering),
           style = MaterialTheme.typography.titleLarge,
           modifier = Modifier.padding(start = 16.dp)
         )
@@ -310,7 +320,7 @@ fun AddGeofencePopup(
           modifier = Modifier.fillMaxWidth()
         ) {
           Text(
-            text = "${delay.roundToInt()} minutes",
+            text = stringResource(R.string.x_minutes, delay.roundToInt()),
             modifier = Modifier.padding(start = 16.dp)
           )
 
@@ -339,7 +349,7 @@ fun AddGeofencePopup(
             onClick = { onDismissRequest() },
             modifier = Modifier.padding(8.dp),
           ) {
-            Text("Cancel")
+            Text(stringResource(R.string.cancel))
           }
           TextButton(
             onClick = {
@@ -359,7 +369,7 @@ fun AddGeofencePopup(
             enabled = inputValid,
             modifier = Modifier.padding(8.dp),
           ) {
-            Text("Save")
+            Text(stringResource(R.string.save))
           }
         }
       }
@@ -367,7 +377,7 @@ fun AddGeofencePopup(
   }
 }
 
-fun getLocationName(address: Address): String {
+fun getLocationName(context: Context, address: Address): String {
   if (address.locality != null) {
     return address.locality
   }
@@ -384,5 +394,5 @@ fun getLocationName(address: Address): String {
     return address.featureName
   }
 
-  return "unnamed Area"
+  return context.getString(R.string.unnamed_area)
 }

@@ -26,9 +26,11 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import de.tobibrtnr.geofication.R
 import de.tobibrtnr.geofication.util.storage.GeofenceUtil
 import de.tobibrtnr.geofication.util.storage.GeoficationGeofence
 
@@ -137,7 +139,7 @@ fun SearchLocationCard(query: String, searchGlobally: (String) -> Unit) {
         .padding(horizontal = 16.dp, vertical = 12.dp)
         .wrapContentSize(Alignment.Center)
     ) {
-      Text("Hit enter to search for a location name globally")
+      Text(stringResource(R.string.hit_enter_to_search))
     }
   }
 }
@@ -156,7 +158,7 @@ fun NoResultCard() {
         .padding(horizontal = 16.dp, vertical = 12.dp)
         .wrapContentSize(Alignment.Center)
     ) {
-      Text("No Geofication or geofence found for the given query.")
+      Text(stringResource(R.string.no_geofication_or_geofence_found))
     }
   }
 }

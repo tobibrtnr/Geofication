@@ -32,11 +32,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import de.tobibrtnr.geofication.R
 import de.tobibrtnr.geofication.ui.GeoficationScreen
 import de.tobibrtnr.geofication.ui.common.CircleWithColor
 import de.tobibrtnr.geofication.ui.common.DeleteConfirmPopup
@@ -60,9 +62,14 @@ fun GeoficationsScreen(
 
   // UI
   Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-    Text(text = "Geofications", style = MaterialTheme.typography.headlineMedium)
+    Text(text = stringResource(R.string.geofications), style = MaterialTheme.typography.headlineMedium)
     Spacer(modifier = Modifier.height(8.dp))
-    Text("${geoficationsArray.size} Geofication${if (geoficationsArray.size == 1) "" else "s"} created.")
+    Text(
+      stringResource(
+        R.string.geofication_created,
+        geoficationsArray.size,
+        if (geoficationsArray.size == 1) "" else "s"
+      ))
     Spacer(modifier = Modifier.height(8.dp))
 
     LazyColumn {
@@ -134,7 +141,7 @@ fun ListItem(geofication: Geofication, navController: NavController) {
 
             Icon(
               imageVector = Icons.Filled.Delete,
-              contentDescription = "Delete Geofication",
+              contentDescription = stringResource(R.string.delete_geofication),
               modifier = Modifier
                 .size(32.dp)
                 .clickable {
@@ -152,7 +159,7 @@ fun ListItem(geofication: Geofication, navController: NavController) {
         Spacer(modifier = Modifier.height(4.dp))
         Text(geofence!!.fenceName, maxLines = 1, overflow = TextOverflow.Ellipsis)
         Spacer(modifier = Modifier.height(4.dp))
-        Text("Trigger Count: ${geofication.triggerCount}")
+        Text(stringResource(R.string.trigger_count, geofication.triggerCount))
       }
     }
     Spacer(modifier = Modifier.height(8.dp))

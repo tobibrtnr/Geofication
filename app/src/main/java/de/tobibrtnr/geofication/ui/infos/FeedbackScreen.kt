@@ -13,18 +13,23 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import de.tobibrtnr.geofication.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FeedbackScreen(navController: NavHostController) {
   Scaffold(
     topBar = {
-      TopAppBar(title = { Text("Feedback") },
+      TopAppBar(title = { Text(stringResource(R.string.feedback)) },
         navigationIcon = {
           IconButton(onClick = { navController.navigateUp() }) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+            Icon(
+              Icons.AutoMirrored.Filled.ArrowBack,
+              contentDescription = stringResource(R.string.back)
+            )
           }
         }
       )
@@ -38,7 +43,7 @@ fun FeedbackScreen(navController: NavHostController) {
     ) {
       Column {
         Text(
-          text = "If you want to send feedback, you have multiple options:\n- You can open an issue on the official GitHub\n- You can give feedback on the Instagram account\n- You can rate the app on the Google Play Store\n- You can send feedback directly over the app",
+          text = stringResource(R.string.send_feedback),
           modifier = Modifier.padding(bottom = 16.dp)
         )
       }

@@ -7,6 +7,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import de.tobibrtnr.geofication.R
 
 @Composable
 fun InfoDialog(title: String, text: String, onDismiss: () -> Unit) {
@@ -29,7 +31,7 @@ fun InfoDialog(title: String, text: String, onDismiss: () -> Unit) {
           onDismiss()
         }
       ) {
-        Text("Okay")
+        Text(stringResource(R.string.okay))
       }
     }
   )

@@ -28,12 +28,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun SegmentedButtons(opt1: String, opt2: String, onValueChange: (List<String>) -> Unit, flags: Int = 1) {
+fun SegmentedButtons(
+  label1: String,
+  label2: String,
+  opt1: String,
+  opt2: String,
+  onValueChange: (List<String>) -> Unit,
+  flags: Int = 1
+) {
   val initialList = mutableListOf<String>()
-  if(flags == 1 || flags == 3) {
+  if (flags == 1 || flags == 3) {
     initialList.add(opt1)
   }
-  if(flags == 2 || flags == 3) {
+  if (flags == 2 || flags == 3) {
     initialList.add(opt2)
   }
 
@@ -45,6 +52,7 @@ fun SegmentedButtons(opt1: String, opt2: String, onValueChange: (List<String>) -
       .padding(16.dp)
   ) {
     SegmentedButton(
+      label = label1,
       option = opt1,
       selectedOption = selectedOptions,
       onOptionSelected = {
@@ -62,6 +70,7 @@ fun SegmentedButtons(opt1: String, opt2: String, onValueChange: (List<String>) -
       icon = Icons.AutoMirrored.Filled.ArrowForward
     )
     SegmentedButton(
+      label = label2,
       option = opt2,
       selectedOption = selectedOptions,
       onOptionSelected = {
@@ -83,6 +92,7 @@ fun SegmentedButtons(opt1: String, opt2: String, onValueChange: (List<String>) -
 
 @Composable
 fun SegmentedButton(
+  label: String,
   option: String,
   selectedOption: List<String>,
   onOptionSelected: (String) -> Unit,
@@ -107,9 +117,9 @@ fun SegmentedButton(
       horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
       Icon(
-        icon, contentDescription = "button description"
+        icon, contentDescription = label
       )
-      Text(text = option)
+      Text(text = label)
     }
   }
 }
@@ -117,5 +127,10 @@ fun SegmentedButton(
 @Preview(showBackground = true)
 @Composable
 fun SegmentedButtonsPreview() {
-  SegmentedButtons(opt1 = "entering", opt2 = "exiting", onValueChange = {})
+  SegmentedButtons(
+    label1 = "entering",
+    label2 = "exiting",
+    opt1 = "entering",
+    opt2 = "exiting",
+    onValueChange = {})
 }

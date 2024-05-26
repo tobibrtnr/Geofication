@@ -31,7 +31,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import de.tobibrtnr.geofication.R
 import de.tobibrtnr.geofication.util.storage.LogEntry
 import de.tobibrtnr.geofication.util.storage.LogUtil
 import de.tobibrtnr.geofication.util.storage.SettingsUtil
@@ -65,9 +67,9 @@ fun SettingsScreen(
 
   // UI
   Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-    Text(text = "Settings", style = MaterialTheme.typography.headlineMedium)
+    Text(text = stringResource(R.string.settings), style = MaterialTheme.typography.headlineMedium)
     Spacer(modifier = Modifier.height(8.dp))
-    Text(text = "Theme", style = MaterialTheme.typography.titleLarge)
+    Text(text = stringResource(R.string.theme), style = MaterialTheme.typography.titleLarge)
     Row(verticalAlignment = Alignment.CenterVertically) {
       RadioButton(
         selected = selectedMode == "yes",
@@ -77,7 +79,7 @@ fun SettingsScreen(
         )
         },
       )
-      Text(text = "Dark Mode")
+      Text(text = stringResource(R.string.dark_mode))
     }
 
     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -89,7 +91,7 @@ fun SettingsScreen(
         )
         },
       )
-      Text(text = "Light Mode")
+      Text(text = stringResource(R.string.light_mode))
     }
 
     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -101,10 +103,10 @@ fun SettingsScreen(
         )
         },
       )
-      Text(text = "System Default")
+      Text(text = stringResource(R.string.system_default))
     }
     Spacer(modifier = Modifier.height(8.dp))
-    Text(text = "Distance Unit", style = MaterialTheme.typography.titleLarge)
+    Text(text = stringResource(R.string.distance_unit), style = MaterialTheme.typography.titleLarge)
     Row(verticalAlignment = Alignment.CenterVertically) {
       RadioButton(
         selected = selectedUnit,
@@ -113,7 +115,7 @@ fun SettingsScreen(
           UnitUtil.setDistanceUnit(true)
         },
       )
-      Text(text = "Metric (m)")
+      Text(text = stringResource(R.string.metric_m))
     }
 
     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -124,11 +126,11 @@ fun SettingsScreen(
           UnitUtil.setDistanceUnit(false)
         },
       )
-      Text(text = "Imperial (ft)")
+      Text(text = stringResource(R.string.imperial_ft))
     }
     Spacer(modifier = Modifier.height(8.dp))
     Row(verticalAlignment = Alignment.CenterVertically) {
-      Text(text = "Debug Log", style = MaterialTheme.typography.titleLarge)
+      Text(text = stringResource(R.string.debug_log), style = MaterialTheme.typography.titleLarge)
       Spacer(Modifier.width(8.dp))
       Button(onClick = {
         CoroutineScope(SupervisorJob()).launch {
@@ -136,7 +138,7 @@ fun SettingsScreen(
           logEntryArray = LogUtil.getLogs()
         }
       }) {
-        Text("Clear Log")
+        Text(stringResource(R.string.clear_log))
       }
     }
     Spacer(modifier = Modifier.height(8.dp))

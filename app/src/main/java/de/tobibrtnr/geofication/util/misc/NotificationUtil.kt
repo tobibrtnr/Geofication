@@ -9,6 +9,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import androidx.compose.ui.res.stringResource
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -52,7 +53,7 @@ fun sendNotification(context: Context, fence: Geofence, notif: Geofication) {
     .setContentIntent(pendingIntent)
 
   // Add quick action buttons depending on trigger mode
-  if(notif.onTrigger == 0 || notif.onTrigger == 1) {
+  if (notif.onTrigger == 0 || notif.onTrigger == 1) {
     val deleteIntent = Intent(context, NotificationReceiver::class.java).apply {
       action = "DELETE_ACTION"
       putExtra("id", fence.id)
@@ -63,9 +64,13 @@ fun sendNotification(context: Context, fence: Geofence, notif: Geofication) {
       deleteIntent,
       PendingIntent.FLAG_MUTABLE
     )
-    builder.addAction(R.drawable.ic_notification, "Delete", deletePendingIntent)
+    builder.addAction(
+      R.drawable.ic_notification,
+      context.getString(R.string.delete),
+      deletePendingIntent
+    )
   }
-  if(notif.onTrigger == 0) {
+  if (notif.onTrigger == 0) {
     val disableIntent = Intent(context, NotificationReceiver::class.java).apply {
       action = "DISABLE_ACTION"
       putExtra("id", notif.id)
@@ -76,7 +81,11 @@ fun sendNotification(context: Context, fence: Geofence, notif: Geofication) {
       disableIntent,
       PendingIntent.FLAG_MUTABLE
     )
-    builder.addAction(R.drawable.ic_notification, "Disable", deletePendingIntent)
+    builder.addAction(
+      R.drawable.ic_notification,
+      context.getString(R.string.disable),
+      deletePendingIntent
+    )
   }
 
   // Show the notification
@@ -105,10 +114,10 @@ private fun createNotificationChannel(context: Context) {
   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
     val channel = NotificationChannel(
       CHANNEL_ID,
-      "Geofication",
+      context.getString(R.string.geofication),
       NotificationManager.IMPORTANCE_HIGH
     ).apply {
-      description = "Geofication Notifications"
+      description = context.getString(R.string.geofication_notifications)
     }
 
     // Register the channel with the system

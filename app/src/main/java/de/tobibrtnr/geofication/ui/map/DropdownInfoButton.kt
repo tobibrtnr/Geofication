@@ -9,17 +9,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.AbsoluteRoundedCornerShape
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
@@ -35,10 +31,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import de.tobibrtnr.geofication.R
 
 @Composable
 fun DropdownInfoButton(
@@ -85,7 +82,7 @@ fun DropdownInfoButton(
         ) {
           Icon(
             imageVector = Icons.Filled.Close,
-            contentDescription = "Clear search query"
+            contentDescription = stringResource(R.string.clear_search_query)
           )
         }
         VerticalDivider(thickness = 1.dp, color = Color.Black)
@@ -103,7 +100,7 @@ fun DropdownInfoButton(
       ) {
         Icon(
           imageVector = Icons.Filled.MoreVert,
-          contentDescription = "Open Dropdown Menu"
+          contentDescription = stringResource(R.string.open_dropdown_menu)
         )
       }
 
@@ -117,21 +114,21 @@ fun DropdownInfoButton(
             showMenu = false
             navController.navigate("faq")
           },
-          text = { Text("About, Help, FAQ") }
+          text = { Text(stringResource(R.string.about_help_faq)) }
         )
         DropdownMenuItem(
           onClick = {
             showMenu = false
             navController.navigate("support")
           },
-          text = { Text("Support the Developer") }
+          text = { Text(stringResource(R.string.support)) }
         )
         DropdownMenuItem(
           onClick = {
             showMenu = false
             navController.navigate("feedback")
           },
-          text = { Text("Send Feedback") }
+          text = { Text(stringResource(R.string.feedback)) }
         )
       }
     }

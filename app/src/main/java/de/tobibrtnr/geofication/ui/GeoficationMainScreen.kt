@@ -1,6 +1,7 @@
 package de.tobibrtnr.geofication.ui
 
 import android.Manifest
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
@@ -24,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -36,15 +38,16 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.accompanist.permissions.rememberPermissionState
+import de.tobibrtnr.geofication.R
 import de.tobibrtnr.geofication.ui.geofications.GeoficationsScreen
 import de.tobibrtnr.geofication.ui.map.MapScreen
 import de.tobibrtnr.geofication.ui.settings.SettingsScreen
 import de.tobibrtnr.geofication.ui.startup.PermissionScreen
 
-enum class GeoficationScreen(val title: String, val icon: ImageVector) {
-  Start(title = "Map", icon = Icons.Outlined.Map),
-  Geofications(title = "Geofications", icon = Icons.Outlined.Notifications),
-  Settings(title = "Settings", icon = Icons.Outlined.Settings)
+enum class GeoficationScreen(@StringRes val title: Int, val icon: ImageVector) {
+  Start(title = R.string.map, icon = Icons.Outlined.Map),
+  Geofications(title = R.string.geofications, icon = Icons.Outlined.Notifications),
+  Settings(title = R.string.settings, icon = Icons.Outlined.Settings)
 }
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -99,7 +102,7 @@ fun GeoficationApp(
               selected = sel,
               label = {
                 Text(
-                  text = navItem.title,
+                  text = stringResource(navItem.title),
                   fontWeight = if (sel) FontWeight.Bold else FontWeight.Normal
                 )
               },
@@ -115,7 +118,7 @@ fun GeoficationApp(
                   restoreState = true
                 }
               },
-              icon = { Icon(navItem.icon, contentDescription = navItem.title) })
+              icon = { Icon(navItem.icon, contentDescription = stringResource(navItem.title)) })
           }
         }
       }

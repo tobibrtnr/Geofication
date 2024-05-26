@@ -41,11 +41,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import de.tobibrtnr.geofication.R
 import de.tobibrtnr.geofication.ui.common.MarkerColor
 import de.tobibrtnr.geofication.ui.common.SegmentedButtons
 import de.tobibrtnr.geofication.ui.common.SegmentedRadioButtons
@@ -154,7 +156,7 @@ fun EditGeoficationPopup(
             modifier = Modifier.fillMaxWidth()
           ) {
             Text(
-              "Edit",
+              text = stringResource(R.string.edit),
               style = MaterialTheme.typography.headlineMedium,
               modifier = Modifier.padding(start = 16.dp),
               fontWeight = FontWeight.Bold
@@ -171,7 +173,7 @@ fun EditGeoficationPopup(
 
               Icon(
                 imageVector = Icons.Filled.Delete,
-                contentDescription = "Delete Geofication",
+                contentDescription = stringResource(R.string.delete_geofication),
                 modifier = Modifier
                   .size(32.dp)
                   .clickable {
@@ -213,7 +215,7 @@ fun EditGeoficationPopup(
           }
 
           Text(
-            text = "Geofication title",
+            text = stringResource(R.string.geofication_title),
             style = MaterialTheme.typography.titleLarge,
             modifier = Modifier.padding(start = 16.dp)
           )
@@ -226,7 +228,7 @@ fun EditGeoficationPopup(
               .border(
                 1.dp, Color(0xFF000000), CircleShape
               ),
-            placeholder = { Text("Notification message") },
+            placeholder = { Text(stringResource(R.string.notification_message)) },
             singleLine = true,
             value = selectedGeofication!!.message,
             onValueChange = {
@@ -244,7 +246,7 @@ fun EditGeoficationPopup(
               .border(
                 1.dp, Color(0xFF000000), CircleShape
               ),
-            placeholder = { Text("Geofence name") },
+            placeholder = { Text(stringResource(R.string.geofence_name)) },
             singleLine = true,
             value = selectedGeofence!!.fenceName,
             onValueChange = {
@@ -267,7 +269,7 @@ fun EditGeoficationPopup(
             ),
             shape = MaterialTheme.shapes.medium,
             value = selectedGeofence!!.radius.toString(),
-            placeholder = { Text("Enter geofence radius") },
+            placeholder = { Text(stringResource(R.string.enter_geofence_radius)) },
             singleLine = true,
             onValueChange = {
               val newValue = it.filter { char ->
@@ -282,26 +284,33 @@ fun EditGeoficationPopup(
           )
 
           Text(
-            text = "Trigger event",
+            text = stringResource(R.string.trigger_event),
             style = MaterialTheme.typography.titleLarge,
             modifier = Modifier.padding(start = 16.dp)
           )
 
-          SegmentedButtons("entering", "exiting", {
-            selectedGeofication = selectedGeofication!!.copy(flags = getFlagsFromList(it))
-            inputValid = isInputValid()
-          }, selectedGeofication!!.flags)
+          SegmentedButtons(
+            stringResource(R.string.entering),
+            stringResource(R.string.exiting),
+            "entering",
+            "exiting",
+            {
+              selectedGeofication = selectedGeofication!!.copy(flags = getFlagsFromList(it))
+              inputValid = isInputValid()
+            },
+            selectedGeofication!!.flags
+          )
 
           Text(
-            text = "Behavior after triggering",
+            text = stringResource(R.string.behavior_after_triggering),
             style = MaterialTheme.typography.titleLarge,
             modifier = Modifier.padding(start = 16.dp)
           )
 
           SegmentedRadioButtons(
-            opt1 = "stay active",
-            opt2 = "disable",
-            opt3 = "delete",
+            opt1 = stringResource(R.string.stay_active),
+            opt2 = stringResource(R.string.disable),
+            opt3 = stringResource(R.string.delete),
             onValueChange = {
               selectedGeofication = selectedGeofication!!.copy(onTrigger = it)
               inputValid = isInputValid()
@@ -310,7 +319,7 @@ fun EditGeoficationPopup(
           )
 
           Text(
-            text = "Delay after Triggering",
+            text = stringResource(R.string.delay_after_triggering),
             style = MaterialTheme.typography.titleLarge,
             modifier = Modifier.padding(start = 16.dp)
           )
@@ -321,7 +330,7 @@ fun EditGeoficationPopup(
             modifier = Modifier.fillMaxWidth()
           ) {
             Text(
-              text = "${selectedGeofication!!.delay} minutes",
+              text = stringResource(R.string.x_minutes, selectedGeofication!!.delay),
               modifier = Modifier.padding(start = 16.dp)
             )
 
@@ -367,7 +376,7 @@ fun EditGeoficationPopup(
               enabled = inputValid,
               modifier = Modifier.padding(8.dp),
             ) {
-              Text("Save")
+              Text(stringResource(R.string.save))
             }
           }
         }
