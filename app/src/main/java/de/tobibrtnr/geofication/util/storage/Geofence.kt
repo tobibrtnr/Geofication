@@ -13,6 +13,7 @@ import androidx.room.RoomDatabase
 import androidx.room.Transaction
 import de.tobibrtnr.geofication.ui.common.MarkerColor
 import kotlinx.coroutines.flow.Flow
+import java.io.Serializable
 
 data class GeoficationGeofence(
   val message: String,
@@ -37,7 +38,7 @@ data class Geofence(
   var color: MarkerColor,
   var active: Boolean,
   val triggerCount: Int
-)
+) : Serializable
 
 @Entity(
   foreignKeys = [ForeignKey(
@@ -59,7 +60,7 @@ data class Geofication(
   val active: Boolean,
   var onTrigger: Int,
   val triggerCount: Int
-)
+) : Serializable
 
 @Entity
 data class LogEntry(

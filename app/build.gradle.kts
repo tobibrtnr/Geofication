@@ -96,6 +96,9 @@ dependencies {
   // Accompanist, utilities for e.g. permission handling
   implementation("com.google.accompanist:accompanist-permissions:0.34.0")
 
+  // WorkManager for Geofication trigger handling after x minutes
+  implementation("androidx.work:work-runtime-ktx:2.9.0")
+
   testImplementation("junit:junit:4.13.2")
 
   androidTestImplementation("androidx.test.ext:junit:1.1.5")

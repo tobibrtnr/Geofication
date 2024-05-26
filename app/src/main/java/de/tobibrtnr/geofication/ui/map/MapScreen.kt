@@ -34,6 +34,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,9 +49,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.core.app.ActivityCompat
-//import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -66,10 +65,8 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapType
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.google.maps.android.compose.widgets.DisappearingScaleBar
 import com.google.maps.android.compose.widgets.ScaleBar
 import de.tobibrtnr.geofication.R
-import de.tobibrtnr.geofication.ui.common.DeleteConfirmPopup
 import de.tobibrtnr.geofication.ui.common.MarkerColor
 import de.tobibrtnr.geofication.ui.infos.FaqScreen
 import de.tobibrtnr.geofication.ui.infos.FeedbackScreen
@@ -83,7 +80,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import kotlin.math.roundToInt
 
@@ -98,13 +94,15 @@ fun MapScreen(
   val mapNavController = rememberNavController()
 
   NavHost(navController = mapNavController, startDestination = "mapMain") {
-    composable("mapMain") { MapScreenMain(
-      topPadding = topPadding,
-      openGeoId = openGeoId,
-      intentQuery = intentQuery,
-      mapViewModel = mapViewModel,
-      navController = mapNavController
-    ) }
+    composable("mapMain") {
+      MapScreenMain(
+        topPadding = topPadding,
+        openGeoId = openGeoId,
+        intentQuery = intentQuery,
+        mapViewModel = mapViewModel,
+        navController = mapNavController
+      )
+    }
     composable("faq") {
       FaqScreen(
         navController = mapNavController
@@ -201,6 +199,8 @@ fun MapScreenMain(
   val searchInputState = remember { mutableStateOf("") }
 
   var currentLocation by remember { mutableStateOf(LatLng(0.0, 0.0)) }
+
+  val gestureCoroutineScope = rememberCoroutineScope()
 
   // If location permission is given, get it and set the camera position to it
   if (ActivityCompat.checkSelfPermission(
@@ -522,27 +522,29 @@ fun MapScreenMain(
           awaitEachGesture {
             do {
               val event = awaitPointerEvent()
+
               event.changes.forEach {
                 when (event.type) {
                   PointerEventType.Move -> {
-                    if (tempGeofenceLocation != null) {
-                      val projection = cameraPositionState.projection
-                      if (projection != null) {
-                        val pointerLocation = projection.fromScreenLocation(
-                          Point(
-                            it.position.x.toInt(),
-                            it.position.y.toInt()
+
+                    gestureCoroutineScope.launch {
+                      if (tempGeofenceLocation != null) {
+                        val projection = cameraPositionState.projection
+                        if (projection != null) {
+                          val pointerLocation = projection.fromScreenLocation(
+                            Point(
+                              it.position.x.toInt(),
+                              it.position.y.toInt()
+                            )
                           )
-                        )
-                        tempGeofenceRadius =
-                          SphericalUtil.computeDistanceBetween(
-                            tempGeofenceLocation,
-                            pointerLocation
-                          )
-                        if (tempGeofenceRadius < 30.0) tempGeofenceRadius = 30.0
-                        /*if (dragAmount.x > 0.5 || dragAmount.y > 0.5) {
+                          tempGeofenceRadius =
+                            SphericalUtil.computeDistanceBetween(
+                              tempGeofenceLocation,
+                              pointerLocation
+                            )
+                          if (tempGeofenceRadius < 30.0) tempGeofenceRadius = 30.0
                           Vibrate.vibrate(context, 1)
-                        }*/
+                        }
                       }
                     }
                   }

@@ -126,7 +126,7 @@ fun SettingsScreen(
       )
       Text(text = "Imperial (ft)")
     }
-    /*Spacer(modifier = Modifier.height(8.dp))
+    Spacer(modifier = Modifier.height(8.dp))
     Row(verticalAlignment = Alignment.CenterVertically) {
       Text(text = "Debug Log", style = MaterialTheme.typography.titleLarge)
       Spacer(Modifier.width(8.dp))
@@ -146,11 +146,11 @@ fun SettingsScreen(
         ListItem(it)
       }
 
-    }*/
+    }
   }
 }
 
-/*@Composable
+@Composable
 fun ListItem(logEntry: LogEntry) {
   Card(
     colors = CardDefaults.cardColors()
@@ -179,4 +179,4 @@ fun ListItem(logEntry: LogEntry) {
     }
   }
   Spacer(modifier = Modifier.height(8.dp))
-}*/
+}

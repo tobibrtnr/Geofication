@@ -3,6 +3,9 @@ package de.tobibrtnr.geofication.util.receivers
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofenceStatusCodes
 import com.google.android.gms.location.GeofencingEvent
@@ -10,9 +13,10 @@ import de.tobibrtnr.geofication.util.storage.GeofenceUtil
 import de.tobibrtnr.geofication.util.storage.LogUtil
 import de.tobibrtnr.geofication.util.misc.ServiceProvider
 import de.tobibrtnr.geofication.util.misc.sendNotification
+import de.tobibrtnr.geofication.util.misc.serializeObject
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import kotlin.concurrent.thread
-
+import java.util.concurrent.TimeUnit
 
 class GeofenceBroadcastReceiver : BroadcastReceiver() {
   override fun onReceive(context: Context, intent: Intent) {
@@ -41,14 +45,11 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
       // Get the geofences that were triggered. A single event can trigger multiple geofences.
       val triggeringGeofences = geofencingEvent.triggeringGeofences
 
-      // Delay of the one geofication that is assigned to the geofence
-      var delay = 0
-
       triggeringGeofences?.forEachIndexed { _, geofence ->
 
         LogUtil.addLog(
           "Geofence ${geofence.requestId} was triggered.\n" +
-              "Entering? $geofenceTransition\n"
+              "Entering? $geofenceTransition"
         )
 
         runBlocking {
@@ -64,32 +65,26 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
             return@runBlocking
           }
 
+          // Get current triggered geofication
           val tNotif = geofications[0]
 
-          // If the flags equals the triggered one or is both, and the geofication is active:
-          if ((tNotif.flags == geofenceTransition || tNotif.flags == 3) && tNotif.active) {
-            GeofenceUtil.incrementNotifTriggerCount(tNotif.id)
-            delay = tNotif.delay
-          }
+          val fenceBytes = serializeObject(tFence)
+          val notifBytes = serializeObject(tNotif)
 
-          when (tNotif.onTrigger) {
-            1 -> GeofenceUtil.setNotifActive(tNotif.id, false)
-            2 -> GeofenceUtil.deleteGeofence(tFence.id)
-          }
+          val input = Data.Builder()
+            .putByteArray("tFence", fenceBytes)
+            .putByteArray("tNotif", notifBytes)
+            .putInt("geofenceTransition", geofenceTransition)
+            .build()
 
-          LogUtil.addLog("Attempt to send Notification \"${tNotif.message}\", \"${tFence.fenceName}\"")
+          val notifWorkerRequest = OneTimeWorkRequestBuilder<GeoficationWorker>()
+            .setInputData(input)
+            .setInitialDelay(tNotif.delay.toLong(), TimeUnit.MINUTES)
+            .build()
 
-          thread {
-            // x minutes in ms
-            // TODO does not work on real device
-            Thread.sleep((delay * 60 * 1000).toLong())
+          WorkManager.getInstance(context).enqueue(notifWorkerRequest)
 
-            sendNotification(
-              context,
-              tFence,
-              tNotif
-            )
-          }
+          LogUtil.addLog("Worker Request started. Notification in ${tNotif.delay} minutes.")
         }
       }
     } else {
