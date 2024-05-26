@@ -2,6 +2,8 @@ package de.tobibrtnr.geofication.ui.settings
 
 import android.app.UiModeManager
 import android.content.Context
+import android.content.Intent
+import android.content.res.Configuration
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatDelegate
@@ -16,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -32,8 +35,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import de.tobibrtnr.geofication.MainActivity
 import de.tobibrtnr.geofication.R
+import de.tobibrtnr.geofication.util.storage.LocaleUtil
 import de.tobibrtnr.geofication.util.storage.LogEntry
 import de.tobibrtnr.geofication.util.storage.LogUtil
 import de.tobibrtnr.geofication.util.storage.SettingsUtil
@@ -59,6 +65,11 @@ fun SettingsScreen(
   // true is meter, false is foot
   var selectedUnit by remember { mutableStateOf(UnitUtil.getDistanceUnit()) }
 
+  // locale
+  val languageNames by lazy { context.resources.getStringArray(R.array.languages) }
+  val languageCodes by lazy { context.resources.getStringArray(R.array.language_codes) }
+  var selectedLocale by remember { mutableStateOf(LocaleUtil.getLocale()) }
+
   var logEntryArray by remember { mutableStateOf(emptyList<LogEntry>()) }
   LaunchedEffect(Unit) {
     val logEntries = LogUtil.getLogs()
@@ -68,7 +79,10 @@ fun SettingsScreen(
   // UI
   Column(modifier = Modifier.padding(horizontal = 16.dp)) {
     Text(text = stringResource(R.string.settings), style = MaterialTheme.typography.headlineMedium)
+
     Spacer(modifier = Modifier.height(8.dp))
+
+    // Dark / Light Theme
     Text(text = stringResource(R.string.theme), style = MaterialTheme.typography.titleLarge)
     Row(verticalAlignment = Alignment.CenterVertically) {
       RadioButton(
@@ -105,7 +119,10 @@ fun SettingsScreen(
       )
       Text(text = stringResource(R.string.system_default))
     }
+
     Spacer(modifier = Modifier.height(8.dp))
+
+    // Distance Unit
     Text(text = stringResource(R.string.distance_unit), style = MaterialTheme.typography.titleLarge)
     Row(verticalAlignment = Alignment.CenterVertically) {
       RadioButton(
@@ -128,7 +145,41 @@ fun SettingsScreen(
       )
       Text(text = stringResource(R.string.imperial_ft))
     }
+
     Spacer(modifier = Modifier.height(8.dp))
+
+    // Locale
+    Text(text = stringResource(R.string.language), style = MaterialTheme.typography.titleLarge)
+
+    languageNames.forEachIndexed { index, language ->
+      val isSelected = selectedLocale == languageCodes[index]
+      Row(
+        modifier = Modifier
+          .fillMaxWidth()
+          .selectable(
+            selected = isSelected,
+            onClick = {
+              selectedLocale = languageCodes[index]
+              LocaleUtil.setLocale(context, languageCodes[index])
+              println("SET NEW LOCALE ${languageCodes[index]}")
+            },
+            role = Role.RadioButton
+          )
+          .padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+      ) {
+        RadioButton(
+          selected = isSelected,
+          onClick = null // null recommended for accessibility with screenreaders
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(text = language)
+      }
+    }
+
+    Spacer(modifier = Modifier.height(8.dp))
+
+    // Debug Log
     Row(verticalAlignment = Alignment.CenterVertically) {
       Text(text = stringResource(R.string.debug_log), style = MaterialTheme.typography.titleLarge)
       Spacer(Modifier.width(8.dp))

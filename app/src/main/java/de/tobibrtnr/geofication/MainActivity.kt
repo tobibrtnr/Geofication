@@ -9,6 +9,7 @@ import com.google.android.gms.maps.MapsInitializer
 import de.tobibrtnr.geofication.ui.GeoficationApp
 import de.tobibrtnr.geofication.ui.theme.GeoficationTheme
 import de.tobibrtnr.geofication.util.misc.ServiceProvider
+import de.tobibrtnr.geofication.util.storage.LocaleUtil
 import de.tobibrtnr.geofication.util.storage.UnitUtil
 
 class MainActivity : ComponentActivity() {
@@ -35,6 +36,7 @@ class MainActivity : ComponentActivity() {
     ServiceProvider.setInstance(this)
 
     UnitUtil.init(this)
+    LocaleUtil.init(this)
 
     val openGeoId = intent.getIntExtra("openGeoId", -1)
 

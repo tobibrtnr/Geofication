@@ -14,16 +14,16 @@
     <string name="faq_2_a">Wenn dies der Fall ist, überprüfen Sie bitte Ihre Systemeinstellungen. Google Play-Dienste müssen aktiviert sein und die Standortverbesserung muss aktiviert sein. Außerdem kann ein aktivierter Energiesparmodus die Leistung der App beeinträchtigen, was dazu führen kann, dass Geofences im schlimmsten Fall nicht ausgelöst werden.</string>
     <string name="faq_3_q">Gibt es irgendwelche Einschränkungen für die Geofences?</string>
     <string name="faq_3_a">Aufgrund von Beschränkungen der Google Play-Dienste sind maximal 100 Geofences erlaubt.</string>
-    <string name="about_help_faq">Über, Hilfe, FAQ</string>
+    <string name="about_help_faq">Infos, Hilfe, FAQ</string>
     <string name="further_information">Hier finden Sie weitere Informationen zur App.</string>
     <string name="back">Zurück</string>
     <string name="send_feedback">Wenn Sie Feedback senden möchten, haben Sie mehrere Möglichkeiten:\n- Sie können ein Issue auf dem offiziellen GitHub eröffnen\n- Sie können Feedback auf dem Instagram-Konto geben\n- Sie können die App im Google Play Store bewerten\n- Sie können Feedback direkt über die App senden</string>
     <string name="feedback">Feedback</string>
     <string name="support_developer">Wenn Sie den Entwickler unterstützen möchten, haben Sie mehrere Möglichkeiten:\n- Probleme hinzufügen oder die Entwicklung auf der offiziellen GitHub-Seite unterstützen\n- Feedback über das Instagram-Konto, den Google Play Store oder direkt in der App geben\n- Einen Kaffee kaufen (Paypal?)\n- Ein Werbevideo ansehen\n\nVielen Dank!</string>
-    <string name="support">Entwickler unterstützen</string>
+    <string name="support">Den Entwickler unterstützen</string>
     <string name="question_mark_icon">Fragezeichen-Symbol</string>
-    <string name="invalid_radius_input">Ungültige Radius-Eingabe</string>
-    <string name="unnamed_geofence">Unbenanntes Geofence</string>
+    <string name="invalid_radius_input">Ungültiger Radius</string>
+    <string name="unnamed_geofence">Unbenannter Geofence</string>
     <string name="geofence_in_location">Geofence in %1$s</string>
     <string name="new_geofication">Neue Geofication</string>
     <string name="geofication_title">Geofication-Titel</string>
@@ -39,7 +39,7 @@
     <string name="delay_after_triggering">Verzögerung nach dem Auslösen</string>
     <string name="x_minutes">%1$s Minuten</string>
     <string name="save">Speichern</string>
-    <string name="unnamed_area">Unbenanntes Gebiet</string>
+    <string name="unnamed_area">unbenanntem Gebiet</string>
     <string name="clear_search_query">Suchanfrage löschen</string>
     <string name="open_dropdown_menu">Dropdown-Menü öffnen</string>
     <string name="edit">Bearbeiten</string>
@@ -63,7 +63,7 @@
     <string name="distance_unit">Entfernungseinheit</string>
     <string name="okay">Okay</string>
     <string name="permissions_1_h">Benachrichtigungen</string>
-    <string name="permissions_1_a">Die Benachrichtigungsberechtigung wird benötigt, um Ihnen eine Nachricht zu senden, wenn Sie Ihr angegebenes Geofence betreten oder verlassen.</string>
+    <string name="permissions_1_a">Die Benachrichtigungsberechtigung wird benötigt, um Ihnen eine Nachricht zu senden, wenn Sie Ihren angegebenen Geofence betreten oder verlassen.</string>
     <string name="permissions_2_h">Allgemeiner Standort</string>
     <string name="permissions_2_a">Die allgemeine Standortberechtigung ermöglicht es der App, Ihren Standort zu verfolgen. Dies ist notwendig, um zu überprüfen, wann Sie Ihre Geofences betreten oder verlassen.</string>
     <string name="permissions_3_h">Hintergrundstandort</string>
@@ -79,4 +79,5 @@
     <string name="map">Karte</string>
     <string name="geofication_notifications">Geofication-Benachrichtigungen</string>
     <string name="geofication">Geofication</string>
+    <string name="language">Sprache</string>
 </resources>
