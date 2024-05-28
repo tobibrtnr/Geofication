@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -62,14 +63,18 @@ fun GeoficationsScreen(
 
   // UI
   Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-    Text(text = stringResource(R.string.geofications), style = MaterialTheme.typography.headlineMedium)
+    Text(
+      text = stringResource(R.string.geofications),
+      style = MaterialTheme.typography.headlineMedium
+    )
     Spacer(modifier = Modifier.height(8.dp))
     Text(
       stringResource(
         R.string.geofication_created,
         geoficationsArray.size,
         if (geoficationsArray.size == 1) "" else "s"
-      ))
+      )
+    )
     Spacer(modifier = Modifier.height(8.dp))
 
     LazyColumn {
@@ -105,7 +110,7 @@ fun ListItem(geofication: Geofication, navController: NavController) {
     Card(
       colors = CardDefaults.cardColors(),
       onClick = {
-        navController.navigate("${GeoficationScreen.Start.name}/${geofence!!.id}")
+        navController.navigate("${GeoficationScreen.Start.name}/${geofence!!.id}/false")
       }
     ) {
       Column(
@@ -118,26 +123,42 @@ fun ListItem(geofication: Geofication, navController: NavController) {
           verticalAlignment = Alignment.CenterVertically,
           modifier = Modifier.fillMaxWidth()
         ) {
-            Row {
-              CircleWithColor(color = geofence!!.color.color, radius = 15.dp, modifier = Modifier.shadow(4.dp, CircleShape))
-              Spacer(Modifier.width(8.dp))
-              Text(
-                modifier = Modifier.fillMaxWidth(0.65f),
-                text = geofication.message,
-                style = MaterialTheme.typography.headlineSmall,
-                fontStyle = if (geofication.active) FontStyle.Normal else FontStyle.Italic,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-              )
+          Row {
+            CircleWithColor(
+              color = geofence!!.color.color,
+              radius = 15.dp,
+              modifier = Modifier.shadow(4.dp, CircleShape)
+            )
+            Spacer(Modifier.width(8.dp))
+            Text(
+              modifier = Modifier.fillMaxWidth(0.55f),
+              text = geofication.message,
+              style = MaterialTheme.typography.headlineSmall,
+              fontStyle = if (geofication.active) FontStyle.Normal else FontStyle.Italic,
+              maxLines = 1,
+              overflow = TextOverflow.Ellipsis
+            )
           }
 
-          Row(verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+          Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+          ) {
             Switch(checked = geofication.active, onCheckedChange = {
               CoroutineScope(SupervisorJob()).launch {
                 GeofenceUtil.setNotifActive(geofication.id, it)
               }
             })
+
+            Icon(
+              imageVector = Icons.Filled.Edit,
+              contentDescription = stringResource(R.string.edit),
+              modifier = Modifier
+                .size(32.dp)
+                .clickable {
+                  navController.navigate("${GeoficationScreen.Start.name}/${geofence!!.id}/true")
+                }
+            )
 
             Icon(
               imageVector = Icons.Filled.Delete,

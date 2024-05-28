@@ -65,6 +65,8 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapType
 import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.widgets.ScaleBar
 import de.tobibrtnr.geofication.R
@@ -89,6 +91,7 @@ fun MapScreen(
   modifier: Modifier = Modifier,
   topPadding: Dp,
   openGeoId: Int?,
+  edit: Boolean?,
   intentQuery: String,
   mapViewModel: MapViewModel = viewModel(),
 ) {
@@ -99,6 +102,7 @@ fun MapScreen(
       MapScreenMain(
         topPadding = topPadding,
         openGeoId = openGeoId,
+        edit = edit,
         intentQuery = intentQuery,
         mapViewModel = mapViewModel,
         navController = mapNavController
@@ -127,6 +131,7 @@ fun MapScreenMain(
   modifier: Modifier = Modifier,
   topPadding: Dp,
   openGeoId: Int?,
+  edit: Boolean?,
   intentQuery: String,
   mapViewModel: MapViewModel,
   navController: NavHostController
@@ -144,13 +149,6 @@ fun MapScreenMain(
   }
 
   val context = LocalContext.current
-
-  var openedGeofence by remember { mutableStateOf<Geofence?>(null) }
-
-  LaunchedEffect(Unit) {
-    openedGeofence =
-      if (openGeoId != null && openGeoId > 0) GeofenceUtil.getGeofenceById(openGeoId) else null
-  }
 
   val mapStyleOptions = if (isSystemInDarkTheme()) MapStyleOptions.loadRawResourceStyle(
     context,
@@ -203,6 +201,35 @@ fun MapScreenMain(
 
   val gestureCoroutineScope = rememberCoroutineScope()
 
+  /*
+   * Check Composable Route Parameters
+   */
+
+
+  var openedGeofence by remember { mutableStateOf<Geofence?>(null) }
+  var usedGeoId by remember { mutableStateOf(openGeoId ?: 0) }
+
+  var usedEdit by remember { mutableStateOf(edit ?: false) }
+
+  LaunchedEffect(Unit) {
+    if (usedGeoId > 0) {
+      val tmpGeofence = GeofenceUtil.getGeofenceById(usedGeoId)
+      if (usedEdit) {
+        openedGeofence = tmpGeofence
+      } else {
+        MainScope().launch {
+          val geoLocation = LatLng(tmpGeofence.latitude, tmpGeofence.longitude)
+
+          cameraPositionState.position = CameraPosition(geoLocation, 15f, 0f, 0f)
+        }
+      }
+      usedGeoId = 0
+      usedEdit = false
+    } else {
+      openedGeofence = null
+    }
+  }
+
   // If location permission is given, get it and set the camera position to it
   if (ActivityCompat.checkSelfPermission(
       LocalContext.current,
@@ -214,19 +241,21 @@ fun MapScreenMain(
   ) {
     // Asynchronously set the position of the map camera to current position on startup
     LaunchedEffect(Unit) {
-      val locationClient = ServiceProvider.location()
-      val location = locationClient.lastLocation.await()
+      if (usedGeoId <= 0) {
+        val locationClient = ServiceProvider.location()
+        val location = locationClient.lastLocation.await()
 
-      if (location == null) {
-        println("location is null!?")
-        return@LaunchedEffect
+        if (location == null) {
+          println("location is null!?")
+          return@LaunchedEffect
+        }
+
+        currentLocation = LatLng(location.latitude, location.longitude)
+
+        // Update the camera position state with the current location
+        cameraPositionState.position =
+          CameraPosition(currentLocation, 15f, 0f, 0f)
       }
-
-      currentLocation = LatLng(location.latitude, location.longitude)
-
-      // Update the camera position state with the current location
-      cameraPositionState.position =
-        CameraPosition(currentLocation, 15f, 0f, 0f)
     }
   }
 
@@ -577,37 +606,48 @@ fun MapScreenMain(
     ) {
 
       tempGeofenceLocation?.let {
-        Circle(
-          center = LatLng(it.latitude, it.longitude),
-          radius = tempGeofenceRadius,
-          strokeColor = MarkerColor.RED.color,
-          fillColor = MarkerColor.RED.color.copy(alpha = 0.25f)
+        Marker(
+          state = MarkerState(
+            position = LatLng(
+              tempGeofenceLocation!!.latitude,
+              tempGeofenceLocation!!.longitude
+            )
+          )
         )
       }
 
-      // Place each Geofence as Marker and Circle on the Map
-      geofencesArray.forEach { geo ->
-        MarkerCircle(geo) {
-          markerPopupVisible = true
-          selectedMarkerId = geo.id
-          MainScope().launch {
-            cameraPositionState.animate(
-              CameraUpdateFactory.newCameraPosition(
-                CameraPosition(
-                  LatLng(geo.latitude, geo.longitude), 15f, 0f, 0f
+        tempGeofenceLocation?.let {
+          Circle(
+            center = LatLng(it.latitude, it.longitude),
+            radius = tempGeofenceRadius,
+            strokeColor = MarkerColor.RED.color,
+            fillColor = MarkerColor.RED.color.copy(alpha = 0.25f)
+          )
+        }
+
+        // Place each Geofence as Marker and Circle on the Map
+        geofencesArray.forEach { geo ->
+          MarkerCircle(geo) {
+            markerPopupVisible = true
+            selectedMarkerId = geo.id
+            MainScope().launch {
+              cameraPositionState.animate(
+                CameraUpdateFactory.newCameraPosition(
+                  CameraPosition(
+                    LatLng(geo.latitude, geo.longitude), 15f, 0f, 0f
+                  )
                 )
               )
-            )
+            }
           }
         }
       }
-    }
 
-    ScaleBar(
-      modifier = Modifier
-        .padding(bottom = 10.dp, end = 105.dp)
-        .align(Alignment.BottomEnd),
-      cameraPositionState = cameraPositionState
-    )
+      ScaleBar(
+        modifier = Modifier
+          .padding(bottom = 10.dp, end = 105.dp)
+          .align(Alignment.BottomEnd),
+        cameraPositionState = cameraPositionState
+      )
+    }
   }
-}

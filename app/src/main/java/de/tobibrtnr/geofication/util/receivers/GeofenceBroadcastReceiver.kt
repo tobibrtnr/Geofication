@@ -9,12 +9,10 @@ import androidx.work.WorkManager
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofenceStatusCodes
 import com.google.android.gms.location.GeofencingEvent
+import de.tobibrtnr.geofication.util.misc.ServiceProvider
+import de.tobibrtnr.geofication.util.misc.serializeObject
 import de.tobibrtnr.geofication.util.storage.GeofenceUtil
 import de.tobibrtnr.geofication.util.storage.LogUtil
-import de.tobibrtnr.geofication.util.misc.ServiceProvider
-import de.tobibrtnr.geofication.util.misc.sendNotification
-import de.tobibrtnr.geofication.util.misc.serializeObject
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import java.util.concurrent.TimeUnit
 

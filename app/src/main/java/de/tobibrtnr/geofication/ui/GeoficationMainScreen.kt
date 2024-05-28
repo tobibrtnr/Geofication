@@ -82,6 +82,8 @@ fun GeoficationApp(
     )
   }
 
+  var navigateByBottomBar by remember { mutableStateOf(false) }
+
   if (!permissionsGranted) {
     PermissionScreen(
       locPerm,
@@ -109,7 +111,10 @@ fun GeoficationApp(
               onClick = {
                 navigationSelectedItem = index
                 var target = navItem.name
-                if (target == GeoficationScreen.Start.name) target += "/0"
+                if (target == GeoficationScreen.Start.name) {
+                  navigateByBottomBar = true
+                  target += "/0/false"
+                }
                 navController.navigate(target) {
                   popUpTo(navController.graph.findStartDestination().id) {
                     saveState = true
@@ -126,19 +131,29 @@ fun GeoficationApp(
       val ld = LocalLayoutDirection.current
       NavHost(
         navController = navController,
-        startDestination = "${GeoficationScreen.Start.name}/{openGeofence}",
+        startDestination = "${GeoficationScreen.Start.name}/{openGeofence}/{edit}",
         modifier = Modifier
           .fillMaxSize()
         //.verticalScroll(rememberScrollState())
         //.padding(innerPadding)
       ) {
         composable(
-          route = "${GeoficationScreen.Start.name}/{openGeofence}",
-          arguments = listOf(navArgument("openGeofence") { defaultValue = 0 })
+          route = "${GeoficationScreen.Start.name}/{openGeofence}/{edit}",
+          arguments = listOf(
+            navArgument("openGeofence") { defaultValue = 0 },
+            navArgument("edit") { defaultValue = false }
+          )
         ) { backStackEntry ->
-          var openGeofence = backStackEntry.arguments?.getInt("openGeofence", 0)
-          if(openGeofence == 0 && openGeoId != 1) {
-            openGeofence = openGeoId
+          var openGeofence: Int? = null
+          var edit: Boolean? = null
+          if (navigateByBottomBar) {
+            navigateByBottomBar = false
+          } else {
+            openGeofence = backStackEntry.arguments?.getInt("openGeofence", 0)
+            edit = backStackEntry.arguments?.getBoolean("edit", false)
+            if (openGeofence == 0 && openGeoId != -1) {
+              openGeofence = openGeoId
+            }
           }
           Box(
             modifier = Modifier.padding(
@@ -152,7 +167,8 @@ fun GeoficationApp(
               modifier = Modifier.fillMaxHeight(),
               topPadding = innerPadding.calculateTopPadding(),
               intentQuery = intentQuery,
-              openGeoId = openGeofence
+              openGeoId = openGeofence,
+              edit = edit
             )
           }
         }
