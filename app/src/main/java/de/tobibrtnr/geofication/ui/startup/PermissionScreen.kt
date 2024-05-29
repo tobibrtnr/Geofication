@@ -65,7 +65,10 @@ fun PermissionScreen(
   ) {
     Column {
       Spacer(Modifier.height(32.dp))
-      Text(text = stringResource(R.string.welcome_to_geofication), style = MaterialTheme.typography.titleLarge)
+      Text(
+        text = stringResource(R.string.welcome_to_geofication),
+        style = MaterialTheme.typography.titleLarge
+      )
       Text(stringResource(R.string.please_allow_all_required_permissions))
       Spacer(Modifier.height(48.dp))
       Row {
@@ -86,7 +89,8 @@ fun PermissionScreen(
           dialogInfoIndex = 0
         }) {
           Icon(
-            imageVector = Icons.Outlined.Info, contentDescription = stringResource(R.string.show_info)
+            imageVector = Icons.Outlined.Info,
+            contentDescription = stringResource(R.string.show_info)
           )
         }
       }
@@ -109,7 +113,8 @@ fun PermissionScreen(
           dialogInfoIndex = 1
         }) {
           Icon(
-            imageVector = Icons.Outlined.Info, contentDescription = stringResource(R.string.show_info)
+            imageVector = Icons.Outlined.Info,
+            contentDescription = stringResource(R.string.show_info)
           )
         }
       }
@@ -132,7 +137,8 @@ fun PermissionScreen(
           dialogInfoIndex = 2
         }) {
           Icon(
-            imageVector = Icons.Outlined.Info, contentDescription = stringResource(R.string.show_info)
+            imageVector = Icons.Outlined.Info,
+            contentDescription = stringResource(R.string.show_info)
           )
         }
       }

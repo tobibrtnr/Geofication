@@ -1,11 +1,11 @@
 package de.tobibrtnr.geofication.util.receivers
 
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import androidx.work.Data
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
+import android.os.SystemClock
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofenceStatusCodes
 import com.google.android.gms.location.GeofencingEvent
@@ -69,20 +69,38 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
           val fenceBytes = serializeObject(tFence)
           val notifBytes = serializeObject(tNotif)
 
-          val input = Data.Builder()
-            .putByteArray("tFence", fenceBytes)
-            .putByteArray("tNotif", notifBytes)
-            .putInt("geofenceTransition", geofenceTransition)
-            .build()
+          val alarmIntent = Intent(context, AlarmReceiver::class.java).apply {
+            action = "de.tobibrtnr.geofication.GEOFICATION_ALARM"
+            putExtra("tFence", fenceBytes)
+            putExtra("tNotif", notifBytes)
+            putExtra("geofenceTransition", geofenceTransition)
+          }
 
-          val notifWorkerRequest = OneTimeWorkRequestBuilder<GeoficationWorker>()
-            .setInputData(input)
-            .setInitialDelay(tNotif.delay.toLong(), TimeUnit.MINUTES)
-            .build()
+          if (tNotif.delay == 0) {
+            // No delay, send notification immediately
+            handleGeofication(context, tFence, tNotif, geofenceTransition)
+          } else {
+            // Delay is x minutes, schedule alarm
+            val pendingIntent = PendingIntent.getBroadcast(
+              context, 0, alarmIntent, PendingIntent.FLAG_IMMUTABLE
+            )
 
-          WorkManager.getInstance(context).enqueue(notifWorkerRequest)
+            val triggerTimeMillis =
+              SystemClock.elapsedRealtime() + TimeUnit.MINUTES.toMillis(tNotif.delay.toLong())
 
-          LogUtil.addLog("Worker Request started. Notification in ${tNotif.delay} minutes.")
+            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            try {
+              alarmManager.setExact(
+                AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                triggerTimeMillis,
+                pendingIntent
+              )
+            } catch (e: SecurityException) {
+              LogUtil.addLog("No permission for scheduling exact alarm!")
+            }
+
+            LogUtil.addLog("Worker Request started. Notification in ${tNotif.delay} minutes.")
+          }
         }
       }
     } else {
