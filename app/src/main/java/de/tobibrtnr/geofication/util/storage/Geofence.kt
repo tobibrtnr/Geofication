@@ -23,6 +23,7 @@ data class GeoficationGeofence(
   val latitude: Double,
   val longitude: Double,
   var radius: Float,
+  var color: MarkerColor,
 )
 
 @Entity
@@ -149,7 +150,7 @@ interface GeoficationDao {
   fun deactivateAll(fenceid: Int)
 
   @Transaction
-  @Query("SELECT geofication.message, geofication.active, geofence.fenceName, geofence.latitude, geofence.longitude, geofence.radius FROM geofication INNER JOIN geofence ON geofication.fenceId = geofence.id WHERE geofication.message LIKE '%' || :query || '%' OR geofence.fenceName LIKE '%' || :query || '%'")
+  @Query("SELECT geofication.message, geofication.active, geofence.fenceName, geofence.latitude, geofence.longitude, geofence.radius, geofence.color FROM geofication INNER JOIN geofence ON geofication.fenceId = geofence.id WHERE geofication.message LIKE '%' || :query || '%' OR geofence.fenceName LIKE '%' || :query || '%'")
   fun searchGeofications(query: String): List<GeoficationGeofence>
 }
 

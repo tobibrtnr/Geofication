@@ -1,9 +1,11 @@
 package de.tobibrtnr.geofication.ui.map
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
@@ -31,6 +33,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import de.tobibrtnr.geofication.R
+import de.tobibrtnr.geofication.ui.common.CircleWithColor
 import de.tobibrtnr.geofication.util.storage.GeofenceUtil
 import de.tobibrtnr.geofication.util.storage.GeoficationGeofence
 
@@ -86,15 +89,24 @@ fun SearchResultsCard(results: List<GeoficationGeofence>, goToLocation: (Double,
             focusManager.clearFocus()
             goToLocation(result.latitude, result.longitude)
           }) {
-        Text(
-          text = result.message,
+        Row(
           modifier = Modifier
             .padding(top = 12.dp)
             .padding(horizontal = 16.dp),
-          maxLines = 1,
-          overflow = TextOverflow.Ellipsis,
-          fontStyle = if (result.active) FontStyle.Normal else FontStyle.Italic,
-        )
+          verticalAlignment = Alignment.CenterVertically,
+        ) {
+          CircleWithColor(
+            modifier = Modifier.padding(end = 8.dp),
+            color = result.color.color,
+            radius = 8.dp
+          )
+          Text(
+            text = result.message,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            fontStyle = if (result.active) FontStyle.Normal else FontStyle.Italic,
+          )
+        }
         Text(
           text = result.fenceName,
           modifier = Modifier

@@ -88,8 +88,8 @@ fun EditGeoficationPopup(
 
   val context = LocalContext.current
 
-  var initialGeofication: Geofication? = null
-  var initialGeofence: Geofence? = null
+  var initialGeofication by remember { mutableStateOf<Geofication?>(null) }
+  var initialGeofence by remember { mutableStateOf<Geofence?>(null) }
 
   var selectedGeofication by remember { mutableStateOf<Geofication?>(null) }
   var selectedGeofence by remember { mutableStateOf<Geofence?>(null) }
@@ -104,17 +104,14 @@ fun EditGeoficationPopup(
     selectedGeofication = GeofenceUtil.getGeoficationByGeofence(selectedMarkerId)[0]
     selectedGeofence = GeofenceUtil.getGeofenceById(selectedMarkerId)
 
-    initialGeofication = selectedGeofication
-    initialGeofence = selectedGeofence
+    initialGeofication = selectedGeofication!!.copy()
+    initialGeofence = selectedGeofence!!.copy()
     enabled = selectedGeofication!!.active
   }
 
   // Check if input is valid: Geofence or Geofication attribute changed + all inputs valid
   fun isInputValid(): Boolean {
-    if (selectedGeofication!! == initialGeofication) {
-      return false
-    }
-    if (selectedGeofence!! == initialGeofence) {
+    if (selectedGeofication!! == initialGeofication && selectedGeofence!! == initialGeofence) {
       return false
     }
 
