@@ -43,7 +43,6 @@ import de.tobibrtnr.geofication.R
 import de.tobibrtnr.geofication.ui.GeoficationScreen
 import de.tobibrtnr.geofication.ui.common.CircleWithColor
 import de.tobibrtnr.geofication.ui.common.DeleteConfirmPopup
-import de.tobibrtnr.geofication.ui.map.MapViewModel
 import de.tobibrtnr.geofication.util.storage.Geofence
 import de.tobibrtnr.geofication.util.storage.GeofenceUtil
 import de.tobibrtnr.geofication.util.storage.Geofication

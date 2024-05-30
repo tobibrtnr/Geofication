@@ -60,19 +60,7 @@ fun LocationSearchBar(
         overflow = TextOverflow.Ellipsis
       )
     },
-    modifier = modifier/*.clip(CircleShape)*/
-      .border(
-        1.dp,
-        Color.LightGray,
-        RoundedCornerShape(topStartPercent = 50, bottomStartPercent = 50)
-      )
-      .shadow(
-        elevation = 16.dp,
-        shape = RoundedCornerShape(topStartPercent = 50, bottomStartPercent = 50)
-      ),
-    //.padding(3.dp)
-    //textStyle = TextStyle(color = Color.Black, fontSize = 15.sp),
-    shape = RoundedCornerShape(topStartPercent = 50, bottomStartPercent = 50),
+    modifier = modifier,
     colors = TextFieldDefaults.colors(
       focusedIndicatorColor = Color.Transparent,
       unfocusedIndicatorColor = Color.Transparent,

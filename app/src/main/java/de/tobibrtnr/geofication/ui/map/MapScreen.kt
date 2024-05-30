@@ -6,6 +6,8 @@ import android.graphics.Point
 import android.location.Address
 import android.location.Geocoder
 import android.os.Build
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -21,6 +23,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationSearching
 import androidx.compose.material.icons.filled.Map
@@ -38,9 +41,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
@@ -435,7 +441,20 @@ fun MapScreenMain(
         .padding(0.dp, topPadding + 8.dp, 0.dp, 8.dp),
     ) {
       Column {
-        Row(modifier = Modifier.padding(horizontal = 16.dp)) {
+        Row(
+          modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .clip(CircleShape)
+            .border(
+              1.dp,
+              Color.LightGray,
+              CircleShape
+            )
+            .shadow(
+              elevation = 16.dp,
+              shape = CircleShape
+            )
+        ) {
           LocationSearchBar(
             modifier = Modifier
               .weight(1f)
@@ -616,38 +635,38 @@ fun MapScreenMain(
         )
       }
 
-        tempGeofenceLocation?.let {
-          Circle(
-            center = LatLng(it.latitude, it.longitude),
-            radius = tempGeofenceRadius,
-            strokeColor = MarkerColor.RED.color,
-            fillColor = MarkerColor.RED.color.copy(alpha = 0.25f)
-          )
-        }
+      tempGeofenceLocation?.let {
+        Circle(
+          center = LatLng(it.latitude, it.longitude),
+          radius = tempGeofenceRadius,
+          strokeColor = MarkerColor.RED.color,
+          fillColor = MarkerColor.RED.color.copy(alpha = 0.25f)
+        )
+      }
 
-        // Place each Geofence as Marker and Circle on the Map
-        geofencesArray.forEach { geo ->
-          MarkerCircle(geo) {
-            markerPopupVisible = true
-            selectedMarkerId = geo.id
-            MainScope().launch {
-              cameraPositionState.animate(
-                CameraUpdateFactory.newCameraPosition(
-                  CameraPosition(
-                    LatLng(geo.latitude, geo.longitude), 15f, 0f, 0f
-                  )
+      // Place each Geofence as Marker and Circle on the Map
+      geofencesArray.forEach { geo ->
+        MarkerCircle(geo) {
+          markerPopupVisible = true
+          selectedMarkerId = geo.id
+          MainScope().launch {
+            cameraPositionState.animate(
+              CameraUpdateFactory.newCameraPosition(
+                CameraPosition(
+                  LatLng(geo.latitude, geo.longitude), 15f, 0f, 0f
                 )
               )
-            }
+            )
           }
         }
       }
-
-      ScaleBar(
-        modifier = Modifier
-          .padding(bottom = 10.dp, end = 105.dp)
-          .align(Alignment.BottomEnd),
-        cameraPositionState = cameraPositionState
-      )
     }
+
+    ScaleBar(
+      modifier = Modifier
+        .padding(bottom = 10.dp, end = 105.dp)
+        .align(Alignment.BottomEnd),
+      cameraPositionState = cameraPositionState
+    )
   }
+}

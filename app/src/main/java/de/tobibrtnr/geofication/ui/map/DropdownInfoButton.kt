@@ -56,18 +56,12 @@ fun DropdownInfoButton(
   ) {
     Row(
       Modifier
-        .width(((if (input.isNotEmpty()) 1.27 else 0.75) * th).dp)
+        .width(((if (input.isNotEmpty()) 1.125 else 0.75) * th).dp)
         .height(th.dp)
         .background(
           TextFieldDefaults.colors().focusedContainerColor,
           RoundedCornerShape(topEndPercent = 50, bottomEndPercent = 50)
         )
-        .border(
-          1.dp,
-          Color.LightGray,
-          RoundedCornerShape(topEndPercent = 50, bottomEndPercent = 50)
-        )
-        .clip(RoundedCornerShape(topEndPercent = 50, bottomEndPercent = 50))
     ) {
       if (input.isNotEmpty()) {
         Column(

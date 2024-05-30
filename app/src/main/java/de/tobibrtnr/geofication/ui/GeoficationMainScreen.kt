@@ -93,7 +93,6 @@ fun GeoficationApp(
       permissionsGranted = true
     }
   } else {
-
     Scaffold(
       modifier = Modifier.fillMaxSize(),
       bottomBar = {
@@ -149,6 +148,12 @@ fun GeoficationApp(
           if (navigateByBottomBar) {
             navigateByBottomBar = false
           } else {
+            if (navController.currentDestination?.route?.startsWith(GeoficationScreen.Start.name) == true) {
+              // manually set bottom navigation selected tab to "Map", if this screen
+              // is really selected
+              navigationSelectedItem = 0
+            }
+            // Get optional arguments if Geofication was selected
             openGeofence = backStackEntry.arguments?.getInt("openGeofence", 0)
             edit = backStackEntry.arguments?.getBoolean("edit", false)
             if (openGeofence == 0 && openGeoId != -1) {
