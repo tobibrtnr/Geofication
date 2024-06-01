@@ -94,7 +94,9 @@ fun processInput(
     radius = (enteredFloat / UnitUtil.distanceFactor()).toFloat(),
     color = color,
     active = true,
-    triggerCount = 0
+    triggerCount = 0,
+    created = System.currentTimeMillis(),
+    lastEdit = System.currentTimeMillis()
   )
 
   val geofication = Geofication(
@@ -105,7 +107,9 @@ fun processInput(
     repeat = true, // TODO not used right now
     active = true,
     onTrigger = onTrigger,
-    triggerCount = 0
+    triggerCount = 0,
+    created = System.currentTimeMillis(),
+    lastEdit = System.currentTimeMillis()
   )
 
   GeofenceUtil.addGeofence(

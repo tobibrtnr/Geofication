@@ -80,4 +80,5 @@
     <string name="geofication_notifications">Geofication-Benachrichtigungen</string>
     <string name="geofication">Geofication</string>
     <string name="language">Sprache</string>
+    <string name="date_time_format">dd.MM.yyyy HH:mm</string>
 </resources>

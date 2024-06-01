@@ -11,6 +11,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import java.nio.charset.Charset
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 class LocaleUtil {
@@ -57,6 +59,14 @@ class LocaleUtil {
 
     fun getLocale(): String {
       return currentLocale
+    }
+
+    fun getLocalDateTime(timestamp: Long, context: Context): String {
+      val locale = Locale(currentLocale)
+      val dateFormat = SimpleDateFormat(context.getString(R.string.date_time_format), locale)
+      val date = Date(timestamp)
+
+      return dateFormat.format(date)
     }
 
     private fun setContextLocale(context: Context, language: String) {

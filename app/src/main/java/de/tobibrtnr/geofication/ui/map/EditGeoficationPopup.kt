@@ -70,7 +70,10 @@ fun processEdit(
 
   geofence.active = geofication.active
 
-  // TODO if Geofence is edited, it is immediately triggered
+  // Update last edit time for both objects
+  geofence.lastEdit = System.currentTimeMillis()
+  geofication.lastEdit = System.currentTimeMillis()
+
   GeofenceUtil.addGeofence(
     context,
     geofence,
@@ -85,7 +88,6 @@ fun EditGeoficationPopup(
   onDismissRequest: () -> Unit,
   onDeleteRequest: () -> Unit
 ) {
-
   val context = LocalContext.current
 
   var initialGeofication by remember { mutableStateOf<Geofication?>(null) }

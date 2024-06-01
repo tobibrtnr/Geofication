@@ -33,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
@@ -46,6 +47,7 @@ import de.tobibrtnr.geofication.ui.common.DeleteConfirmPopup
 import de.tobibrtnr.geofication.util.storage.Geofence
 import de.tobibrtnr.geofication.util.storage.GeofenceUtil
 import de.tobibrtnr.geofication.util.storage.Geofication
+import de.tobibrtnr.geofication.util.storage.LocaleUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -86,6 +88,9 @@ fun GeoficationsScreen(
 
 @Composable
 fun ListItem(geofication: Geofication, navController: NavController) {
+
+  val context = LocalContext.current
+
   var deletePopupVisible by remember { mutableStateOf(false) }
 
   var geofence by remember { mutableStateOf<Geofence?>(null) }
@@ -180,6 +185,20 @@ fun ListItem(geofication: Geofication, navController: NavController) {
         Text(geofence!!.fenceName, maxLines = 1, overflow = TextOverflow.Ellipsis)
         Spacer(modifier = Modifier.height(4.dp))
         Text(stringResource(R.string.trigger_count, geofication.triggerCount))
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+          stringResource(
+            R.string.creation_time,
+            LocaleUtil.getLocalDateTime(geofication.created, context)
+          )
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+          stringResource(
+            R.string.last_edit,
+            LocaleUtil.getLocalDateTime(geofication.lastEdit, context)
+          )
+        )
       }
     }
     Spacer(modifier = Modifier.height(8.dp))

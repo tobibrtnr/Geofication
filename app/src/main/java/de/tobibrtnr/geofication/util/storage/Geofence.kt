@@ -38,7 +38,10 @@ data class Geofence(
 
   var color: MarkerColor,
   var active: Boolean,
-  val triggerCount: Int
+  val triggerCount: Int,
+
+  val created: Long,
+  var lastEdit: Long
 ) : Serializable
 
 @Entity(
@@ -60,7 +63,10 @@ data class Geofication(
   val repeat: Boolean,
   val active: Boolean,
   var onTrigger: Int,
-  val triggerCount: Int
+
+  val triggerCount: Int,
+  val created: Long,
+  var lastEdit: Long
 ) : Serializable
 
 @Entity

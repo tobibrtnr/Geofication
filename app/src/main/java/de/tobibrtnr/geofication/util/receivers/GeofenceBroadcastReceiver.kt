@@ -53,7 +53,17 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
         runBlocking {
           // Check if geofence is active
           val tFence = GeofenceUtil.getGeofenceById(geofence.requestId.toInt())
+
+          // If geofence not active, do nothing and return
           if (!tFence.active) return@runBlocking
+
+          // If geofence was recently created or edited, do nothing and return
+          val timeDelta = TimeUnit.SECONDS.toMillis(30)
+          val currentTime = System.currentTimeMillis()
+          if(currentTime - tFence.created < timeDelta ||
+             currentTime - tFence.lastEdit < timeDelta) {
+            return@runBlocking
+          }
 
           GeofenceUtil.incrementFenceTriggerCount(geofence.requestId.toInt())
 

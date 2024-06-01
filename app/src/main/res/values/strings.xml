@@ -80,4 +80,7 @@
     <string name="geofication_notifications">Geofication Notifications</string>
     <string name="geofication">Geofication</string>
     <string name="language">Language</string>
+    <string name="creation_time">Creation Time: %1$s</string>
+    <string name="last_edit">Last Edit: %1$s</string>
+    <string name="date_time_format">yyyy-MM-dd HH:mm</string>
 </resources>
