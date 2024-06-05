@@ -53,6 +53,7 @@ import de.tobibrtnr.geofication.ui.common.SegmentedButtons
 import de.tobibrtnr.geofication.ui.common.SegmentedRadioButtons
 import de.tobibrtnr.geofication.ui.common.CircleWithColor
 import de.tobibrtnr.geofication.util.misc.NumericUnitTransformation
+import de.tobibrtnr.geofication.util.misc.Vibrate
 import de.tobibrtnr.geofication.util.storage.Geofence
 import de.tobibrtnr.geofication.util.storage.GeofenceUtil
 import de.tobibrtnr.geofication.util.storage.Geofication
@@ -325,7 +326,7 @@ fun AddGeofencePopup(
         ) {
           Text(
             text = stringResource(R.string.x_minutes, delay.roundToInt()),
-            modifier = Modifier.padding(start = 16.dp)
+            modifier = Modifier.padding(start = 16.dp).width(90.dp)
           )
 
           Spacer(modifier = Modifier.width(16.dp))
@@ -333,7 +334,12 @@ fun AddGeofencePopup(
           Slider(
             modifier = Modifier.padding(end = 16.dp),
             value = delay,
-            onValueChange = { delay = it },
+            onValueChange = {
+              if(delay != it) {
+                Vibrate.vibrate(context, 15)
+                delay = it
+              }
+            },
             colors = SliderDefaults.colors(
               thumbColor = MaterialTheme.colorScheme.primary,
               activeTrackColor = MaterialTheme.colorScheme.primary,

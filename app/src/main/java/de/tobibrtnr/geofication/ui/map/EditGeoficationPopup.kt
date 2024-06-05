@@ -54,6 +54,7 @@ import de.tobibrtnr.geofication.ui.common.SegmentedRadioButtons
 import de.tobibrtnr.geofication.ui.common.CircleWithColor
 import de.tobibrtnr.geofication.ui.common.DeleteConfirmPopup
 import de.tobibrtnr.geofication.util.misc.NumericUnitTransformation
+import de.tobibrtnr.geofication.util.misc.Vibrate
 import de.tobibrtnr.geofication.util.storage.Geofence
 import de.tobibrtnr.geofication.util.storage.GeofenceUtil
 import de.tobibrtnr.geofication.util.storage.Geofication
@@ -330,7 +331,7 @@ fun EditGeoficationPopup(
           ) {
             Text(
               text = stringResource(R.string.x_minutes, selectedGeofication!!.delay),
-              modifier = Modifier.padding(start = 16.dp)
+              modifier = Modifier.padding(start = 16.dp).width(90.dp)
             )
 
             Spacer(modifier = Modifier.width(16.dp))
@@ -339,8 +340,11 @@ fun EditGeoficationPopup(
               modifier = Modifier.padding(end = 16.dp),
               value = selectedGeofication!!.delay.toFloat(),
               onValueChange = {
-                selectedGeofication = selectedGeofication!!.copy(delay = it.roundToInt())
-                inputValid = isInputValid()
+                if(selectedGeofication!!.delay != it.roundToInt()) {
+                  selectedGeofication = selectedGeofication!!.copy(delay = it.roundToInt())
+                  Vibrate.vibrate(context, 15)
+                  inputValid = isInputValid()
+                }
               },
               colors = SliderDefaults.colors(
                 thumbColor = MaterialTheme.colorScheme.primary,

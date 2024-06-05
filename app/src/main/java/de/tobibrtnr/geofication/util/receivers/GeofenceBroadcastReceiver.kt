@@ -106,7 +106,7 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
                 pendingIntent
               )
             } catch (e: SecurityException) {
-              LogUtil.addLog("No permission for scheduling exact alarm!")
+              LogUtil.addLog("No permission for scheduling exact alarm!\n${e.message}")
             }
 
             LogUtil.addLog("Worker Request started. Notification in ${tNotif.delay} minutes.")

@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -497,52 +498,78 @@ fun MapScreenMain(
             }
           })
         } else {
-          Row(Modifier.horizontalScroll(geoficationsRow)) {
-            Spacer(Modifier.width(16.dp))
-            geoficationsArray.filter {
-              it.active
-            }.sortedBy {
-              val fence = geofencesArray.firstOrNull() { it2 ->
-                it2.id == it.fenceid
-              }
-
-              if (fence == null) {
-                Double.MAX_VALUE
-              } else {
-                SphericalUtil.computeDistanceBetween(
-                  LatLng(fence.latitude, fence.longitude),
-                  currentLocation
-                ) - fence.radius
-              }
-            }.forEach {
-              var fence: Geofence? = null
-              var meterText = ""
-              try {
-                fence = geofencesArray.first { it2 ->
+          Column {
+            Row(Modifier.horizontalScroll(geoficationsRow)) {
+              Spacer(Modifier.width(16.dp))
+              geoficationsArray.filter {
+                it.active
+              }.sortedBy {
+                val fence = geofencesArray.firstOrNull() { it2 ->
                   it2.id == it.fenceid
                 }
 
-                val distance = (SphericalUtil.computeDistanceBetween(
-                  LatLng(fence.latitude, fence.longitude),
-                  currentLocation
-                ) - fence.radius).roundToInt()
-
-                meterText =
-                  if (distance < 0) {
-                    "✅"
-                  } else {
-                    UnitUtil.appendUnit(distance)
+                if (fence == null) {
+                  Double.MAX_VALUE
+                } else {
+                  SphericalUtil.computeDistanceBetween(
+                    LatLng(fence.latitude, fence.longitude),
+                    currentLocation
+                  ) - fence.radius
+                }
+              }.forEach {
+                var fence: Geofence? = null
+                var meterText = ""
+                try {
+                  fence = geofencesArray.first { it2 ->
+                    it2.id == it.fenceid
                   }
-              } catch (e: NoSuchElementException) {
-                println("no such element exception")
-              }
 
-              fence?.let { _ ->
-                GeoficationChip(fence, it, meterText, cameraPositionState)
+                  val distance = (SphericalUtil.computeDistanceBetween(
+                    LatLng(fence.latitude, fence.longitude),
+                    currentLocation
+                  ) - fence.radius).roundToInt()
+
+                  meterText =
+                    if (distance < 0) {
+                      "✅"
+                    } else {
+                      UnitUtil.appendUnit(distance)
+                    }
+                } catch (e: NoSuchElementException) {
+                  println("no such element exception")
+                }
+
+                fence?.let { _ ->
+                  GeoficationChip(fence, it, meterText, cameraPositionState)
+                }
+                Spacer(Modifier.width(8.dp))
               }
               Spacer(Modifier.width(8.dp))
             }
-            Spacer(Modifier.width(8.dp))
+            if (geoficationsArray.filter {
+                it.active
+              }.isEmpty()) {
+              Spacer(Modifier.height(8.dp))
+            }
+            if (cameraPositionState.position.bearing != 0f) {
+              Row {
+                Spacer(Modifier.width(16.dp))
+                Compass(
+                  Modifier
+                    .size(32.dp), cameraPositionState
+                ) {
+                  MainScope().launch {
+                    cameraPositionState.animate(
+                      CameraUpdateFactory.newCameraPosition(
+                        CameraPosition.Builder(cameraPositionState.position)
+                          .bearing(0f)
+                          .build()
+                      )
+                    )
+                  }
+                }
+              }
+            }
           }
         }
       }
