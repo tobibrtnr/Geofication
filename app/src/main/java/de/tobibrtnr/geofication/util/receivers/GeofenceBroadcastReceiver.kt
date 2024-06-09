@@ -92,7 +92,7 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
           } else {
             // Delay is x minutes, schedule alarm
             val pendingIntent = PendingIntent.getBroadcast(
-              context, 0, alarmIntent, PendingIntent.FLAG_IMMUTABLE
+              context, System.currentTimeMillis().toInt(), alarmIntent, PendingIntent.FLAG_IMMUTABLE
             )
 
             val triggerTimeMillis =
