@@ -29,7 +29,7 @@ fun SegmentedRadioButtons(opt1: String, opt2: String, opt3: String, onValueChang
   Row(
     modifier = Modifier
       .fillMaxWidth()
-      .padding(16.dp)
+      .padding(horizontal = 16.dp)
   ) {
     SegmentedRadioButton(
       option = 0,

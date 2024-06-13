@@ -63,6 +63,7 @@ data class Geofication(
   val repeat: Boolean,
   val active: Boolean,
   var onTrigger: Int,
+  var link: String,
 
   val triggerCount: Int,
   val created: Long,

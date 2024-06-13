@@ -145,8 +145,11 @@ fun GeoficationApp(
         ) { backStackEntry ->
           var openGeofence: Int? = null
           var edit: Boolean? = null
+          var intentQueryString = intentQuery
           if (navigateByBottomBar) {
             navigateByBottomBar = false
+            // No not move to intent query location if navigate
+            intentQueryString = ""
           } else {
             if (navController.currentDestination?.route?.startsWith(GeoficationScreen.Start.name) == true) {
               // manually set bottom navigation selected tab to "Map", if this screen
@@ -171,7 +174,7 @@ fun GeoficationApp(
             MapScreen(
               modifier = Modifier.fillMaxHeight(),
               topPadding = innerPadding.calculateTopPadding(),
-              intentQuery = intentQuery,
+              intentQuery = intentQueryString,
               openGeoId = openGeofence,
               edit = edit
             )

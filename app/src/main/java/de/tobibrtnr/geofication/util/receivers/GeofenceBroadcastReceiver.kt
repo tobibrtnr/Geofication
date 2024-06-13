@@ -58,7 +58,7 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
           if (!tFence.active) return@runBlocking
 
           // If geofence was recently created or edited, do nothing and return
-          val timeDelta = TimeUnit.SECONDS.toMillis(30)
+          val timeDelta = TimeUnit.MINUTES.toMillis(1)
           val currentTime = System.currentTimeMillis()
           if(currentTime - tFence.created < timeDelta ||
              currentTime - tFence.lastEdit < timeDelta) {
