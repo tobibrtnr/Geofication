@@ -1,9 +1,12 @@
 package de.tobibrtnr.geofication.util.receivers
 
 import android.app.NotificationManager
+import android.app.PendingIntent
+import android.app.TaskStackBuilder
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import de.tobibrtnr.geofication.util.misc.ServiceProvider
 import de.tobibrtnr.geofication.util.storage.GeofenceUtil
 import kotlinx.coroutines.runBlocking
@@ -14,16 +17,18 @@ class NotificationReceiver : BroadcastReceiver() {
 
     val id = intent.getIntExtra("id", -1)
 
-    val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    val notificationManager =
+      context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     notificationManager.cancel(1)
 
     runBlocking {
       when (intent.action) {
-        "DISABLE_ACTION" -> {
+        "DISABLE_ACTION" ->
           GeofenceUtil.setNotifActive(id, false)
-        }
+
         "DELETE_ACTION" ->
           GeofenceUtil.deleteGeofence(id)
+
         else -> {}
       }
 

@@ -6,6 +6,7 @@ import android.location.Geocoder
 import android.os.Build
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.border
@@ -39,6 +40,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -68,6 +70,7 @@ import de.tobibrtnr.geofication.util.storage.Geofence
 import de.tobibrtnr.geofication.util.storage.GeofenceUtil
 import de.tobibrtnr.geofication.util.storage.Geofication
 import de.tobibrtnr.geofication.util.storage.UnitUtil
+import java.util.regex.Pattern
 import kotlin.math.roundToInt
 
 fun processInput(
@@ -159,6 +162,9 @@ fun AddGeofencePopup(
   var inputValid by remember { mutableStateOf(false) }
 
   val geocoder = Geocoder(context)
+
+  val urlRegex = ".*" //"(http(s)?://.)?(www\\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_+.~#?&/=]*)"
+  val urlPattern = Pattern.compile(urlRegex)
 
   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
     // Implementation of GeocodeListener
@@ -260,8 +266,12 @@ fun AddGeofencePopup(
           value = message,
           onValueChange = {
             message = it//.take(max) for max name length
+            val matcher = urlPattern.matcher(link)
             inputValid =
-              message.isNotEmpty() && (radius.toFloatOrNull() != null) && (radius.toFloat() > 0)
+              message.isNotEmpty() &&
+                  (radius.toFloatOrNull() != null) &&
+                  (radius.toFloat() > 0) &&
+                  (link.isEmpty() || matcher.matches())
           }
         )
 
@@ -291,8 +301,12 @@ fun AddGeofencePopup(
               char.isDigit() || char == '.' //|| char == ','
             }
             radius = newValue
+            val matcher = urlPattern.matcher(link)
             inputValid =
-              message.isNotEmpty() && (radius.toFloatOrNull() != null) && (radius.toFloat() > 0)
+              message.isNotEmpty() &&
+                  (radius.toFloatOrNull() != null) &&
+                  (radius.toFloat() > 0) &&
+                  (link.isEmpty() || matcher.matches())
           },
           visualTransformation = NumericUnitTransformation()
         )
@@ -391,8 +405,12 @@ fun AddGeofencePopup(
               value = link,
               onValueChange = {
                 link = it//.take(max) for max name length
+                val matcher = urlPattern.matcher(link)
                 inputValid =
-                  message.isNotEmpty() && (radius.toFloatOrNull() != null) && (radius.toFloat() > 0)
+                  message.isNotEmpty() &&
+                      (radius.toFloatOrNull() != null) &&
+                      (radius.toFloat() > 0) &&
+                      (link.isEmpty() || matcher.matches())
               }
             )
           }
@@ -472,7 +490,11 @@ fun CategoryItem(title: String, content: @Composable () -> Unit) {
         )
       }
       AnimatedVisibility(visible = isExpanded) {
-        content()
+        Column(modifier = Modifier.animateContentSize()) {
+          key(isExpanded) {
+            content()
+          }
+        }
       }
     }
   }

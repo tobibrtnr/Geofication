@@ -5,9 +5,11 @@ import android.app.Activity
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.app.TaskStackBuilder
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import androidx.compose.ui.res.stringResource
 import androidx.core.app.ActivityCompat
@@ -32,16 +34,29 @@ fun sendNotification(context: Context, fence: Geofence, notif: Geofication) {
   // Create a notification channel for devices running Android Oreo (API level 26) and above
   createNotificationChannel(context)
 
-  val intent = Intent(context, MainActivity::class.java).apply {
-    //flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-    putExtra("openGeoId", fence.id)
+  val pendingIntent = if(notif.link.isNotEmpty()) {
+    val linkIntent = Intent(Intent.ACTION_VIEW, Uri.parse(notif.link))
+    linkIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+
+    TaskStackBuilder.create(context).run {
+      addNextIntentWithParentStack(linkIntent)
+
+      getPendingIntent(
+        System.currentTimeMillis().toInt(),
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+      )
+    }
+  } else {
+    val intent = Intent(context, MainActivity::class.java).apply {
+      putExtra("openGeoId", fence.id)
+    }
+    PendingIntent.getActivity(
+      context,
+      Random.nextInt(),
+      intent,
+      PendingIntent.FLAG_MUTABLE
+    )
   }
-  val pendingIntent = PendingIntent.getActivity(
-    context,
-    Random.nextInt(),
-    intent,
-    PendingIntent.FLAG_MUTABLE
-  )
 
   // Create a notification builder
   val builder = NotificationCompat.Builder(context, CHANNEL_ID)
