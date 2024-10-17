@@ -9,16 +9,14 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -28,16 +26,19 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -53,17 +54,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.google.android.gms.maps.model.LatLng
 import de.tobibrtnr.geofication.R
+import de.tobibrtnr.geofication.ui.common.CircleWithColor
 import de.tobibrtnr.geofication.ui.common.MarkerColor
 import de.tobibrtnr.geofication.ui.common.SegmentedButtons
 import de.tobibrtnr.geofication.ui.common.SegmentedRadioButtons
-import de.tobibrtnr.geofication.ui.common.CircleWithColor
 import de.tobibrtnr.geofication.util.misc.NumericUnitTransformation
 import de.tobibrtnr.geofication.util.misc.Vibrate
 import de.tobibrtnr.geofication.util.storage.Geofence
@@ -247,22 +247,24 @@ fun AddGeofencePopup(
           }
         }
 
-        Text(
-          text = stringResource(R.string.geofication_title),
-          style = MaterialTheme.typography.titleLarge,
-          modifier = Modifier.padding(start = 16.dp)
-        )
+        //Text(
+        //  text = stringResource(R.string.geofication_title),
+        //  modifier = Modifier.padding(start = 16.dp),
+        //  fontSize = 18.sp,
+        //  fontWeight = FontWeight.Bold,
+        //)
 
-        TextField(
+        OutlinedTextField(
           modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 16.dp, end = 16.dp, bottom = 0.dp)
-            .clip(CircleShape)
-            .border(
-              1.dp, Color(0xFF000000), CircleShape
-            ),
-          placeholder = { Text(stringResource(R.string.notification_message)) },
+            .padding(start = 16.dp, end = 16.dp, bottom = 10.dp),
+            //.clip(CircleShape),
+            //.border(
+            //  1.dp, Color(0xFF000000), CircleShape
+            //),
+          //placeholder = { Text(stringResource(R.string.notification_message)) },
           singleLine = true,
+          shape = CircleShape,
           value = message,
           onValueChange = {
             message = it//.take(max) for max name length
@@ -272,29 +274,33 @@ fun AddGeofencePopup(
                   (radius.toFloatOrNull() != null) &&
                   (radius.toFloat() > 0) &&
                   (link.isEmpty() || matcher.matches())
-          }
+          },
+          label = { Text(stringResource(R.string.notification_message)) },
+          colors = TextFieldDefaults.colors(errorContainerColor = Color(0xFFFF0000)),
         )
 
-        Text(
-          text = stringResource(R.string.geofence_radius),
-          style = MaterialTheme.typography.titleLarge,
-          modifier = Modifier.padding(start = 16.dp)
-        )
+        //Text(
+        //  text = stringResource(R.string.geofence_radius),
+        //  modifier = Modifier.padding(start = 16.dp),
+        //  fontSize = 18.sp,
+        //  fontWeight = FontWeight.Bold,
+        //)
 
-        TextField(
+        OutlinedTextField(
           modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
-            .clip(CircleShape)
-            .border(
-              1.dp, Color(0xFF000000), CircleShape
-            ),
+            .padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
+            //.clip(CircleShape)
+            //.border(
+            //1.dp, Color(0xFF000000), CircleShape
+            //),
           keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Decimal
           ),
-          shape = MaterialTheme.shapes.medium,
           value = radius,
-          placeholder = { Text(stringResource(R.string.enter_geofence_radius)) },
+          //placeholder = { Text(stringResource(R.string.enter_geofence_radius)) },
+          label = { Text(stringResource(R.string.geofence_radius)) },
+          shape = CircleShape,
           singleLine = true,
           onValueChange = {
             val newValue = it.filter { char ->
@@ -315,8 +321,8 @@ fun AddGeofencePopup(
           Column {
             Text(
               text = stringResource(R.string.trigger_event),
-              style = MaterialTheme.typography.titleLarge,
-              modifier = Modifier.padding(start = 16.dp)
+              style = MaterialTheme.typography.bodyLarge,
+              modifier = Modifier//.padding(start = 16.dp)
             )
 
             SegmentedButtons(
@@ -330,8 +336,8 @@ fun AddGeofencePopup(
 
             Text(
               text = stringResource(R.string.behavior_after_triggering),
-              style = MaterialTheme.typography.titleLarge,
-              modifier = Modifier.padding(start = 16.dp)
+              style = MaterialTheme.typography.bodyLarge,
+              modifier = Modifier//.padding(start = 16.dp)
             )
 
             SegmentedRadioButtons(
@@ -345,8 +351,8 @@ fun AddGeofencePopup(
 
             Text(
               text = stringResource(R.string.delay_after_triggering),
-              style = MaterialTheme.typography.titleLarge,
-              modifier = Modifier.padding(start = 16.dp)
+              style = MaterialTheme.typography.bodyLarge,
+              modifier = Modifier//.padding(start = 16.dp)
             )
 
             Row(
@@ -386,22 +392,24 @@ fun AddGeofencePopup(
 
         CategoryItem("Extras") {
           Column {
-            Text(
-              text = "Link (TODO INFO ICON HERE)",
-              style = MaterialTheme.typography.titleLarge,
-              modifier = Modifier.padding(start = 16.dp)
-            )
+            //Text(
+            //  text = "Link (TODO INFO ICON HERE)",
+            //  style = MaterialTheme.typography.titleLarge,
+            //  modifier = Modifier.padding(start = 16.dp)
+            //)
 
-            TextField(
+            OutlinedTextField(
               modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 16.dp, end = 16.dp, bottom = 0.dp)
-                .clip(CircleShape)
-                .border(
-                  1.dp, Color(0xFF000000), CircleShape
-                ),
+                .fillMaxWidth(),
+                //.padding(start = 16.dp, end = 16.dp, bottom = 0.dp)
+                //.clip(CircleShape)
+                //.border(
+                //  1.dp, Color(0xFF000000), CircleShape
+                //),
+              label = { Text("Link (TODO INFO ICON HERE)")},
               placeholder = { Text("https://www.example.com") },
               singleLine = true,
+              shape = CircleShape,
               value = link,
               onValueChange = {
                 link = it//.take(max) for max name length
@@ -467,22 +475,22 @@ fun CategoryItem(title: String, content: @Composable () -> Unit) {
     modifier = Modifier
       .fillMaxWidth()
       .padding(vertical = 4.dp)
-      .clickable { isExpanded = !isExpanded }
   ) {
     Column(
       modifier = Modifier.padding(16.dp)
     ) {
       Row(
+        modifier = Modifier.clickable { isExpanded = !isExpanded },
         verticalAlignment = Alignment.CenterVertically
       ) {
         Text(
           text = title,
           fontSize = 18.sp,
           fontWeight = FontWeight.Bold,
-          modifier = Modifier.weight(1f)
+          modifier = Modifier.weight(1f).padding(vertical = 10.dp)
         )
         Icon(
-          imageVector = Icons.Default.ArrowDropDown,
+          imageVector = Icons.Default.KeyboardArrowDown,
           contentDescription = null,
           modifier = Modifier
             .size(24.dp)
@@ -491,9 +499,9 @@ fun CategoryItem(title: String, content: @Composable () -> Unit) {
       }
       AnimatedVisibility(visible = isExpanded) {
         Column(modifier = Modifier.animateContentSize()) {
-          key(isExpanded) {
+          //key(isExpanded) {
             content()
-          }
+          //}
         }
       }
     }

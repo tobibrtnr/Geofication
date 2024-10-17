@@ -62,6 +62,7 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
           val currentTime = System.currentTimeMillis()
           if(currentTime - tFence.created < timeDelta ||
              currentTime - tFence.lastEdit < timeDelta) {
+            LogUtil.addLog("Geofence not triggered as it was created too recent.")
             return@runBlocking
           }
 
