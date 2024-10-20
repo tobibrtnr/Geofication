@@ -88,4 +88,12 @@
     <string name="battery_saver_mode_text">Having the Battery Saver Mode activated can lead to Geofications being triggered delayed or not at all. Do you want to disable it?</string>
     <string name="disable_capitalized">Disable</string>
     <string name="keep_enabled">Keep enabled</string>
+    <string name="delete_all_geofications">Delete all Geofications?</string>
+    <string name="really_want_to_delete_all_geofications">Do you really want to delete all Geofications, including active ones?</string>
+    <string name="delete_all_geofications_cd">Delete all Geofications</string>
+    <string name="reset_settings">Reset settings</string>
+    <string name="really_want_to_reset_all_user_settings">Do you really want to reset all user settings?</string>
+    <string name="reset">Reset</string>
+    <string name="miscellaneous">Miscellaneous</string>
+    <string name="show_popup_at_startup_if">Show popup at startup if power saving mode is turned on</string>
 </resources>

@@ -15,6 +15,7 @@ import de.tobibrtnr.geofication.ui.GeoficationApp
 import de.tobibrtnr.geofication.ui.theme.GeoficationTheme
 import de.tobibrtnr.geofication.util.misc.ServiceProvider
 import de.tobibrtnr.geofication.util.storage.LocaleUtil
+import de.tobibrtnr.geofication.util.storage.SettingsUtil
 import de.tobibrtnr.geofication.util.storage.UnitUtil
 
 class MainActivity : ComponentActivity() {
@@ -50,8 +51,9 @@ class MainActivity : ComponentActivity() {
     MapsInitializer.initialize(this)
     ServiceProvider.setInstance(this)
 
-    UnitUtil.init(this)
     LocaleUtil.init(this)
+    UnitUtil.init(this)
+    SettingsUtil.init()
 
     val openGeoId = intent.getIntExtra("openGeoId", -1)
 

@@ -125,6 +125,9 @@ interface GeofenceDao {
 
   @Query("UPDATE geofence SET active = :isActive WHERE id = :gid")
   fun setActive(isActive: Boolean, gid: Int)
+
+  @Query("DELETE FROM geofence")
+  fun deleteAllGeofences()
 }
 
 @Dao
@@ -180,6 +183,9 @@ interface SettingsDao {
 
   @Query("SELECT value FROM setting WHERE `key` = :name")
   fun getSetting(name: String): ByteArray
+
+  @Query("DELETE from setting")
+  fun resetSettings()
 }
 
 @Database(

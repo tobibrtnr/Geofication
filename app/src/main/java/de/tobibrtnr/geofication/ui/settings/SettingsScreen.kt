@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Build
+import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.layout.Arrangement
@@ -26,7 +27,9 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -42,12 +45,16 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import de.tobibrtnr.geofication.MainActivity
 import de.tobibrtnr.geofication.R
+import de.tobibrtnr.geofication.ui.common.DeleteAllConfirmPopup
+import de.tobibrtnr.geofication.ui.common.ResetSettingsPopup
+import de.tobibrtnr.geofication.util.storage.GeofenceUtil
 import de.tobibrtnr.geofication.util.storage.LocaleUtil
 import de.tobibrtnr.geofication.util.storage.LogEntry
 import de.tobibrtnr.geofication.util.storage.LogUtil
 import de.tobibrtnr.geofication.util.storage.SettingsUtil
 import de.tobibrtnr.geofication.util.storage.UnitUtil
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -61,9 +68,13 @@ fun SettingsScreen(
 ) {
 
   val context = LocalContext.current
+  val activity = context as? ComponentActivity
+
   val uiModeManager = context.getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
 
   var selectedMode by remember { mutableStateOf(SettingsUtil.getThemeMode()) }
+
+  var powerPopup by remember { mutableStateOf(SettingsUtil.getPowerPopup()) }
 
   // true is meter, false is foot
   var selectedUnit by remember { mutableStateOf(UnitUtil.getDistanceUnit()) }
@@ -73,10 +84,45 @@ fun SettingsScreen(
   val languageCodes by lazy { context.resources.getStringArray(R.array.language_codes) }
   var selectedLocale by remember { mutableStateOf(LocaleUtil.getLocale()) }
 
+  var deleteAllPopupVisible by remember { mutableStateOf(false) }
+  var resetSettingsPopupVisible by remember { mutableStateOf(false) }
+
   var logEntryArray by remember { mutableStateOf(emptyList<LogEntry>()) }
   LaunchedEffect(Unit) {
     val logEntries = LogUtil.getLogs()
     logEntryArray = logEntries
+  }
+
+  // Delete all Geofications Popup
+  if (deleteAllPopupVisible) {
+    DeleteAllConfirmPopup(
+      onConfirm = {
+        deleteAllPopupVisible = false
+        CoroutineScope(Dispatchers.Default).launch {
+          GeofenceUtil.deleteAllGeofications()
+        }
+      },
+      onCancel = { deleteAllPopupVisible = false }
+    )
+  }
+
+  // Reset Settings Popup
+  if (resetSettingsPopupVisible) {
+    ResetSettingsPopup(
+      onConfirm = {
+        resetSettingsPopupVisible = false
+        CoroutineScope(Dispatchers.Default).launch {
+          Locale.setDefault(context.applicationContext.resources.configuration.locales[0])
+
+          SettingsUtil.resetSettings()
+          uiModeManager.setApplicationNightMode(
+            UiModeManager.MODE_NIGHT_AUTO
+          )
+          activity?.restartApp()
+        }
+      },
+      onCancel = { resetSettingsPopupVisible = false }
+    )
   }
 
   // UI
@@ -171,7 +217,6 @@ fun SettingsScreen(
               onClick = {
                 selectedLocale = languageCodes[index]
                 LocaleUtil.setLocale(context, languageCodes[index])
-                println("SET NEW LOCALE ${languageCodes[index]}")
               },
               role = Role.RadioButton
             )
@@ -180,13 +225,44 @@ fun SettingsScreen(
         ) {
           RadioButton(
             selected = isSelected,
-            onClick = null // null recommended for accessibility with screenreaders
+            onClick = null // null recommended for accessibility with screen readers
           )
           Spacer(modifier = Modifier.width(8.dp))
           Text(text = language)
         }
       }
 
+      Spacer(modifier = Modifier.height(8.dp))
+
+      // Locale
+      Text(text = stringResource(R.string.miscellaneous), style = MaterialTheme.typography.titleLarge)
+
+      Row(
+        modifier = Modifier.fillMaxWidth()
+      ) {
+        Switch(checked = powerPopup, onCheckedChange = {
+            powerPopup = !powerPopup; SettingsUtil.setPowerPopup(powerPopup)
+        })
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(text = stringResource(R.string.show_popup_at_startup_if))
+      }
+
+      Spacer(modifier = Modifier.height(8.dp))
+
+      OutlinedButton(modifier = Modifier.fillMaxWidth(), onClick = {
+        deleteAllPopupVisible = true
+      }) {
+        Text(text = stringResource(R.string.delete_all_geofications_cd))
+      }
+
+      Spacer(modifier = Modifier.height(8.dp))
+
+      OutlinedButton(modifier = Modifier.fillMaxWidth(), onClick = {
+        resetSettingsPopupVisible = true
+      }) {
+        Text(text = stringResource(R.string.reset_settings))
+      }
+      
       Spacer(modifier = Modifier.height(8.dp))
 
       // Debug Log
@@ -243,4 +319,11 @@ fun ListItem(logEntry: LogEntry) {
     }
   }
   Spacer(modifier = Modifier.height(8.dp))
+}
+
+fun ComponentActivity.restartApp() {
+  val intent = Intent(this, this::class.java)
+  intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+  startActivity(intent)
+  finish()
 }

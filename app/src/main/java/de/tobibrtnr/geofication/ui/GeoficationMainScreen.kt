@@ -50,6 +50,7 @@ import de.tobibrtnr.geofication.ui.geofications.GeoficationsScreen
 import de.tobibrtnr.geofication.ui.map.MapScreen
 import de.tobibrtnr.geofication.ui.settings.SettingsScreen
 import de.tobibrtnr.geofication.ui.startup.PermissionScreen
+import de.tobibrtnr.geofication.util.storage.SettingsUtil
 
 enum class GeoficationScreen(@StringRes val title: Int, val icon: ImageVector) {
   Start(title = R.string.map, icon = Icons.Outlined.Map),
@@ -93,7 +94,6 @@ fun GeoficationApp(
 
   val esEnabled = isPowerSaveMode(context)
   var isInPowerSaveMode by remember { mutableStateOf(esEnabled) }
-  println("ENERGY SAVER ENABLED? $esEnabled")
 
   var navigateByBottomBar by remember { mutableStateOf(false) }
 
@@ -108,7 +108,7 @@ fun GeoficationApp(
   } else {
 
     // Popup to notify user that battery saver mode is enabled
-    if(isInPowerSaveMode) {
+    if(isInPowerSaveMode && SettingsUtil.getPowerPopup()) {
       BatterySavingPopup(onConfirm = {
         openBatterySaverSettings(context)
         isInPowerSaveMode = false

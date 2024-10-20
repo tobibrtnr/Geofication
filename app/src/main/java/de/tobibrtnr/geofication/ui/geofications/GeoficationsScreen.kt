@@ -15,7 +15,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ClearAll
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -43,6 +45,7 @@ import androidx.navigation.NavController
 import de.tobibrtnr.geofication.R
 import de.tobibrtnr.geofication.ui.GeoficationScreen
 import de.tobibrtnr.geofication.ui.common.CircleWithColor
+import de.tobibrtnr.geofication.ui.common.DeleteAllConfirmPopup
 import de.tobibrtnr.geofication.ui.common.DeleteConfirmPopup
 import de.tobibrtnr.geofication.util.storage.Geofence
 import de.tobibrtnr.geofication.util.storage.GeofenceUtil
@@ -62,12 +65,44 @@ fun GeoficationsScreen(
 
   val geoficationsArray by geoViewModel.geoficationsArray.collectAsState()
 
+  var deleteAllPopupVisible by remember { mutableStateOf(false) }
+
+  if (deleteAllPopupVisible) {
+    DeleteAllConfirmPopup(
+      onConfirm = {
+        deleteAllPopupVisible = false
+        CoroutineScope(Dispatchers.Default).launch {
+          GeofenceUtil.deleteAllGeofications()
+        }
+      },
+      onCancel = { deleteAllPopupVisible = false }
+    )
+  }
+
   // UI
   Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-    Text(
-      text = stringResource(R.string.geofications),
-      style = MaterialTheme.typography.headlineMedium
-    )
+    Row(
+      horizontalArrangement = Arrangement.SpaceBetween,
+      modifier = Modifier.fillMaxWidth()
+    ) {
+      Text(
+        text = stringResource(R.string.geofications),
+        style = MaterialTheme.typography.headlineMedium
+      )
+
+      if(geoficationsArray.isNotEmpty()) {
+        Icon(
+          imageVector = Icons.Filled.DeleteSweep,
+          contentDescription = stringResource(R.string.delete_all_geofications_cd),
+          modifier = Modifier
+            .size(32.dp)
+            .clickable {
+              deleteAllPopupVisible = true
+            }
+        )
+      }
+
+    }
     Spacer(modifier = Modifier.height(8.dp))
     Text(
       stringResource(

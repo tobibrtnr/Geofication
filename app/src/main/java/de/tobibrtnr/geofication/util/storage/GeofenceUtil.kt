@@ -230,5 +230,16 @@ class GeofenceUtil {
         geoDao.searchGeofications(query)
       }
     }
+
+    /**
+     * Delete all Geofications and Geofences
+     */
+    suspend fun deleteAllGeofications() {
+      return withContext(Dispatchers.IO) {
+        val db = ServiceProvider.database()
+        val geoDao = db.geofenceDao()
+        geoDao.deleteAllGeofences()
+      }
+    }
   }
 }
