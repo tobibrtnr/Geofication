@@ -234,7 +234,7 @@ fun SettingsScreen(
 
       Spacer(modifier = Modifier.height(8.dp))
 
-      // Locale
+      // Miscellaneous
       Text(text = stringResource(R.string.miscellaneous), style = MaterialTheme.typography.titleLarge)
 
       Row(

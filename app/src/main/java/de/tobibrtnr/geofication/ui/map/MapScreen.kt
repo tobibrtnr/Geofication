@@ -24,14 +24,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationSearching
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Satellite
+import androidx.compose.material.icons.filled.SwipeDown
+import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -42,17 +45,24 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.BlurredEdgeTreatment
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -72,8 +82,8 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapType
 import com.google.maps.android.compose.MapUiSettings
-import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.widgets.ScaleBar
 import de.tobibrtnr.geofication.R
@@ -85,6 +95,7 @@ import de.tobibrtnr.geofication.util.misc.ServiceProvider
 import de.tobibrtnr.geofication.util.misc.Vibrate
 import de.tobibrtnr.geofication.util.storage.Geofence
 import de.tobibrtnr.geofication.util.storage.GeofenceUtil
+import de.tobibrtnr.geofication.util.storage.SettingsUtil
 import de.tobibrtnr.geofication.util.storage.UnitUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -207,6 +218,8 @@ fun MapScreenMain(
   var currentLocation by remember { mutableStateOf(LatLng(0.0, 0.0)) }
 
   val gestureCoroutineScope = rememberCoroutineScope()
+
+  var firstStartup by remember { mutableStateOf(SettingsUtil.getFirstStartup()) }
 
   /*
    * Check Composable Route Parameters
@@ -575,6 +588,47 @@ fun MapScreenMain(
       }
     }
 
+    if(firstStartup) {
+      Box(
+        modifier = Modifier
+          .fillMaxSize()
+          .zIndex(100f),
+        contentAlignment = Alignment.Center
+      ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+          Text(
+            style = MaterialTheme.typography.bodyLarge.copy(
+              shadow = Shadow(color = Color.Black, blurRadius = 16f)
+            ),
+            textAlign = TextAlign.Center,
+            fontWeight = FontWeight.Bold,
+            text = "Hold down on the map and drag\nto create your first Geofication!",
+            color = Color(237, 237, 237)
+
+          )
+
+          Spacer(Modifier.height(8.dp))
+
+          Box(
+            contentAlignment = Alignment.Center
+          ) {
+            Icon(
+              modifier = Modifier.size(70.dp).blur(8.dp, edgeTreatment = BlurredEdgeTreatment.Unbounded),
+              imageVector = Icons.Filled.SwipeDown,
+              contentDescription = "Icon Shadow",
+              tint = Color.DarkGray
+            )
+            Icon(
+              modifier = Modifier.size(60.dp),
+              imageVector = Icons.Filled.SwipeDown,
+              contentDescription = "Touch here",
+              tint = Color(237, 237, 237)
+            )
+          }
+        }
+      }
+    }
+
     GoogleMap(
       uiSettings = uiSettings,
       properties = properties,
@@ -595,6 +649,12 @@ fun MapScreenMain(
       modifier = Modifier
         .fillMaxSize()
         .pointerInput(Unit) {
+
+          if(firstStartup) {
+            firstStartup = false
+            SettingsUtil.setFirstStartup(false)
+          }
+
           awaitEachGesture {
             do {
               val event = awaitPointerEvent()
@@ -643,7 +703,9 @@ fun MapScreenMain(
               }
             } while (event.changes.any { it.pressed })
           }
-        },
+        }.then(
+          if (firstStartup) Modifier.blur(4.dp) else Modifier.blur(0.dp)
+        ),
       cameraPositionState = cameraPositionState,
       onMapLoaded = {
         isMapLoaded = true

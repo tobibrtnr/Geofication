@@ -11,6 +11,8 @@ class SettingsUtil {
     private var themeMode: String = "auto"
     private var powerPopup: Boolean = true
 
+    private var firstStartup: Boolean = true
+
     fun init() {
       CoroutineScope(SupervisorJob()).launch {
         val db = ServiceProvider.database()
@@ -24,6 +26,14 @@ class SettingsUtil {
 
         powerPopup = try {
           val byteArray = setDao.getSetting("powerPopup")
+          byteArray.isNotEmpty() && byteArray[0] == 1.toByte()
+        } catch (e: NullPointerException) {
+          // Setting does not exist yet
+          true
+        }
+
+        firstStartup = try {
+          val byteArray = setDao.getSetting("firstStartup")
           byteArray.isNotEmpty() && byteArray[0] == 1.toByte()
         } catch (e: NullPointerException) {
           // Setting does not exist yet
@@ -60,6 +70,20 @@ class SettingsUtil {
       }
     }
 
+    fun getFirstStartup(): Boolean {
+      return firstStartup
+    }
+
+    fun setFirstStartup(new: Boolean) {
+      firstStartup = new;
+      CoroutineScope(SupervisorJob()).launch {
+        val db = ServiceProvider.database()
+        val setDao = db.settingsDao()
+        val themeSetting = Setting("firstStartup", byteArrayOf(if(new) 1 else 0))
+        setDao.setSetting(themeSetting)
+      }
+    }
+
     fun resetSettings() {
       CoroutineScope(SupervisorJob()).launch {
         val db = ServiceProvider.database()
@@ -67,5 +91,6 @@ class SettingsUtil {
         setDao.resetSettings()
       }
     }
+
   }
 }
