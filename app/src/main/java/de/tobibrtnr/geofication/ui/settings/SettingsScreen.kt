@@ -3,16 +3,13 @@ package de.tobibrtnr.geofication.ui.settings
 import android.app.UiModeManager
 import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
 import android.os.Build
 import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -42,8 +39,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import de.tobibrtnr.geofication.MainActivity
 import de.tobibrtnr.geofication.R
 import de.tobibrtnr.geofication.ui.common.DeleteAllConfirmPopup
 import de.tobibrtnr.geofication.ui.common.ResetSettingsPopup
@@ -53,6 +50,7 @@ import de.tobibrtnr.geofication.util.storage.LogEntry
 import de.tobibrtnr.geofication.util.storage.LogUtil
 import de.tobibrtnr.geofication.util.storage.SettingsUtil
 import de.tobibrtnr.geofication.util.storage.UnitUtil
+import de.tobibrtnr.geofication.BuildConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -262,29 +260,40 @@ fun SettingsScreen(
       }) {
         Text(text = stringResource(R.string.reset_settings))
       }
-      
+
       Spacer(modifier = Modifier.height(8.dp))
 
-      // Debug Log
-      Row(verticalAlignment = Alignment.CenterVertically) {
-        Text(text = stringResource(R.string.debug_log), style = MaterialTheme.typography.titleLarge)
-        Spacer(Modifier.width(8.dp))
-        Button(onClick = {
-          CoroutineScope(SupervisorJob()).launch {
-            LogUtil.deleteAll()
-            logEntryArray = LogUtil.getLogs()
+      Text(
+        modifier = Modifier.fillMaxWidth(),
+        text = stringResource(R.string.app_version, BuildConfig.VERSION_NAME),
+        style = MaterialTheme.typography.bodySmall,
+        textAlign = TextAlign.End
+      )
+
+      Spacer(modifier = Modifier.height(8.dp))
+
+      // Debug Log, show only in debug mode
+      if(BuildConfig.DEBUG) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+          Text(text = stringResource(R.string.debug_log), style = MaterialTheme.typography.titleLarge)
+          Spacer(Modifier.width(8.dp))
+          Button(onClick = {
+            CoroutineScope(SupervisorJob()).launch {
+              LogUtil.deleteAll()
+              logEntryArray = LogUtil.getLogs()
+            }
+          }) {
+            Text(stringResource(R.string.clear_log))
           }
-        }) {
-          Text(stringResource(R.string.clear_log))
         }
-      }
-      Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
-      LazyColumn(Modifier.height(500.dp)) {
-        items(logEntryArray) {
-          ListItem(it)
+        LazyColumn(Modifier.height(500.dp)) {
+          items(logEntryArray) {
+            ListItem(it)
+          }
+
         }
-
       }
     }
   }

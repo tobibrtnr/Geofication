@@ -399,7 +399,7 @@ fun MapScreenMain(
             }, clearFocus = {
               removeFocusFromSearchBar()
             })
-          DropdownInfoButton(searchInputState, navController) { removeFocusFromSearchBar() }
+          DropdownInfoButton(navController) { removeFocusFromSearchBar() }
         }
         if (resultsShown) {
           SearchResultList(searchInputState, searchGlobally = { query ->
@@ -563,12 +563,12 @@ fun MapScreenMain(
       }
     }
 
-    ScaleBar(
-      modifier = Modifier
-        .padding(bottom = 10.dp, end = 105.dp)
-        .align(Alignment.BottomEnd),
-      cameraPositionState = cameraPositionState
-    )
+    //ScaleBar(
+    //  modifier = Modifier
+    //    .padding(bottom = 10.dp, end = 105.dp)
+    //    .align(Alignment.BottomEnd),
+    //  cameraPositionState = cameraPositionState
+    //)
   }
 }
 

@@ -11,8 +11,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -76,7 +78,19 @@ fun LocationSearchBar(
         focusManager.clearFocus()
         searchLocation(locationName, context, callback, clearFocus)
       }
-    )
+    ),
+    trailingIcon = {
+      if(locationName.isNotEmpty()) {
+        IconButton(onClick = {
+          locationName = ""
+        }) {
+          Icon(
+            imageVector = Icons.Default.Close,
+            contentDescription = stringResource(R.string.clear_search_query)
+          )
+        }
+      }
+    }
   )
 }
 

@@ -23,11 +23,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
@@ -272,6 +274,16 @@ fun AddGeofencePopup(
           },
           label = { Text(stringResource(R.string.notification_message)) },
           colors = TextFieldDefaults.colors(errorContainerColor = Color(0xFFFF0000)),
+          trailingIcon = {
+            if(message.isNotEmpty()) {
+              IconButton(onClick = { message = "" }) {
+                Icon(
+                  imageVector = Icons.Default.Close,
+                  contentDescription = stringResource(R.string.clear_text)
+                )
+              }
+            }
+          }
         )
 
         //Text(
@@ -414,6 +426,16 @@ fun AddGeofencePopup(
                       (radius.toFloatOrNull() != null) &&
                       (radius.toFloat() > 0) &&
                       (link.isEmpty() || matcher.matches())
+              },
+              trailingIcon = {
+                if(link.isNotEmpty()) {
+                  IconButton(onClick = { link = "" }) {
+                    Icon(
+                      imageVector = Icons.Default.Close,
+                      contentDescription = stringResource(R.string.clear_text)
+                    )
+                  }
+                }
               }
             )
           }
@@ -482,7 +504,9 @@ fun CategoryItem(title: String, content: @Composable () -> Unit) {
           text = title,
           fontSize = 18.sp,
           fontWeight = FontWeight.Bold,
-          modifier = Modifier.weight(1f).padding(vertical = 10.dp)
+          modifier = Modifier
+            .weight(1f)
+            .padding(vertical = 10.dp)
         )
         Icon(
           imageVector = Icons.Default.KeyboardArrowDown,

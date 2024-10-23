@@ -39,12 +39,10 @@ import de.tobibrtnr.geofication.R
 
 @Composable
 fun DropdownInfoButton(
-  inputState: MutableState<String>,
   navController: NavHostController,
   rmFocus: () -> Unit
 ) {
   val th = 56
-  var input by inputState
 
   var showMenu by remember { mutableStateOf(false) }
 
@@ -56,31 +54,13 @@ fun DropdownInfoButton(
   ) {
     Row(
       Modifier
-        .width(((if (input.isNotEmpty()) 1.125 else 0.75) * th).dp)
+        .width((0.75 * th).dp)
         .height(th.dp)
         .background(
           TextFieldDefaults.colors().focusedContainerColor,
           RoundedCornerShape(topEndPercent = 50, bottomEndPercent = 50)
         )
     ) {
-      if (input.isNotEmpty()) {
-        Column(
-          Modifier
-            .weight(1f / 3f)
-            .fillMaxHeight()
-            .clickable {
-              input = ""
-            },
-          horizontalAlignment = Alignment.CenterHorizontally,
-          verticalArrangement = Arrangement.Center
-        ) {
-          Icon(
-            imageVector = Icons.Filled.Close,
-            contentDescription = stringResource(R.string.clear_search_query)
-          )
-        }
-        VerticalDivider(thickness = 1.dp, color = Color.Black)
-      }
       Column(
         Modifier
           .weight(2f / 3f)

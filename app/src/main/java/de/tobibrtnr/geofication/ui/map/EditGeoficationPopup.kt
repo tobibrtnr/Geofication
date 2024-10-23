@@ -18,11 +18,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
@@ -235,6 +237,19 @@ fun EditGeoficationPopup(
               selectedGeofication =
                 selectedGeofication!!.copy(message = it)//.take(max) for max name length
               inputValid = isInputValid()
+            },
+            trailingIcon = {
+              if(selectedGeofication!!.message.isNotEmpty()) {
+                IconButton(onClick = {
+                  selectedGeofication = selectedGeofication!!.copy(message = "")
+                  inputValid = isInputValid()
+                }) {
+                  Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = stringResource(R.string.clear_text)
+                  )
+                }
+              }
             }
           )
 
@@ -253,6 +268,19 @@ fun EditGeoficationPopup(
               selectedGeofence =
                 selectedGeofence!!.copy(fenceName = it)//.take(max) for max name length
               inputValid = isInputValid()
+            },
+            trailingIcon = {
+              if(selectedGeofence!!.fenceName.isNotEmpty()) {
+                IconButton(onClick = {
+                  selectedGeofence = selectedGeofence!!.copy(fenceName = "")
+                  inputValid = isInputValid()
+                }) {
+                  Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = stringResource(R.string.clear_text)
+                  )
+                }
+              }
             }
           )
 
