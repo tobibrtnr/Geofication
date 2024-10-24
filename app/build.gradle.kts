@@ -105,6 +105,10 @@ dependencies {
   // WorkManager for Geofication trigger handling after x minutes
   implementation("androidx.work:work-runtime-ktx:2.9.1")
 
+  // In-app Play Store rating
+  implementation("com.google.android.play:review:2.0.2")
+  implementation("com.google.android.play:review-ktx:2.0.2")
+
   testImplementation("junit:junit:4.13.2")
 
   androidTestImplementation("androidx.test.ext:junit:1.2.1")

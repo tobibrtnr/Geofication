@@ -1,11 +1,16 @@
 package de.tobibrtnr.geofication.util.storage
 
+import android.app.Activity
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.GeofencingRequest
+import com.google.android.play.core.review.ReviewException
+import com.google.android.play.core.review.ReviewManagerFactory
+import com.google.android.play.core.review.model.ReviewErrorCode
+import com.google.android.play.core.review.testing.FakeReviewManager
 import de.tobibrtnr.geofication.util.misc.ServiceProvider
 import de.tobibrtnr.geofication.util.receivers.GeofenceBroadcastReceiver
 import kotlinx.coroutines.CoroutineScope
@@ -55,7 +60,33 @@ class GeofenceUtil {
         val newId = if (daoGeofence.id <= 0 || forceAddGeofence) {
           // Add geofence to local database
           val geofenceDao = db.geofenceDao()
-          geofenceDao.insert(daoGeofence).toInt()
+          val idToAdd = geofenceDao.insert(daoGeofence).toInt()
+
+          // If 8 Geofications have been created, show a rating popup
+          // TODO test internally
+          if(idToAdd == 8) {
+            //val manager = FakeReviewManager(context)
+            val manager = ReviewManagerFactory.create(context)
+            val request = manager.requestReviewFlow()
+            request.addOnCompleteListener { task ->
+              if (task.isSuccessful) {
+                // We got the ReviewInfo object
+                val reviewInfo = task.result
+                val flow = manager.launchReviewFlow(context as Activity, reviewInfo)
+                flow.addOnCompleteListener { _ ->
+                  // The flow has finished. The API does not indicate whether the user
+                  // reviewed or not, or even whether the review dialog was shown. Thus, no
+                  // matter the result, we continue our app flow.
+                }
+              } else {
+                // There was some problem, log or handle the error code.
+                @ReviewErrorCode val reviewErrorCode = (task.exception as ReviewException).errorCode
+                println(reviewErrorCode)
+              }
+            }
+          }
+
+          idToAdd
         } else {
           daoGeofence.id
         }
