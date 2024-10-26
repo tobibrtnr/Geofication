@@ -1,6 +1,7 @@
 package de.tobibrtnr.geofication.ui.map
 
 import android.Manifest
+import android.R.attr.radius
 import android.content.pm.PackageManager
 import android.graphics.Point
 import android.location.Address
@@ -58,6 +59,7 @@ import androidx.navigation.NavHostController
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.SphericalUtil
 import com.google.maps.android.compose.CameraPositionState
@@ -69,7 +71,6 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.google.maps.android.compose.widgets.ScaleBar
 import de.tobibrtnr.geofication.R
 import de.tobibrtnr.geofication.ui.common.MarkerColor
 import de.tobibrtnr.geofication.util.misc.ServiceProvider
@@ -83,6 +84,8 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlin.math.abs
+import kotlin.math.ln
+
 
 @Composable
 fun MapScreenMain(
@@ -169,6 +172,12 @@ fun MapScreenMain(
 
   var usedEdit by remember { mutableStateOf(edit ?: false) }
 
+  val searchBarOutline = if (isSystemInDarkTheme()) {
+    Color.DarkGray
+  } else {
+    Color.LightGray
+  }
+
   LaunchedEffect(Unit) {
     if (usedGeoId > 0) {
       val tmpGeofence = GeofenceUtil.getGeofenceById(usedGeoId)
@@ -177,8 +186,9 @@ fun MapScreenMain(
       } else {
         MainScope().launch {
           val geoLocation = LatLng(tmpGeofence.latitude, tmpGeofence.longitude)
-
           cameraPositionState.position = CameraPosition(geoLocation, 15f, 0f, 0f)
+
+          animateCameraToGeofence(cameraPositionState, tmpGeofence)
         }
       }
       usedGeoId = 0
@@ -375,7 +385,7 @@ fun MapScreenMain(
             .clip(CircleShape)
             .border(
               1.dp,
-              Color.LightGray,
+              searchBarOutline,
               CircleShape
             )
             .shadow(
@@ -409,9 +419,9 @@ fun MapScreenMain(
             }, clearFocus = {
               removeFocusFromSearchBar()
             })
-          }, goToLocation = { lat, lng ->
+          }, goToLocation = { lat, lng, radius ->
             removeFocusFromSearchBar()
-            animateCamera(cameraPositionState, LatLng(lat, lng))
+            animateCameraToGeofence(cameraPositionState, lat, lng, radius)
           })
         } else {
           Column {
@@ -434,7 +444,6 @@ fun MapScreenMain(
                   Modifier
                     .size(32.dp), cameraPositionState
                 ) {
-
                   val currPos = cameraPositionState.position
                   animateCamera(cameraPositionState, currPos.target, currPos.zoom, currPos.tilt)
                 }
@@ -558,17 +567,10 @@ fun MapScreenMain(
         MarkerCircle(geo) {
           markerPopupVisible = true
           selectedMarkerId = geo.id
-          animateCamera(cameraPositionState, LatLng(geo.latitude, geo.longitude))
+          animateCameraToGeofence(cameraPositionState, geo)
         }
       }
     }
-
-    //ScaleBar(
-    //  modifier = Modifier
-    //    .padding(bottom = 10.dp, end = 105.dp)
-    //    .align(Alignment.BottomEnd),
-    //  cameraPositionState = cameraPositionState
-    //)
   }
 }
 
@@ -591,4 +593,33 @@ fun animateCamera(
       )
     )
   }
+}
+
+/**
+ * Animate the camera to a new position and optional zoom, tilt and bearing.
+ */
+fun animateCameraToGeofence(
+  cameraPositionState: CameraPositionState,
+  lat: Double,
+  lon: Double,
+  radius: Float
+) {
+  MainScope().launch {
+    val pos = LatLng(lat, lon)
+    val distance = 2.0 * radius
+
+    // Calculate the southwest and northeast bounds based on the distance
+    val southwest = SphericalUtil.computeOffset(pos, distance, 225.0) // 225° SW
+    val northeast = SphericalUtil.computeOffset(pos, distance, 45.0)   // 45° NE
+
+    val bounds = LatLngBounds(southwest, northeast)
+    cameraPositionState.animate(CameraUpdateFactory.newLatLngBounds(bounds, 0))
+  }
+}
+
+fun animateCameraToGeofence(
+  cameraPositionState: CameraPositionState,
+  geofence: Geofence
+) {
+  animateCameraToGeofence(cameraPositionState, geofence.latitude, geofence.longitude, geofence.radius)
 }

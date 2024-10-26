@@ -24,18 +24,7 @@ fun GeoficationChip(geofence: Geofence, geofication: Geofication, meterText: Str
     border = AssistChipDefaults.assistChipBorder(enabled = false),
     colors = AssistChipDefaults.assistChipColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
     onClick = {
-      MainScope().launch {
-        cameraPositionState.animate(
-          CameraUpdateFactory.newCameraPosition(
-            CameraPosition(
-              LatLng(geofence.latitude, geofence.longitude),
-              15f,
-              0f,
-              0f
-            )
-          )
-        )
-      }
+      animateCameraToGeofence(cameraPositionState, geofence)
     },
     label = {
       Text(

@@ -41,7 +41,7 @@ import de.tobibrtnr.geofication.util.storage.GeoficationGeofence
 fun SearchResultList(
   query: MutableState<String>,
   searchGlobally: (String) -> Unit,
-  goToLocation: (Double, Double) -> Unit
+  goToLocation: (Double, Double, Float) -> Unit
 ) {
   val queryString by query
 
@@ -70,7 +70,7 @@ fun SearchResultList(
 }
 
 @Composable
-fun SearchResultsCard(results: List<GeoficationGeofence>, goToLocation: (Double, Double) -> Unit) {
+fun SearchResultsCard(results: List<GeoficationGeofence>, goToLocation: (Double, Double, Float) -> Unit) {
   val keyboardController = LocalSoftwareKeyboardController.current
   val focusManager = LocalFocusManager.current
 
@@ -87,7 +87,7 @@ fun SearchResultsCard(results: List<GeoficationGeofence>, goToLocation: (Double,
           .clickable {
             keyboardController?.hide()
             focusManager.clearFocus()
-            goToLocation(result.latitude, result.longitude)
+            goToLocation(result.latitude, result.longitude, result.radius)
           }) {
         Row(
           modifier = Modifier
