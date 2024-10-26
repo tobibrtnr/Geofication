@@ -3,6 +3,7 @@ plugins {
   id("org.jetbrains.kotlin.android")
   id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
   id("com.google.devtools.ksp")
+  id("com.google.android.gms.oss-licenses-plugin")
 }
 
 android {
@@ -108,6 +109,9 @@ dependencies {
   // In-app Play Store rating
   implementation("com.google.android.play:review:2.0.2")
   implementation("com.google.android.play:review-ktx:2.0.2")
+
+  // Display OSS licenses
+  implementation("com.google.android.gms:play-services-oss-licenses:17.1.0")
 
   testImplementation("junit:junit:4.13.2")
 

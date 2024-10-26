@@ -95,7 +95,9 @@ class GeofenceUtil {
           .setRequestId(newId.toString())
           .setCircularRegion(daoGeofence.latitude, daoGeofence.longitude, daoGeofence.radius)
           .setExpirationDuration(com.google.android.gms.location.Geofence.NEVER_EXPIRE)
-          .setTransitionTypes(com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_ENTER or com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_EXIT)
+          .setTransitionTypes(
+            com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_ENTER or
+            com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_EXIT)
           .build()
 
         val geofenceRequest = GeofencingRequest.Builder()

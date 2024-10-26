@@ -98,4 +98,5 @@
     <string name="show_popup_at_startup_if">Show popup at startup if power saving mode is turned on</string>
     <string name="clear_text">Clear text</string>
     <string name="app_version">App version %1$s</string>
+    <string name="open_source_licenses">Open Source Licenses</string>
 </resources>
