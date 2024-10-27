@@ -113,6 +113,8 @@ dependencies {
   // Display OSS licenses
   implementation("com.google.android.gms:play-services-oss-licenses:17.1.0")
 
+  implementation("androidx.core:core-splashscreen:1.0.1")
+
   testImplementation("junit:junit:4.13.2")
 
   androidTestImplementation("androidx.test.ext:junit:1.2.1")
