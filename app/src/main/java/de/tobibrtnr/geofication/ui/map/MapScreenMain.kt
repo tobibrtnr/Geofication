@@ -41,6 +41,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -104,6 +105,9 @@ fun MapScreenMain(
 ) {
   val context = LocalContext.current
 
+  val isDarkTheme = isSystemInDarkTheme()
+  val currentThemeState by rememberUpdatedState(isDarkTheme)
+
   // Map Settings
   var uiSettings by remember {
     mutableStateOf(
@@ -117,7 +121,7 @@ fun MapScreenMain(
     )
   }
 
-  val mapStyleOptions = if (isSystemInDarkTheme()) MapStyleOptions.loadRawResourceStyle(
+  val mapStyleOptions = if (currentThemeState) MapStyleOptions.loadRawResourceStyle(
     context,
     R.raw.google_maps_style_dark_mode
   ) else null
@@ -184,10 +188,26 @@ fun MapScreenMain(
 
   var usedEdit by remember { mutableStateOf(edit ?: false) }
 
-  val searchBarOutline = if (isSystemInDarkTheme()) {
+  var searchBarOutline = if (currentThemeState) {
     Color.DarkGray
   } else {
     Color.LightGray
+  }
+
+  // on Theme Update, update outline and Map style
+  LaunchedEffect(currentThemeState) {
+    searchBarOutline = if (currentThemeState) {
+      Color.DarkGray
+    } else {
+      Color.LightGray
+    }
+
+    val newMapStyleOptions = if (currentThemeState) MapStyleOptions.loadRawResourceStyle(
+      context,
+      R.raw.google_maps_style_dark_mode
+    ) else null
+
+    properties = properties.copy(mapStyleOptions = newMapStyleOptions)
   }
 
   LaunchedEffect(Unit) {
@@ -456,7 +476,12 @@ fun MapScreenMain(
               }) {
               Spacer(Modifier.height(8.dp))
             }
-            if (cameraPositionState.position.bearing != 0f) {
+
+            AnimatedVisibility(
+              visible = cameraPositionState.position.bearing != 0f,
+              enter = fadeIn(animationSpec = tween(durationMillis = 200)),
+              exit = fadeOut(animationSpec = tween(durationMillis = 200))
+            ) {
               Row {
                 Spacer(Modifier.width(16.dp))
                 Compass(
@@ -467,6 +492,7 @@ fun MapScreenMain(
                   animateCamera(cameraPositionState, currPos.target, currPos.zoom, currPos.tilt)
                 }
               }
+
             }
           }
         }
@@ -560,7 +586,7 @@ fun MapScreenMain(
           }
         }
         .then(
-         Modifier.blur(blurRadius)
+          Modifier.blur(blurRadius)
         ),
       cameraPositionState = cameraPositionState,
       contentPadding = PaddingValues.Absolute(0.dp, 60.dp, 0.dp, 0.dp),

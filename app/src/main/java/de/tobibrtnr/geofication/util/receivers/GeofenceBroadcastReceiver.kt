@@ -9,6 +9,7 @@ import android.os.SystemClock
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofenceStatusCodes
 import com.google.android.gms.location.GeofencingEvent
+import de.tobibrtnr.geofication.BuildConfig
 import de.tobibrtnr.geofication.util.misc.ServiceProvider
 import de.tobibrtnr.geofication.util.misc.serializeObject
 import de.tobibrtnr.geofication.util.storage.GeofenceUtil
@@ -57,8 +58,13 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
           // If geofence not active, do nothing and return
           if (!tFence.active) return@runBlocking
 
-          // If geofence was recently created or edited, do nothing and return
-          val timeDelta = TimeUnit.MINUTES.toMillis(1)
+          // If geofence was recently created or edited, do nothing and return (in release mode)
+          val timeDelta = if (BuildConfig.DEBUG) {
+            0
+          } else {
+            TimeUnit.MINUTES.toMillis(3)
+          }
+
           val currentTime = System.currentTimeMillis()
           if(currentTime - tFence.created < timeDelta ||
              currentTime - tFence.lastEdit < timeDelta) {

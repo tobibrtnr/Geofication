@@ -86,6 +86,13 @@ fun SettingsScreen(
   var resetSettingsPopupVisible by remember { mutableStateOf(false) }
 
   var logEntryArray by remember { mutableStateOf(emptyList<LogEntry>()) }
+
+  var versionPrefix = if(BuildConfig.DEBUG) {
+    "d"
+  } else {
+    "v"
+  }
+
   LaunchedEffect(Unit) {
     val logEntries = LogUtil.getLogs()
     logEntryArray = logEntries
@@ -265,7 +272,7 @@ fun SettingsScreen(
 
       Text(
         modifier = Modifier.fillMaxWidth(),
-        text = stringResource(R.string.app_version, BuildConfig.VERSION_NAME),
+        text = stringResource(R.string.geofication_version, versionPrefix, BuildConfig.VERSION_NAME),
         style = MaterialTheme.typography.bodySmall,
         textAlign = TextAlign.End
       )

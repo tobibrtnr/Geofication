@@ -1,6 +1,5 @@
 package de.tobibrtnr.geofication.ui.geofications
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

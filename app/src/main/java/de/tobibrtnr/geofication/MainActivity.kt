@@ -2,6 +2,7 @@ package de.tobibrtnr.geofication
 
 import android.app.AlarmManager
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -65,5 +66,11 @@ class MainActivity : ComponentActivity() {
         GeoficationApp(openGeoId = openGeoId, intentQuery = intentQuery)
       }
     }
+  }
+
+  // Implementing this method stops recreating the activity when
+  // dark mode is enabled or disabled.
+  override fun onConfigurationChanged(newConfig: Configuration) {
+    super.onConfigurationChanged(newConfig)
   }
 }

@@ -1,7 +1,9 @@
 package de.tobibrtnr.geofication.ui.map
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,6 +22,7 @@ import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.unit.dp
 import com.google.maps.android.compose.CameraPositionState
 
 @Composable
@@ -30,11 +33,13 @@ fun Compass(modifier: Modifier, cameraPositionState: CameraPositionState, onPres
   }
 
   val bgColor = MaterialTheme.colorScheme.primaryContainer
+  val borderColor = MaterialTheme.colorScheme.onSurface.copy(alpha=0.12f)
 
   Box(
     modifier = modifier
       .clip(CircleShape)
-      .background(Color.Gray)
+      .background(bgColor)
+      .border(BorderStroke(1.dp, borderColor), shape = CircleShape)
       .clickable { onPress() },
     contentAlignment = Alignment.Center
   ) {
@@ -44,37 +49,32 @@ fun Compass(modifier: Modifier, cameraPositionState: CameraPositionState, onPres
       val radius = size.minDimension / 2
       val paint = Paint()
 
-      // Draw the grey circle background
-      drawCircle(
-        color = bgColor,
-        radius = radius
-      )
 
       // Rotate the whole canvas to simulate the compass rotation
       rotate(angle) {
         // Draw the north red triangle with shadow
-        paint.color = Color.Red
+        paint.color = Color(0xFFDB4242)
         //paint.setShadowLayer(10f, 0f, 0f, Color.Black.toArgb())
 
         drawIntoCanvas { canvas ->
           val path = Path().apply {
             moveTo(canvasWidth / 2, 10f)
-            lineTo(canvasWidth / 2 - 15f, canvasHeight / 2)
-            lineTo(canvasWidth / 2 + 15f, canvasHeight / 2)
+            lineTo(canvasWidth / 2 - 12f, canvasHeight / 2)
+            lineTo(canvasWidth / 2 + 12f, canvasHeight / 2)
             close()
           }
           canvas.drawPath(path, paint)
         }
 
         // Draw the south dark gray triangle with shadow
-        paint.color = Color.DarkGray
+        paint.color = Color(0xFF6E6E6E)
         //paint.setShadowLayer(10f, 0f, 0f, Color.Black.toArgb())
 
         drawIntoCanvas { canvas ->
           val path = Path().apply {
             moveTo(canvasWidth / 2, canvasHeight - 10)
-            lineTo(canvasWidth / 2 - 15f, canvasHeight / 2)
-            lineTo(canvasWidth / 2 + 15f, canvasHeight / 2)
+            lineTo(canvasWidth / 2 - 12f, canvasHeight / 2)
+            lineTo(canvasWidth / 2 + 12f, canvasHeight / 2)
             close()
           }
           canvas.drawPath(path, paint)
