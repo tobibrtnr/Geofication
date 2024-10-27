@@ -1,12 +1,15 @@
 package de.tobibrtnr.geofication.ui.map
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -56,15 +59,19 @@ fun SearchResultList(
   }
 
   Column(
-    modifier = Modifier.padding(top = 8.dp, start = 16.dp, end = 16.dp),
-    verticalArrangement = Arrangement.spacedBy(8.dp)
+    modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 25.dp)
   ) {
-
-    if (queryString.isNotEmpty() && results.isEmpty()) {
+    AnimatedVisibility(
+      visible = queryString.isNotEmpty() && results.isEmpty()
+    ) {
       NoResultCard()
-    } else if (results.isNotEmpty()) {
+    }
+    AnimatedVisibility(
+      visible = results.isNotEmpty()
+    ) {
       SearchResultsCard(results = results, goToLocation)
     }
+    Spacer(modifier = Modifier.height(8.dp))
     SearchLocationCard(queryString, searchGlobally)
   }
 }
@@ -78,7 +85,8 @@ fun SearchResultsCard(results: List<GeoficationGeofence>, goToLocation: (Double,
     shape = RoundedCornerShape(28.dp),
     colors = CardDefaults.cardColors(),
     modifier = Modifier
-      .shadow(elevation = 16.dp, shape = RoundedCornerShape(28.dp)),
+      //.shadow(elevation = 16.dp, shape = RoundedCornerShape(28.dp))
+      .padding(top = 8.dp)
   ) {
     results.forEachIndexed { index, result ->
       Column(
@@ -121,7 +129,7 @@ fun SearchResultsCard(results: List<GeoficationGeofence>, goToLocation: (Double,
       if (index != results.lastIndex) {
         HorizontalDivider(
           thickness = 1.dp,
-          color = Color.Black,
+          color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
           modifier = Modifier.padding(horizontal = 8.dp)
         )
       }
@@ -162,7 +170,8 @@ fun NoResultCard() {
     shape = RoundedCornerShape(28.dp),
     colors = CardDefaults.cardColors(),
     modifier = Modifier
-      .shadow(elevation = 16.dp, shape = RoundedCornerShape(28.dp))
+      //.shadow(elevation = 16.dp, shape = RoundedCornerShape(28.dp))
+      .padding(top = 8.dp),
   ) {
     Box(
       Modifier

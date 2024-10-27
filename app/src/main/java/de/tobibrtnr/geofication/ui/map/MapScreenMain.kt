@@ -7,6 +7,11 @@ import android.graphics.Point
 import android.location.Address
 import android.location.Geocoder
 import android.os.Build
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -162,6 +167,13 @@ fun MapScreenMain(
   val gestureCoroutineScope = rememberCoroutineScope()
 
   var firstStartup by remember { mutableStateOf(SettingsUtil.getFirstStartup()) }
+
+  // Animate the blur effect
+  val blurRadius by animateDpAsState(
+    targetValue = if (firstStartup) 4.dp else 0.dp,
+    animationSpec = tween(durationMillis = 200),
+    label = "blur_animation"
+  )
 
   /*
    * Check Composable Route Parameters
@@ -411,7 +423,10 @@ fun MapScreenMain(
             })
           DropdownInfoButton(navController) { removeFocusFromSearchBar() }
         }
-        if (resultsShown) {
+
+        AnimatedVisibility(
+          visible = resultsShown
+        ) {
           SearchResultList(searchInputState, searchGlobally = { query ->
             searchLocation(query, context, callback = {
               removeFocusFromSearchBar()
@@ -423,7 +438,11 @@ fun MapScreenMain(
             removeFocusFromSearchBar()
             animateCameraToGeofence(cameraPositionState, lat, lng, radius)
           })
-        } else {
+        }
+
+        AnimatedVisibility(
+          visible = !resultsShown
+        ) {
           Column {
             // Geofication Chips below the search bar
             GeoficationsChipList(
@@ -455,7 +474,12 @@ fun MapScreenMain(
     }
 
     // Show a tutorial screen on first startup
-    if(firstStartup) {
+    AnimatedVisibility(
+      modifier = Modifier.zIndex(100f),
+      visible = firstStartup,
+      enter = fadeIn(animationSpec = tween(durationMillis = 200)),
+      exit = fadeOut(animationSpec = tween(durationMillis = 200))
+    ) {
       StartupTutorialScreen()
     }
 
@@ -536,7 +560,7 @@ fun MapScreenMain(
           }
         }
         .then(
-          if (firstStartup) Modifier.blur(4.dp) else Modifier.blur(0.dp)
+         Modifier.blur(blurRadius)
         ),
       cameraPositionState = cameraPositionState,
       contentPadding = PaddingValues.Absolute(0.dp, 60.dp, 0.dp, 0.dp),

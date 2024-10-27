@@ -99,4 +99,5 @@
     <string name="clear_text">Clear text</string>
     <string name="app_version">App version %1$s</string>
     <string name="open_source_licenses">Open Source Licenses</string>
+    <string name="create_just_on_map">Create your first Geofication just on the map.</string>
 </resources>
