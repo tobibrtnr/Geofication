@@ -222,6 +222,8 @@ fun SettingsScreen(
               onClick = {
                 selectedLocale = languageCodes[index]
                 LocaleUtil.setLocale(context, languageCodes[index])
+
+                activity?.restartApp()
               },
               role = Role.RadioButton
             )

@@ -71,6 +71,7 @@ class MainActivity : ComponentActivity() {
   // Implementing this method stops recreating the activity when
   // dark mode is enabled or disabled.
   override fun onConfigurationChanged(newConfig: Configuration) {
+    LocaleUtil.setLocale(this, LocaleUtil.getLocale())
     super.onConfigurationChanged(newConfig)
   }
 }
