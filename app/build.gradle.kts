@@ -1,9 +1,15 @@
+import com.android.build.api.dsl.Lint
+import com.android.build.api.dsl.LintOptions
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
   id("com.android.application")
   id("org.jetbrains.kotlin.android")
   id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
   id("com.google.devtools.ksp")
   id("com.google.android.gms.oss-licenses-plugin")
+  id("org.sonarqube")
 }
 
 android {
@@ -23,6 +29,12 @@ android {
     vectorDrawables {
       useSupportLibrary = true
     }
+  }
+
+  lint {
+    checkReleaseBuilds = false
+    //If you want to continue even if errors found use following line
+    abortOnError = false
   }
 
   buildTypes {
@@ -131,4 +143,28 @@ secrets {
   // 1. Add this line to your local.properties file, where YOUR_API_KEY is your API key:
   //        MAPS_API_KEY=YOUR_API_KEY
   defaultPropertiesFileName = "local.properties"
+}
+
+// SonarQube configuration
+// This configuration is only valid for local check
+sonarqube {
+  properties {
+    property("sonar.projectKey", "Geofication")
+    property("sonar.host.url", "http://localhost:9000")
+
+    val localProperties = Properties()
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+      localProperties.load(FileInputStream(localPropertiesFile))
+      property("sonar.token", localProperties.getProperty("sonar.token"))
+    }
+
+    property("sonar.language", "kotlin")
+    property("sonar.sourceEncoding", "UTF-8")
+
+    // Android specific properties
+    property("sonar.sources", "src/main/java")
+    property("sonar.tests", "src/test/java")
+    property("sonar.java.binaries", "build/intermediates/classes/release")
+  }
 }

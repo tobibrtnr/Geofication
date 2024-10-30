@@ -8,7 +8,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import de.tobibrtnr.geofication.ui.infos.FaqScreen
-import de.tobibrtnr.geofication.ui.infos.FeedbackScreen
 import de.tobibrtnr.geofication.ui.infos.SupportScreen
 
 @Composable
@@ -40,11 +39,6 @@ fun MapScreen(
     }
     composable("support") {
       SupportScreen(
-        navController = mapNavController
-      )
-    }
-    composable("feedback") {
-      FeedbackScreen(
         navController = mapNavController
       )
     }

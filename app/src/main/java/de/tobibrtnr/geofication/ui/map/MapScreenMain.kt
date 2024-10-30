@@ -219,9 +219,9 @@ fun MapScreenMain(
         MainScope().launch {
           val geoLocation = LatLng(tmpGeofence.latitude, tmpGeofence.longitude)
           cameraPositionState.position = CameraPosition(geoLocation, 15f, 0f, 0f)
-
           animateCameraToGeofence(cameraPositionState, tmpGeofence)
         }
+
       }
       usedGeoId = 0
       usedEdit = false
@@ -330,6 +330,8 @@ fun MapScreenMain(
 
       cameraPositionState.position =
         CameraPosition(geoLocation, 15f, 0f, 0f)
+
+      animateCameraToGeofence(cameraPositionState, openedGeofence!!)
     }
   }
 

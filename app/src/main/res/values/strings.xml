@@ -13,14 +13,11 @@
     <string name="faq_2_q">The notifications appear delayed or not at all.</string>
     <string name="faq_2_a">If this is the case, please check your system settings. Google Play Services have to be enabled and location enhancement needs to be activated. Also, having a kind of energy saving mode activated will impact the performance of the app, leading to geofences not being triggered in the worst case.</string>
     <string name="faq_3_q">Are there any limitations to the geofences?</string>
-    <string name="faq_3_a">Because of restrictions from the Google Play Services, a maximum of 100 geofences is allowed.</string>
-    <string name="about_help_faq">About, Help, FAQ</string>
+    <string name="faq_3_a">The trigger accuracy of the Geofication is influenced by the location accuracy and the size of the geofence. In general, the larger the radius, the better. The geofence should have at least a radius of 30 m / 100 ft. Because of restrictions from the Google Play Services, a maximum of 100 geofences is allowed.</string>
+    <string name="about_help_faq">About &amp; FAQ</string>
     <string name="further_information">Here you can find further information about the app.</string>
     <string name="back">Back</string>
-    <string name="send_feedback">If you want to send feedback, you have multiple options:\n- You can open an issue on the official GitHub\n- You can give feedback on the Instagram account\n- You can rate the app on the Google Play Store\n- You can send feedback directly over the app</string>
-    <string name="feedback">Feedback</string>
-    <string name="support_developer">If you want to support the developer, you have a couple of options:\n- Add issues or support development on the official GitHub page\n- Give feedback via the Instagram account, Google Play Store or directly in the app\n- Buy a coffee (Paypal?)\n- Watch an advertisement video\n\nThank you!</string>
-    <string name="support">Support the Developer</string>
+    <string name="support">Support &amp; Feedback</string>
     <string name="question_mark_icon">Question Mark Icon</string>
     <string name="invalid_radius_input">Invalid radius input</string>
     <string name="unnamed_geofence">Unnamed Geofence</string>
@@ -100,4 +97,9 @@
     <string name="open_source_licenses">Open Source Licenses</string>
     <string name="create_just_on_map">Create your first Geofication just on the map.</string>
     <string name="geofication_version">Geofication %1$s%2$s</string>
+    <string name="faq_4_q">How to create a Geofication?</string>
+    <string name="faq_5_q">How to edit a Geofication?</string>
+    <string name="faq_4_a">You can create a Geofication by holding down on the map and dragging the circle to the desired size of the geofence.</string>
+    <string name="faq_5_a">You can edit a Geofication by pressing the marker in the center of the geofence. You can also open the edit menu in the Geofications list.</string>
+    <string name="give_support_and_feedback">Using these options, you can support the developer for example by giving feedback or rating the app. On the GitHub repository, you can open issues and contribute to the project.</string>
 </resources>

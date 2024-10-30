@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -55,6 +56,8 @@ fun FaqScreen(navController: NavHostController) {
 
   val faqList = listOf(
     stringResource(R.string.faq_1_q) to stringResource(R.string.faq_1_a),
+    stringResource(R.string.faq_4_q) to stringResource(R.string.faq_4_a),
+    stringResource(R.string.faq_5_q) to stringResource(R.string.faq_5_a),
     stringResource(R.string.faq_2_q) to stringResource(R.string.faq_2_a),
     stringResource(R.string.faq_3_q) to stringResource(R.string.faq_3_a)
   )
@@ -96,22 +99,20 @@ fun FaqScreen(navController: NavHostController) {
       )
     }
   ) {
-
     Box(
       modifier = Modifier
-        .padding(start = 16.dp, end = 16.dp)
-        .padding(it)
+        .padding(top = it.calculateTopPadding(), start = 16.dp, end = 16.dp)
     ) {
       Column {
-        Text(
-          text = stringResource(R.string.further_information),
-          modifier = Modifier.padding(bottom = 16.dp)
-        )
+        //Text(
+        //  text = stringResource(R.string.further_information),
+        //  modifier = Modifier.padding(bottom = 16.dp)
+        //)
 
         LazyColumn(
           modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 16.dp)
+            .fillMaxSize()
+            //.padding(vertical = 16.dp)
         ) {
           items(faqList.size) { index ->
             FaqItem(question = faqList[index].first, answer = faqList[index].second)

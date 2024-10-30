@@ -87,7 +87,7 @@ fun SettingsScreen(
 
   var logEntryArray by remember { mutableStateOf(emptyList<LogEntry>()) }
 
-  var versionPrefix = if(BuildConfig.DEBUG) {
+  val versionPrefix = if(BuildConfig.DEBUG) {
     "d"
   } else {
     "v"

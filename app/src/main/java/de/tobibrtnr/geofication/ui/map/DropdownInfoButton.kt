@@ -97,13 +97,13 @@ fun DropdownInfoButton(
           },
           text = { Text(stringResource(R.string.support)) }
         )
-        DropdownMenuItem(
-          onClick = {
-            showMenu = false
-            navController.navigate("feedback")
-          },
-          text = { Text(stringResource(R.string.feedback)) }
-        )
+        //DropdownMenuItem(
+        //  onClick = {
+        //    showMenu = false
+        //    navController.navigate("feedback")
+        //  },
+        //  text = { Text(stringResource(R.string.feedback)) }
+        //)
       }
     }
   }
