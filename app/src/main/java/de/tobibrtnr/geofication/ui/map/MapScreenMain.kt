@@ -1,12 +1,12 @@
 package de.tobibrtnr.geofication.ui.map
 
 import android.Manifest
-import android.R.attr.radius
 import android.content.pm.PackageManager
 import android.graphics.Point
 import android.location.Address
 import android.location.Geocoder
 import android.os.Build
+import android.os.Looper
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -62,6 +62,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.core.app.ActivityCompat
 import androidx.navigation.NavHostController
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -90,7 +94,6 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlin.math.abs
-import kotlin.math.ln
 
 
 @Composable
@@ -241,21 +244,40 @@ fun MapScreenMain(
   ) {
     // Asynchronously set the position of the map camera to current position on startup
     LaunchedEffect(Unit) {
-      if (usedGeoId <= 0) {
-        val locationClient = ServiceProvider.location()
-        val location = locationClient.lastLocation.await()
+      val locationClient = ServiceProvider.location()
 
-        if (location == null) {
-          println("location is null!?")
-          return@LaunchedEffect
+      // On first location get, set camera position state with the current location
+      if(usedGeoId <= 0) {
+        locationClient.lastLocation.await().let {
+          val newLocation = LatLng(it.latitude, it.longitude)
+
+          currentLocation = newLocation
+
+          cameraPositionState.position =
+            CameraPosition(newLocation, 15f, 0f, 0f)
         }
-
-        currentLocation = LatLng(location.latitude, location.longitude)
-
-        // Update the camera position state with the current location
-        cameraPositionState.position =
-          CameraPosition(currentLocation, 15f, 0f, 0f)
       }
+
+      // After that, use a passive listener for location
+      val locationRequest = LocationRequest.Builder(
+        Priority.PRIORITY_PASSIVE,
+        10000L
+      ).setWaitForAccurateLocation(false).build()
+
+      val locationCallback = object : LocationCallback() {
+        override fun onLocationResult(locationResult: LocationResult) {
+          locationResult.lastLocation?.let {
+            val newLocation = LatLng(it.latitude, it.longitude)
+            currentLocation = newLocation
+          }
+        }
+      }
+
+      locationClient.requestLocationUpdates(
+        locationRequest,
+        locationCallback,
+        Looper.getMainLooper()
+      )
     }
   }
 
