@@ -13,7 +13,7 @@
     <string name="faq_2_q">The notifications appear delayed or not at all.</string>
     <string name="faq_2_a">If this is the case, please check your system settings. Google Play Services have to be enabled and location enhancement needs to be activated. Also, having a kind of energy saving mode activated will impact the performance of the app, leading to geofences not being triggered in the worst case.</string>
     <string name="faq_3_q">Are there any limitations to the geofences?</string>
-    <string name="faq_3_a">The trigger accuracy of the Geofication is influenced by the location accuracy and the size of the geofence. In general, the larger the radius, the better. The geofence should have at least a radius of 30 m / 100 ft. Because of restrictions from the Google Play Services, a maximum of 100 geofences is allowed.</string>
+    <string name="faq_3_a">The trigger accuracy of the Geofication is influenced by the location accuracy and the size of the geofence. In general, the larger the radius, the better. The minimum geofence radius is %1$s, the maximum is %2$s. Because of restrictions from the Google Play Services, a maximum of 100 geofences is allowed.</string>
     <string name="about_help_faq">About &amp; FAQ</string>
     <string name="further_information">Here you can find further information about the app.</string>
     <string name="back">Back</string>

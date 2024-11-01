@@ -269,7 +269,7 @@ fun AddGeofencePopup(
             inputValid =
               message.isNotEmpty() &&
                   (radius.toFloatOrNull() != null) &&
-                  (radius.toFloat() > 0) &&
+                  (radius.toFloat() in 30.0..1000000.0) &&
                   (link.isEmpty() || matcher.matches())
           },
           label = { Text(stringResource(R.string.notification_message)) },
@@ -318,7 +318,7 @@ fun AddGeofencePopup(
             inputValid =
               message.isNotEmpty() &&
                   (radius.toFloatOrNull() != null) &&
-                  (radius.toFloat() > 0) &&
+                  (radius.toFloat() in 30.0..1000000.0) &&
                   (link.isEmpty() || matcher.matches())
           },
           visualTransformation = NumericUnitTransformation()
@@ -424,7 +424,7 @@ fun AddGeofencePopup(
                 inputValid =
                   message.isNotEmpty() &&
                       (radius.toFloatOrNull() != null) &&
-                      (radius.toFloat() > 0) &&
+                      (radius.toFloat() in 30.0..1000000.0) &&
                       (link.isEmpty() || matcher.matches())
               },
               trailingIcon = {

@@ -561,7 +561,8 @@ fun MapScreenMain(
                               tempGeofenceLocation,
                               pointerLocation
                             )
-                          if (newTempGeofenceRadius < 30.0) newTempGeofenceRadius = 30.0
+
+                          newTempGeofenceRadius = newTempGeofenceRadius.coerceIn(30.0, 1000000.0)
                           if (abs(newTempGeofenceRadius - tempGeofenceRadius) > 3) {
                             Vibrate.vibrate(context, 1)
                           }

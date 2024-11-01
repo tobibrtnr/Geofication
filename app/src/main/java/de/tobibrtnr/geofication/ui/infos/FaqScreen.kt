@@ -45,6 +45,7 @@ import androidx.core.content.ContextCompat.getString
 import androidx.navigation.NavHostController
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import de.tobibrtnr.geofication.R
+import de.tobibrtnr.geofication.util.storage.UnitUtil
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,12 +55,16 @@ fun FaqScreen(navController: NavHostController) {
 
   var showMenu by remember { mutableStateOf(false)}
 
+  // Minimum geofence radius is 30 m, maximum is 1000 km
+  val minValue = UnitUtil.appendUnit(30)
+  val maxValue = UnitUtil.appendUnit(1000000)
+
   val faqList = listOf(
     stringResource(R.string.faq_1_q) to stringResource(R.string.faq_1_a),
     stringResource(R.string.faq_4_q) to stringResource(R.string.faq_4_a),
     stringResource(R.string.faq_5_q) to stringResource(R.string.faq_5_a),
     stringResource(R.string.faq_2_q) to stringResource(R.string.faq_2_a),
-    stringResource(R.string.faq_3_q) to stringResource(R.string.faq_3_a)
+    stringResource(R.string.faq_3_q) to stringResource(R.string.faq_3_a, minValue, maxValue)
   )
 
   Scaffold(
