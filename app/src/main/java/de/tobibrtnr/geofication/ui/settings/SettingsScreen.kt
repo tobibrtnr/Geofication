@@ -7,6 +7,7 @@ import android.os.Build
 import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,14 +21,21 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -59,6 +67,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun SettingsScreen(
@@ -131,177 +140,193 @@ fun SettingsScreen(
   }
 
   // UI
-  Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-    Text(text = stringResource(R.string.settings), style = MaterialTheme.typography.headlineMedium)
-
-    Spacer(modifier = Modifier.height(8.dp))
-
-    Column(Modifier.verticalScroll(rememberScrollState())) {
-      // Dark / Light Theme
-      Text(text = stringResource(R.string.theme), style = MaterialTheme.typography.titleLarge)
-      Row(verticalAlignment = Alignment.CenterVertically) {
-        RadioButton(
-          selected = selectedMode == "yes",
-          onClick = {
-            selectedMode =
-              "yes"; SettingsUtil.setThemeMode("yes"); uiModeManager.setApplicationNightMode(
-            UiModeManager.MODE_NIGHT_YES
-          )
-          },
-        )
-        Text(text = stringResource(R.string.dark_mode))
-      }
-
-      Row(verticalAlignment = Alignment.CenterVertically) {
-        RadioButton(
-          selected = selectedMode == "no",
-          onClick = {
-            selectedMode =
-              "no"; SettingsUtil.setThemeMode("no"); uiModeManager.setApplicationNightMode(
-            UiModeManager.MODE_NIGHT_NO
-          )
-          },
-        )
-        Text(text = stringResource(R.string.light_mode))
-      }
-
-      Row(verticalAlignment = Alignment.CenterVertically) {
-        RadioButton(
-          selected = selectedMode == "auto",
-          onClick = {
-            selectedMode =
-              "auto"; SettingsUtil.setThemeMode("auto"); uiModeManager.setApplicationNightMode(
-            UiModeManager.MODE_NIGHT_AUTO
-          )
-          },
-        )
-        Text(text = stringResource(R.string.system_default))
-      }
-
-      Spacer(modifier = Modifier.height(8.dp))
-
-      // Distance Unit
-      Text(
-        text = stringResource(R.string.distance_unit),
-        style = MaterialTheme.typography.titleLarge
+  Scaffold(
+    topBar = {
+      TopAppBar(title = { Text(stringResource(R.string.settings)) }
       )
-      Row(verticalAlignment = Alignment.CenterVertically) {
-        RadioButton(
-          selected = selectedUnit,
-          onClick = {
-            selectedUnit = true
-            UnitUtil.setDistanceUnit(true)
-          },
-        )
-        Text(text = stringResource(R.string.metric_m))
-      }
-
-      Row(verticalAlignment = Alignment.CenterVertically) {
-        RadioButton(
-          selected = !selectedUnit,
-          onClick = {
-            selectedUnit = false
-            UnitUtil.setDistanceUnit(false)
-          },
-        )
-        Text(text = stringResource(R.string.imperial_ft))
-      }
-
-      Spacer(modifier = Modifier.height(8.dp))
-
-      // Locale
-      Text(text = stringResource(R.string.language), style = MaterialTheme.typography.titleLarge)
-
-      languageNames.forEachIndexed { index, language ->
-        val isSelected = selectedLocale == languageCodes[index]
-        Row(
-          modifier = Modifier
-            .fillMaxWidth()
-            .selectable(
-              selected = isSelected,
-              onClick = {
-                selectedLocale = languageCodes[index]
-                LocaleUtil.setLocale(context, languageCodes[index])
-
-                activity?.restartApp()
-              },
-              role = Role.RadioButton
-            )
-            .padding(8.dp),
-          verticalAlignment = Alignment.CenterVertically
-        ) {
-          RadioButton(
-            selected = isSelected,
-            onClick = null // null recommended for accessibility with screen readers
-          )
-          Spacer(modifier = Modifier.width(8.dp))
-          Text(text = language)
-        }
-      }
-
-      Spacer(modifier = Modifier.height(8.dp))
-
-      // Miscellaneous
-      Text(text = stringResource(R.string.miscellaneous), style = MaterialTheme.typography.titleLarge)
-
-      Row(
-        modifier = Modifier.fillMaxWidth()
-      ) {
-        Switch(checked = powerPopup, onCheckedChange = {
-            powerPopup = !powerPopup; SettingsUtil.setPowerPopup(powerPopup)
-        })
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(text = stringResource(R.string.show_popup_at_startup_if))
-      }
-
-      Spacer(modifier = Modifier.height(8.dp))
-
-      OutlinedButton(modifier = Modifier.fillMaxWidth(), onClick = {
-        deleteAllPopupVisible = true
-      }) {
-        Text(text = stringResource(R.string.delete_all_geofications_cd))
-      }
-
-      Spacer(modifier = Modifier.height(8.dp))
-
-      OutlinedButton(modifier = Modifier.fillMaxWidth(), onClick = {
-        resetSettingsPopupVisible = true
-      }) {
-        Text(text = stringResource(R.string.reset_settings))
-      }
-
-      Spacer(modifier = Modifier.height(8.dp))
-
-      Text(
-        modifier = Modifier.fillMaxWidth(),
-        text = stringResource(R.string.geofication_version, versionPrefix, BuildConfig.VERSION_NAME),
-        style = MaterialTheme.typography.bodySmall,
-        textAlign = TextAlign.End
-      )
-
-      Spacer(modifier = Modifier.height(8.dp))
-
-      // Debug Log, show only in debug mode
-      if(BuildConfig.DEBUG) {
+    }
+  ) { paddingValues ->
+    Box(
+      modifier = Modifier
+        .padding(top = paddingValues.calculateTopPadding(), start = 16.dp, end = 16.dp)
+    ) {
+      Column(Modifier.verticalScroll(rememberScrollState())) {
+        // Dark / Light Theme
+        Text(text = stringResource(R.string.theme), style = MaterialTheme.typography.titleLarge)
         Row(verticalAlignment = Alignment.CenterVertically) {
-          Text(text = stringResource(R.string.debug_log), style = MaterialTheme.typography.titleLarge)
-          Spacer(Modifier.width(8.dp))
-          Button(onClick = {
-            CoroutineScope(SupervisorJob()).launch {
-              LogUtil.deleteAll()
-              logEntryArray = LogUtil.getLogs()
-            }
-          }) {
-            Text(stringResource(R.string.clear_log))
-          }
+          RadioButton(
+            selected = selectedMode == "yes",
+            onClick = {
+              selectedMode =
+                "yes"; SettingsUtil.setThemeMode("yes"); uiModeManager.setApplicationNightMode(
+              UiModeManager.MODE_NIGHT_YES
+            )
+            },
+          )
+          Text(text = stringResource(R.string.dark_mode))
         }
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+          RadioButton(
+            selected = selectedMode == "no",
+            onClick = {
+              selectedMode =
+                "no"; SettingsUtil.setThemeMode("no"); uiModeManager.setApplicationNightMode(
+              UiModeManager.MODE_NIGHT_NO
+            )
+            },
+          )
+          Text(text = stringResource(R.string.light_mode))
+        }
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+          RadioButton(
+            selected = selectedMode == "auto",
+            onClick = {
+              selectedMode =
+                "auto"; SettingsUtil.setThemeMode("auto"); uiModeManager.setApplicationNightMode(
+              UiModeManager.MODE_NIGHT_AUTO
+            )
+            },
+          )
+          Text(text = stringResource(R.string.system_default))
+        }
+
         Spacer(modifier = Modifier.height(8.dp))
 
-        LazyColumn(Modifier.height(500.dp)) {
-          items(logEntryArray) {
-            ListItem(it)
-          }
+        // Distance Unit
+        Text(
+          text = stringResource(R.string.distance_unit),
+          style = MaterialTheme.typography.titleLarge
+        )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+          RadioButton(
+            selected = selectedUnit,
+            onClick = {
+              selectedUnit = true
+              UnitUtil.setDistanceUnit(true)
+            },
+          )
+          Text(text = stringResource(R.string.metric_m))
+        }
 
+        Row(verticalAlignment = Alignment.CenterVertically) {
+          RadioButton(
+            selected = !selectedUnit,
+            onClick = {
+              selectedUnit = false
+              UnitUtil.setDistanceUnit(false)
+            },
+          )
+          Text(text = stringResource(R.string.imperial_ft))
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Locale
+        Text(text = stringResource(R.string.language), style = MaterialTheme.typography.titleLarge)
+
+        languageNames.forEachIndexed { index, language ->
+          val isSelected = selectedLocale == languageCodes[index]
+          Row(
+            modifier = Modifier
+              .fillMaxWidth()
+              .selectable(
+                selected = isSelected,
+                onClick = {
+                  selectedLocale = languageCodes[index]
+                  LocaleUtil.setLocale(context, languageCodes[index])
+
+                  activity?.restartApp()
+                },
+                role = Role.RadioButton
+              )
+              .padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+          ) {
+            RadioButton(
+              selected = isSelected,
+              onClick = null // null recommended for accessibility with screen readers
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(text = language)
+          }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Miscellaneous
+        Text(
+          text = stringResource(R.string.miscellaneous),
+          style = MaterialTheme.typography.titleLarge
+        )
+
+        Row(
+          modifier = Modifier.fillMaxWidth()
+        ) {
+          Switch(checked = powerPopup, onCheckedChange = {
+            powerPopup = !powerPopup; SettingsUtil.setPowerPopup(powerPopup)
+          })
+          Spacer(modifier = Modifier.width(8.dp))
+          Text(text = stringResource(R.string.show_popup_at_startup_if))
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedButton(modifier = Modifier.fillMaxWidth(), onClick = {
+          deleteAllPopupVisible = true
+        }) {
+          Text(text = stringResource(R.string.delete_all_geofications_cd))
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedButton(modifier = Modifier.fillMaxWidth(), onClick = {
+          resetSettingsPopupVisible = true
+        }) {
+          Text(text = stringResource(R.string.reset_settings))
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+          modifier = Modifier.fillMaxWidth(),
+          text = stringResource(
+            R.string.geofication_version,
+            versionPrefix,
+            BuildConfig.VERSION_NAME
+          ),
+          style = MaterialTheme.typography.bodySmall,
+          textAlign = TextAlign.End
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Debug Log, show only in debug mode
+        if (BuildConfig.DEBUG) {
+          Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+              text = stringResource(R.string.debug_log),
+              style = MaterialTheme.typography.titleLarge
+            )
+            Spacer(Modifier.width(8.dp))
+            Button(onClick = {
+              CoroutineScope(SupervisorJob()).launch {
+                LogUtil.deleteAll()
+                logEntryArray = LogUtil.getLogs()
+              }
+            }) {
+              Text(stringResource(R.string.clear_log))
+            }
+          }
+          Spacer(modifier = Modifier.height(8.dp))
+
+          LazyColumn(Modifier.height(500.dp)) {
+            items(logEntryArray) {
+              ListItem(it)
+            }
+
+          }
         }
       }
     }

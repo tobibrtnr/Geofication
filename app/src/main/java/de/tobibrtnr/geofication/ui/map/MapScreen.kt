@@ -21,6 +21,9 @@ fun MapScreen(
 ) {
   val mapNavController = rememberNavController()
 
+  // Always go to map view when opening tab
+  mapNavController.navigateUp()
+
   NavHost(navController = mapNavController, startDestination = "mapMain") {
     composable("mapMain") {
       MapScreenMain(

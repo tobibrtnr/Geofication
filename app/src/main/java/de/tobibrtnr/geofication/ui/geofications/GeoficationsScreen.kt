@@ -1,23 +1,22 @@
 package de.tobibrtnr.geofication.ui.geofications
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeleteSweep
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -36,6 +35,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GeoficationsScreen(
   modifier: Modifier = Modifier,
@@ -60,47 +60,46 @@ fun GeoficationsScreen(
   }
 
   // UI
-  Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-    Row(
-      horizontalArrangement = Arrangement.SpaceBetween,
-      modifier = Modifier.fillMaxWidth()
-    ) {
-      Text(
-        text = stringResource(R.string.geofications),
-        style = MaterialTheme.typography.headlineMedium
-      )
-
-      if(geoficationsArray.isNotEmpty()) {
-        Icon(
-          imageVector = Icons.Filled.DeleteSweep,
-          contentDescription = stringResource(R.string.delete_all_geofications_cd),
-          modifier = Modifier
-            .size(32.dp)
-            .clickable {
-              deleteAllPopupVisible = true
+  Scaffold(
+    topBar = {
+      TopAppBar(title = { Text(stringResource(R.string.geofications)) },
+        actions = {
+          if(geoficationsArray.isNotEmpty()) {
+            IconButton(onClick = { deleteAllPopupVisible = true }) {
+              Icon(
+                imageVector = Icons.Filled.DeleteSweep,
+                contentDescription = stringResource(R.string.delete_all_geofications_cd)
+              )
             }
-        )
-      }
-
-    }
-    Spacer(modifier = Modifier.height(8.dp))
-    Text(
-      stringResource(
-        R.string.geofication_created,
-        geoficationsArray.size,
-        if (geoficationsArray.size == 1) "" else "s"
+          }
+        }
       )
-    )
-    Spacer(modifier = Modifier.height(8.dp))
-
-    AnimatedVisibility(visible = geoficationsArray.isEmpty()) {
-      Text(stringResource(R.string.create_just_on_map))
     }
+  ) { paddingValues ->
+    Box(
+      modifier = Modifier
+        .padding(top = paddingValues.calculateTopPadding(), start = 16.dp, end = 16.dp)
+    ) {
+      Column {
+        Text(
+          stringResource(
+            R.string.geofication_created,
+            geoficationsArray.size,
+            if (geoficationsArray.size == 1) "" else "s"
+          )
+        )
+        Spacer(modifier = Modifier.height(8.dp))
 
-    AnimatedVisibility(visible = geoficationsArray.isNotEmpty()) {
-      LazyColumn(modifier = Modifier.fillMaxSize()) {
-        items(geoficationsArray, key = { it.id }) {
-          ListItem(it, navController = navController, modifier = Modifier.animateItem())
+        AnimatedVisibility(visible = geoficationsArray.isEmpty()) {
+          Text(stringResource(R.string.create_just_on_map))
+        }
+
+        AnimatedVisibility(visible = geoficationsArray.isNotEmpty()) {
+          LazyColumn(modifier = Modifier.fillMaxSize()) {
+            items(geoficationsArray, key = { it.id }) {
+              ListItem(it, navController = navController, modifier = Modifier.animateItem())
+            }
+          }
         }
       }
     }

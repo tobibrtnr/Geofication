@@ -205,19 +205,15 @@ fun GeoficationApp(
           }
         }
         composable(route = GeoficationScreen.Settings.name) {
-          Box(modifier = Modifier.padding(innerPadding)) {
             SettingsScreen(
               modifier = Modifier.fillMaxSize()
             )
-          }
         }
         composable(route = GeoficationScreen.Geofications.name) {
-          Box(modifier = Modifier.padding(innerPadding)) {
-            GeoficationsScreen(
-              modifier = Modifier.fillMaxSize(),
-              navController = navController
-            )
-          }
+          GeoficationsScreen(
+            modifier = Modifier.fillMaxSize(),
+            navController = navController
+          )
         }
       }
     }

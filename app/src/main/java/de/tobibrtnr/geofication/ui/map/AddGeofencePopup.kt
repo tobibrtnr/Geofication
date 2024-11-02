@@ -9,6 +9,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -34,6 +35,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
@@ -156,18 +158,17 @@ fun AddGeofencePopup(
 
   var link by remember { mutableStateOf("") }
 
-  var inputValid by remember { mutableStateOf(false) }
+  val (initialErrorMessage, initialInputValid) = validateInput(message, radius, link, "")
+  var inputValid by remember { mutableStateOf(initialInputValid) }
+  var errorMessage by remember { mutableStateOf(initialErrorMessage)}
 
   val geocoder = Geocoder(context)
-
-  val urlRegex = ".*" //"(http(s)?://.)?(www\\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_+.~#?&/=]*)"
-  val urlPattern = Pattern.compile(urlRegex)
 
   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
     // Implementation of GeocodeListener
     val listener = object : Geocoder.GeocodeListener {
       override fun onGeocode(addresses: MutableList<Address>) {
-        if (addresses.size > 0) {
+        if (addresses.isNotEmpty()) {
           name =
             context.getString(R.string.geofence_in_location, getLocationName(context, addresses[0]))
         }
@@ -180,7 +181,7 @@ fun AddGeofencePopup(
     geocoder.getFromLocation(pos.latitude, pos.longitude, 1, listener)
   } else {
     val addresses = geocoder.getFromLocation(pos.latitude, pos.longitude, 1)
-    name = if (addresses != null && addresses.size > 0) {
+    name = if (!addresses.isNullOrEmpty()) {
       context.getString(R.string.geofence_in_location, getLocationName(context, addresses[0]))
     } else {
       initialName
@@ -244,6 +245,24 @@ fun AddGeofencePopup(
           }
         }
 
+        AnimatedVisibility(visible = !inputValid) {
+
+          Surface(
+            color = MaterialTheme.colorScheme.errorContainer,
+            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+            shape = CircleShape,
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 4.dp),
+            tonalElevation = 2.dp,
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.onErrorContainer.copy(alpha=0.12f))
+          ) {
+            Text(
+              text = errorMessage,
+              modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+              style = MaterialTheme.typography.labelLarge
+            )
+          }
+        }
+
         //Text(
         //  text = stringResource(R.string.geofication_title),
         //  modifier = Modifier.padding(start = 16.dp),
@@ -265,18 +284,22 @@ fun AddGeofencePopup(
           value = message,
           onValueChange = {
             message = it//.take(max) for max name length
-            val matcher = urlPattern.matcher(link)
-            inputValid =
-              message.isNotEmpty() &&
-                  (radius.toFloatOrNull() != null) &&
-                  (radius.toFloat() in 30.0..1000000.0) &&
-                  (link.isEmpty() || matcher.matches())
+
+            val (newEM, newIV) = validateInput(message, radius, link, errorMessage)
+            errorMessage = newEM
+            inputValid = newIV
           },
           label = { Text(stringResource(R.string.notification_message)) },
           colors = TextFieldDefaults.colors(errorContainerColor = Color(0xFFFF0000)),
           trailingIcon = {
             if(message.isNotEmpty()) {
-              IconButton(onClick = { message = "" }) {
+              IconButton(onClick = {
+                message = ""
+
+                val (newEM, newIV) = validateInput(message, radius, link, errorMessage)
+                errorMessage = newEM
+                inputValid = newIV
+              }) {
                 Icon(
                   imageVector = Icons.Default.Close,
                   contentDescription = stringResource(R.string.clear_text)
@@ -314,12 +337,10 @@ fun AddGeofencePopup(
               char.isDigit() || char == '.' //|| char == ','
             }
             radius = newValue
-            val matcher = urlPattern.matcher(link)
-            inputValid =
-              message.isNotEmpty() &&
-                  (radius.toFloatOrNull() != null) &&
-                  (radius.toFloat() in 30.0..1000000.0) &&
-                  (link.isEmpty() || matcher.matches())
+
+            val (newEM, newIV) = validateInput(message, radius, link, errorMessage)
+            errorMessage = newEM
+            inputValid = newIV
           },
           visualTransformation = NumericUnitTransformation()
         )
@@ -419,17 +440,21 @@ fun AddGeofencePopup(
               shape = CircleShape,
               value = link,
               onValueChange = {
-                link = it//.take(max) for max name length
-                val matcher = urlPattern.matcher(link)
-                inputValid =
-                  message.isNotEmpty() &&
-                      (radius.toFloatOrNull() != null) &&
-                      (radius.toFloat() in 30.0..1000000.0) &&
-                      (link.isEmpty() || matcher.matches())
+                link = it
+
+                val (newEM, newIV) = validateInput(message, radius, link, errorMessage)
+                errorMessage = newEM
+                inputValid = newIV
               },
               trailingIcon = {
                 if(link.isNotEmpty()) {
-                  IconButton(onClick = { link = "" }) {
+                  IconButton(onClick = {
+                    link = ""
+
+                    val (newEM, newIV) = validateInput(message, radius, link, errorMessage)
+                    errorMessage = newEM
+                    inputValid = newIV
+                  }) {
                     Icon(
                       imageVector = Icons.Default.Close,
                       contentDescription = stringResource(R.string.clear_text)
@@ -525,6 +550,37 @@ fun CategoryItem(title: String, content: @Composable () -> Unit) {
       }
     }
   }
+}
+
+fun validateInput(
+  message: String,
+  radius: String,
+  link: String,
+  errorMessage: String
+): Pair<String, Boolean> {
+  // Minimum geofence radius is 30 m, maximum is 1000 km
+  val minValue = UnitUtil.appendUnit(30)
+  val maxValue = UnitUtil.appendUnit(1000000)
+
+  // Link format
+  val urlRegex = "(http(s)?://.)?(www\\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_+.~#?&/=]*)"
+  val matcher = Pattern.compile(urlRegex).matcher(link)
+
+  if (message.isEmpty()) {
+    return Pair("Please enter a notification message.", false)
+  }
+  if (radius.toFloatOrNull() == null) {
+    return Pair("Please enter a valid radius.", false)
+  }
+  if (radius.toFloat() !in 30.0..1000000.0) {
+    return Pair("Please enter a radius between $minValue and $maxValue.", false)
+  }
+  if (link.isNotEmpty() && !matcher.matches()) {
+    return Pair("Please enter a valid link format.", false)
+  }
+
+  // No errors, input is valid
+  return Pair(errorMessage, true)
 }
 
 fun getLocationName(context: Context, address: Address): String {

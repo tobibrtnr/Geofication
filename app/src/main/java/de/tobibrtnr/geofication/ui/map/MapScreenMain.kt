@@ -248,7 +248,7 @@ fun MapScreenMain(
 
       // On first location get, set camera position state with the current location
       if(usedGeoId <= 0) {
-        locationClient.lastLocation.await().let {
+        locationClient.lastLocation.await()?.let {
           val newLocation = LatLng(it.latitude, it.longitude)
 
           currentLocation = newLocation
