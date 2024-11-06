@@ -47,9 +47,9 @@ fun SegmentedButtons(
   Row(
     modifier = Modifier
       .fillMaxWidth()
-      .padding(horizontal = 16.dp)
   ) {
     SegmentedButton(
+      modifier = Modifier.weight(1f),
       label = label1,
       option = opt1,
       selectedOption = selectedOptions,
@@ -68,6 +68,7 @@ fun SegmentedButtons(
       icon = Icons.AutoMirrored.Filled.ArrowForward
     )
     SegmentedButton(
+      modifier = Modifier.weight(1f),
       label = label2,
       option = opt2,
       selectedOption = selectedOptions,
@@ -90,6 +91,7 @@ fun SegmentedButtons(
 
 @Composable
 fun SegmentedButton(
+  modifier: Modifier,
   label: String,
   option: String,
   selectedOption: List<String>,
@@ -104,6 +106,7 @@ fun SegmentedButton(
   }
 
   Button(
+    modifier = modifier,
     onClick = { onOptionSelected(option) },
     colors = ButtonDefaults.buttonColors(
       backgroundColor

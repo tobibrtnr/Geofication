@@ -1,12 +1,16 @@
 package de.tobibrtnr.geofication.ui.startup
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Circle
@@ -16,6 +20,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -23,6 +28,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -61,7 +71,14 @@ fun PermissionScreen(
   Box(
     modifier = Modifier
       .fillMaxSize()
-      .padding(50.dp)
+      .background(
+        brush = Brush.verticalGradient(
+          0.0f to MaterialTheme.colorScheme.surface,
+          0.6f to MaterialTheme.colorScheme.surface,
+          1f to MaterialTheme.colorScheme.primary
+        )
+      )
+      .padding(top = 50.dp, start = 24.dp, end = 24.dp)
   ) {
     Column {
       Spacer(Modifier.height(32.dp))
@@ -76,7 +93,7 @@ fun PermissionScreen(
           MainScope().launch {
             notifState.launchPermissionRequest()
           }
-        }) {
+        }, modifier = Modifier.weight(1f)) {
           Icon(
             imageVector = if (notifState.status.isGranted) Icons.Outlined.TaskAlt else Icons.Outlined.Circle,
             contentDescription = stringResource(R.string.permission_status)
@@ -100,7 +117,7 @@ fun PermissionScreen(
           MainScope().launch {
             locState.launchMultiplePermissionRequest()
           }
-        }) {
+        }, modifier = Modifier.weight(1f)) {
           Icon(
             imageVector = if (locState.allPermissionsGranted) Icons.Outlined.TaskAlt else Icons.Outlined.Circle,
             contentDescription = stringResource(R.string.permission_status)
@@ -124,7 +141,7 @@ fun PermissionScreen(
           MainScope().launch {
             bgState.launchPermissionRequest()
           }
-        }) {
+        }, modifier = Modifier.weight(1f)) {
           Icon(
             imageVector = if (bgState.status.isGranted) Icons.Outlined.TaskAlt else Icons.Outlined.Circle,
             contentDescription = stringResource(R.string.permission_status)
@@ -144,7 +161,9 @@ fun PermissionScreen(
       }
       Spacer(Modifier.height(16.dp))
       Button(enabled = notifState.status.isGranted && locState.allPermissionsGranted && bgState.status.isGranted,
-        onClick = { callback() }) {
+        onClick = { callback() },
+        modifier = Modifier.fillMaxWidth(0.4f)
+      ) {
         Text(stringResource(R.string.continue_text))
       }
     }

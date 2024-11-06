@@ -29,9 +29,9 @@ fun SegmentedRadioButtons(opt1: String, opt2: String, opt3: String, onValueChang
   Row(
     modifier = Modifier
       .fillMaxWidth()
-      .padding(horizontal = 16.dp)
   ) {
     SegmentedRadioButton(
+      modifier = Modifier.weight(1/3f),
       option = 0,
       label = opt1,
       selectedOption = selectedOption,
@@ -42,6 +42,7 @@ fun SegmentedRadioButtons(opt1: String, opt2: String, opt3: String, onValueChang
       shape = RoundedCornerShape(topStartPercent = 50, bottomStartPercent = 50),
     )
     SegmentedRadioButton(
+      modifier = Modifier.weight(1/3f),
       option = 1,
       label = opt2,
       selectedOption = selectedOption,
@@ -52,6 +53,7 @@ fun SegmentedRadioButtons(opt1: String, opt2: String, opt3: String, onValueChang
       shape = RectangleShape,
     )
     SegmentedRadioButton(
+      modifier = Modifier.weight(1/3f),
       option = 2,
       label = opt3,
       selectedOption = selectedOption,
@@ -66,6 +68,7 @@ fun SegmentedRadioButtons(opt1: String, opt2: String, opt3: String, onValueChang
 
 @Composable
 fun SegmentedRadioButton(
+  modifier: Modifier,
   option: Int,
   label: String,
   selectedOption: Int,
@@ -79,6 +82,7 @@ fun SegmentedRadioButton(
   }
 
   Button(
+    modifier = modifier,
     onClick = { onOptionSelected(option) },
     colors = ButtonDefaults.buttonColors(
       backgroundColor

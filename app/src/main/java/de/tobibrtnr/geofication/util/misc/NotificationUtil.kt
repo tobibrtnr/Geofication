@@ -96,7 +96,7 @@ fun sendNotification(context: Context, fence: Geofence, notif: Geofication) {
     )
     builder.addAction(
       R.drawable.ic_notification,
-      context.getString(R.string.disable),
+      context.getString(R.string.disable_capitalized),
       deletePendingIntent
     )
   }

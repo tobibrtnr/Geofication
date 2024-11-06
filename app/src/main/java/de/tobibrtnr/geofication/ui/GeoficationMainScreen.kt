@@ -3,6 +3,7 @@ package de.tobibrtnr.geofication.ui
 import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.PowerManager
 import android.provider.Settings
 import androidx.annotation.StringRes
@@ -49,6 +50,7 @@ import de.tobibrtnr.geofication.ui.common.BatterySavingPopup
 import de.tobibrtnr.geofication.ui.geofications.GeoficationsScreen
 import de.tobibrtnr.geofication.ui.map.MapScreen
 import de.tobibrtnr.geofication.ui.settings.SettingsScreen
+import de.tobibrtnr.geofication.ui.startup.DummyPermissionState
 import de.tobibrtnr.geofication.ui.startup.PermissionScreen
 import de.tobibrtnr.geofication.util.storage.setting.SettingsUtil
 
@@ -80,13 +82,25 @@ fun GeoficationApp(
     ),
   )
 
-  val notifPerm = rememberPermissionState(
-    Manifest.permission.POST_NOTIFICATIONS
-  )
+  val notifPerm = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+    DummyPermissionState(
+      Manifest.permission.POST_NOTIFICATIONS
+    )
+  } else {
+    rememberPermissionState(
+      Manifest.permission.POST_NOTIFICATIONS
+    )
+  }
 
-  val bgPerm = rememberPermissionState(
-    Manifest.permission.ACCESS_BACKGROUND_LOCATION
-  )
+  val bgPerm = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+    DummyPermissionState(
+      Manifest.permission.ACCESS_BACKGROUND_LOCATION
+    )
+  } else {
+    rememberPermissionState(
+      Manifest.permission.ACCESS_BACKGROUND_LOCATION
+    )
+  }
 
   var permissionsGranted by remember {
     mutableStateOf(

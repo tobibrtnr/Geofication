@@ -11,9 +11,9 @@
     <string name="faq_1_q">How does the App work?</string>
     <string name="faq_1_a">Geofication uses the geofence feature of Google Play Services. This allows the creation and handling of geofences in a very energy efficient and precise way.</string>
     <string name="faq_2_q">The notifications appear delayed or not at all.</string>
-    <string name="faq_2_a">If this is the case, please check your system settings. Google Play Services have to be enabled and location enhancement needs to be activated. Also, having a kind of energy saving mode activated will impact the performance of the app, leading to geofences not being triggered in the worst case.</string>
+    <string name="faq_2_a">If this is the case, please check your system settings. Google Play Services have to be enabled and location enhancement needs to be activated. Also, having a kind of energy saving mode activated will impact the performance of the app, leading to geofences not being triggered in the worst case. Geofences are often not triggered immediately, so they should be made bigger than e.g. a building.</string>
     <string name="faq_3_q">Are there any limitations to the geofences?</string>
-    <string name="faq_3_a">The trigger accuracy of the Geofication is influenced by the location accuracy and the size of the geofence. In general, the larger the radius, the better. The minimum geofence radius is %1$s, the maximum is %2$s. Because of restrictions from the Google Play Services, a maximum of 100 geofences is allowed.</string>
+    <string name="faq_3_a">The trigger accuracy of the Geofication is influenced by the location accuracy and the size of the geofence. In general, the larger the radius, the better. Geofences are often not triggered immediately, so they should be made bigger than e.g. a building. The minimum geofence radius is %1$s, the maximum is %2$s. Because of restrictions from the Google Play Services, a maximum of 100 geofences is allowed.</string>
     <string name="about_help_faq">About &amp; FAQ</string>
     <string name="further_information">Here you can find further information about the app.</string>
     <string name="back">Back</string>
@@ -29,9 +29,9 @@
     <string name="enter_geofence_radius">Enter geofence radius</string>
     <string name="trigger_event">Trigger event</string>
     <string name="behavior_after_triggering">Behavior after triggering</string>
-    <string name="entering">entering</string>
-    <string name="exiting">exiting</string>
-    <string name="stay_active">stay active</string>
+    <string name="entering">Entering</string>
+    <string name="exiting">Exiting</string>
+    <string name="stay_active">Active</string>
     <string name="disable">disable</string>
     <string name="delay_after_triggering">Delay after Triggering</string>
     <string name="x_minutes">%1$s minutes</string>
@@ -66,7 +66,7 @@
     <string name="permissions_3_h">Background Location</string>
     <string name="permissions_3_a">The background location permission is needed in order for the app to also work when it is closed. If another window opens on click on the button, please select \"Allow all the time\".</string>
     <string name="welcome_to_geofication">Welcome to Geofication!</string>
-    <string name="please_allow_all_required_permissions">Please allow all required permissions.</string>
+    <string name="please_allow_all_required_permissions">Please allow all required permissions to ensure the app works correctly. After that, you will be able to go to the home screen.</string>
     <string name="permission_status">Permission Status</string>
     <string name="notification_permission">Notification permission</string>
     <string name="show_info">Show info</string>
@@ -102,4 +102,6 @@
     <string name="faq_4_a">You can create a Geofication by holding down on the map and dragging the circle to the desired size of the geofence.</string>
     <string name="faq_5_a">You can edit a Geofication by pressing the marker in the center of the geofence. You can also open the edit menu in the Geofications list.</string>
     <string name="give_support_and_feedback">Using these options, you can support the developer for example by giving feedback or rating the app. On the GitHub repository, you can open issues and contribute to the project.</string>
+    <string name="link_to_open">Link to open</string>
+    <string name="link_explanation">You can set a website link here. When the Geofication is triggered, you can open that website by tapping on the notification.</string>
 </resources>

@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.activity.ComponentActivity
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -46,12 +45,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import de.tobibrtnr.geofication.BuildConfig
 import de.tobibrtnr.geofication.R
 import de.tobibrtnr.geofication.ui.common.DeleteAllConfirmPopup
 import de.tobibrtnr.geofication.ui.common.ResetSettingsPopup
 import de.tobibrtnr.geofication.util.storage.LocaleUtil
 import de.tobibrtnr.geofication.util.storage.UnitUtil
-import de.tobibrtnr.geofication.BuildConfig
 import de.tobibrtnr.geofication.util.storage.geofence.GeofenceViewModel
 import de.tobibrtnr.geofication.util.storage.log.LogEntry
 import de.tobibrtnr.geofication.util.storage.log.LogUtil
@@ -65,7 +64,6 @@ import java.util.Date
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
-@RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun SettingsScreen(
   modifier: Modifier = Modifier,
@@ -126,9 +124,12 @@ fun SettingsScreen(
           Locale.setDefault(context.applicationContext.resources.configuration.locales[0])
 
           SettingsUtil.resetSettings()
-          uiModeManager.setApplicationNightMode(
-            UiModeManager.MODE_NIGHT_AUTO
-          )
+
+          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            uiModeManager.setApplicationNightMode(
+              UiModeManager.MODE_NIGHT_AUTO
+            )
+          }
           activity?.restartApp()
         }
       },
@@ -153,6 +154,7 @@ fun SettingsScreen(
         )
     ) {
       Column(Modifier.verticalScroll(rememberScrollState())) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         // Dark / Light Theme
         Text(text = stringResource(R.string.theme), style = MaterialTheme.typography.titleLarge)
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -195,7 +197,7 @@ fun SettingsScreen(
         }
 
         Spacer(modifier = Modifier.height(8.dp))
-
+      }
         // Distance Unit
         Text(
           text = stringResource(R.string.distance_unit),
