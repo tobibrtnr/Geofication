@@ -11,16 +11,14 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
-import androidx.compose.ui.res.stringResource
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import de.tobibrtnr.geofication.MainActivity
 import de.tobibrtnr.geofication.R
 import de.tobibrtnr.geofication.util.receivers.NotificationReceiver
-import de.tobibrtnr.geofication.util.storage.Geofence
-import de.tobibrtnr.geofication.util.storage.GeofenceUtil
-import de.tobibrtnr.geofication.util.storage.Geofication
+import de.tobibrtnr.geofication.util.storage.geofence.Geofence
+import de.tobibrtnr.geofication.util.storage.geofication.Geofication
 import kotlin.random.Random
 
 // Constants

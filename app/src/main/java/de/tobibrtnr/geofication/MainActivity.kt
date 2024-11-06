@@ -17,8 +17,8 @@ import de.tobibrtnr.geofication.ui.GeoficationApp
 import de.tobibrtnr.geofication.ui.theme.GeoficationTheme
 import de.tobibrtnr.geofication.util.misc.ServiceProvider
 import de.tobibrtnr.geofication.util.storage.LocaleUtil
-import de.tobibrtnr.geofication.util.storage.SettingsUtil
 import de.tobibrtnr.geofication.util.storage.UnitUtil
+import de.tobibrtnr.geofication.util.storage.setting.SettingsUtil
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {

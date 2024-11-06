@@ -1,9 +1,7 @@
 package de.tobibrtnr.geofication.ui.map
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,7 +26,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
@@ -37,12 +34,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import de.tobibrtnr.geofication.R
 import de.tobibrtnr.geofication.ui.common.CircleWithColor
-import de.tobibrtnr.geofication.util.storage.GeofenceUtil
 import de.tobibrtnr.geofication.util.storage.GeoficationGeofence
+import de.tobibrtnr.geofication.util.storage.geofication.GeoficationViewModel
 
 @Composable
 fun SearchResultList(
   query: MutableState<String>,
+  geoficationViewModel: GeoficationViewModel,
   searchGlobally: (String) -> Unit,
   goToLocation: (Double, Double, Float) -> Unit
 ) {
@@ -52,7 +50,7 @@ fun SearchResultList(
 
   LaunchedEffect(queryString) {
     results = if (queryString.isNotEmpty()) {
-      GeofenceUtil.searchGeofications(queryString.trim())
+      geoficationViewModel.searchGeofications(queryString.trim())
     } else {
       emptyList()
     }

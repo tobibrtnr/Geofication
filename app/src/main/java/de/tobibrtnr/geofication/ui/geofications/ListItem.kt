@@ -22,7 +22,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,134 +39,123 @@ import de.tobibrtnr.geofication.R
 import de.tobibrtnr.geofication.ui.GeoficationScreen
 import de.tobibrtnr.geofication.ui.common.CircleWithColor
 import de.tobibrtnr.geofication.ui.common.DeleteConfirmPopup
-import de.tobibrtnr.geofication.util.storage.Geofence
-import de.tobibrtnr.geofication.util.storage.GeofenceUtil
-import de.tobibrtnr.geofication.util.storage.Geofication
 import de.tobibrtnr.geofication.util.storage.LocaleUtil
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
+import de.tobibrtnr.geofication.util.storage.geofence.Geofence
+import de.tobibrtnr.geofication.util.storage.geofication.Geofication
 
 /**
  * Item of the Geofications list
  */
 @Composable
-fun ListItem(geofication: Geofication, navController: NavController, modifier: Modifier) {
+fun ListItem(
+  geofication: Geofication,
+  geofence: Geofence,
+  navController: NavController,
+  modifier: Modifier,
+  delete: (Int) -> Unit,
+  setActive: (Int, Int, Boolean) -> Unit
+) {
 
   val context = LocalContext.current
 
   var deletePopupVisible by remember { mutableStateOf(false) }
 
-  var geofence by remember { mutableStateOf<Geofence?>(null) }
-  LaunchedEffect(geofication) {
-    geofence = GeofenceUtil.getGeofenceById(geofication.fenceid)
+  if (deletePopupVisible) {
+    DeleteConfirmPopup(
+      onConfirm = {
+        deletePopupVisible = false
+        delete(geofence.id)
+      },
+      onCancel = { deletePopupVisible = false }
+    )
   }
 
-  if (geofence != null) {
-    if (deletePopupVisible) {
-      DeleteConfirmPopup(
-        onConfirm = {
-          deletePopupVisible = false
-          CoroutineScope(Dispatchers.Default).launch {
-            GeofenceUtil.deleteGeofence(geofence!!.id)
-          }
-        },
-        onCancel = { deletePopupVisible = false }
+  Card(
+    modifier = modifier,
+    colors = CardDefaults.cardColors(),
+    onClick = {
+      navController.navigate("${GeoficationScreen.Start.name}/${geofence.id}/false")
+    }
+  ) {
+    Column(
+      Modifier
+        .fillMaxSize()
+        .padding(16.dp)
+    ) {
+      Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+      ) {
+        Row {
+          CircleWithColor(
+            color = geofence.color.color,
+            radius = 15.dp,
+            modifier = Modifier.shadow(4.dp, CircleShape)
+          )
+          Spacer(Modifier.width(8.dp))
+          Text(
+            modifier = Modifier.fillMaxWidth(0.55f),
+            text = geofication.message,
+            style = MaterialTheme.typography.headlineSmall,
+            fontStyle = if (geofication.active) FontStyle.Normal else FontStyle.Italic,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+          )
+        }
+
+        Row(
+          verticalAlignment = Alignment.CenterVertically,
+          horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+          Switch(checked = geofication.active, onCheckedChange = {
+            setActive(geofence.id, geofication.id, it)
+          })
+
+          Icon(
+            imageVector = Icons.Filled.Edit,
+            contentDescription = stringResource(R.string.edit),
+            modifier = Modifier
+              .size(32.dp)
+              .clickable {
+                navController.navigate("${GeoficationScreen.Start.name}/${geofence.id}/true")
+              }
+          )
+
+          Icon(
+            imageVector = Icons.Filled.Delete,
+            contentDescription = stringResource(R.string.delete_geofication),
+            modifier = Modifier
+              .size(32.dp)
+              .clickable {
+                if (geofication.active) {
+                  deletePopupVisible = true
+                } else {
+                  delete(geofence.id)
+                }
+              }
+          )
+        }
+      }
+      Spacer(modifier = Modifier.height(4.dp))
+      Text(geofence.fenceName, maxLines = 1, overflow = TextOverflow.Ellipsis)
+      Spacer(modifier = Modifier.height(4.dp))
+      Text(stringResource(R.string.trigger_count, geofication.triggerCount))
+      Spacer(modifier = Modifier.height(4.dp))
+      Text(
+        stringResource(
+          R.string.creation_time,
+          LocaleUtil.getLocalDateTime(geofication.created, context)
+        )
+      )
+      Spacer(modifier = Modifier.height(4.dp))
+      Text(
+        stringResource(
+          R.string.last_edit,
+          LocaleUtil.getLocalDateTime(geofication.lastEdit, context)
+        )
       )
     }
-
-    Card(
-      modifier = modifier,
-      colors = CardDefaults.cardColors(),
-      onClick = {
-        navController.navigate("${GeoficationScreen.Start.name}/${geofence!!.id}/false")
-      }
-    ) {
-      Column(
-        Modifier
-          .fillMaxSize()
-          .padding(16.dp)
-      ) {
-        Row(
-          horizontalArrangement = Arrangement.SpaceBetween,
-          verticalAlignment = Alignment.CenterVertically,
-          modifier = Modifier.fillMaxWidth()
-        ) {
-          Row {
-            CircleWithColor(
-              color = geofence!!.color.color,
-              radius = 15.dp,
-              modifier = Modifier.shadow(4.dp, CircleShape)
-            )
-            Spacer(Modifier.width(8.dp))
-            Text(
-              modifier = Modifier.fillMaxWidth(0.55f),
-              text = geofication.message,
-              style = MaterialTheme.typography.headlineSmall,
-              fontStyle = if (geofication.active) FontStyle.Normal else FontStyle.Italic,
-              maxLines = 1,
-              overflow = TextOverflow.Ellipsis
-            )
-          }
-
-          Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-          ) {
-            Switch(checked = geofication.active, onCheckedChange = {
-              CoroutineScope(SupervisorJob()).launch {
-                GeofenceUtil.setNotifActive(geofication.id, it)
-              }
-            })
-
-            Icon(
-              imageVector = Icons.Filled.Edit,
-              contentDescription = stringResource(R.string.edit),
-              modifier = Modifier
-                .size(32.dp)
-                .clickable {
-                  navController.navigate("${GeoficationScreen.Start.name}/${geofence!!.id}/true")
-                }
-            )
-
-            Icon(
-              imageVector = Icons.Filled.Delete,
-              contentDescription = stringResource(R.string.delete_geofication),
-              modifier = Modifier
-                .size(32.dp)
-                .clickable {
-                  if (geofication.active) {
-                    deletePopupVisible = true
-                  } else {
-                    CoroutineScope(Dispatchers.Default).launch {
-                      GeofenceUtil.deleteGeofence(geofence!!.id)
-                    }
-                  }
-                }
-            )
-          }
-        }
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(geofence!!.fenceName, maxLines = 1, overflow = TextOverflow.Ellipsis)
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(stringResource(R.string.trigger_count, geofication.triggerCount))
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-          stringResource(
-            R.string.creation_time,
-            LocaleUtil.getLocalDateTime(geofication.created, context)
-          )
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-          stringResource(
-            R.string.last_edit,
-            LocaleUtil.getLocalDateTime(geofication.lastEdit, context)
-          )
-        )
-      }
-    }
-    Spacer(modifier = Modifier.height(8.dp))
   }
+  Spacer(modifier = Modifier.height(8.dp))
 }

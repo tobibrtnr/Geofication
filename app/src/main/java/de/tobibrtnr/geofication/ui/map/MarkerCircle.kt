@@ -7,7 +7,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.Circle
 import com.google.maps.android.compose.MarkerInfoWindow
 import com.google.maps.android.compose.MarkerState
-import de.tobibrtnr.geofication.util.storage.Geofence
+import de.tobibrtnr.geofication.util.storage.geofence.Geofence
 
 /**
  * A composable that consists of a circle and a marker in its center in order

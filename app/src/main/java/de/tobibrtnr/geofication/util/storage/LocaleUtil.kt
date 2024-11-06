@@ -1,12 +1,10 @@
 package de.tobibrtnr.geofication.util.storage
 
-import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.content.res.Configuration
-import de.tobibrtnr.geofication.MainActivity
 import de.tobibrtnr.geofication.R
 import de.tobibrtnr.geofication.util.misc.ServiceProvider
+import de.tobibrtnr.geofication.util.storage.setting.Setting
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch

@@ -6,10 +6,9 @@ import android.content.Intent
 import de.tobibrtnr.geofication.util.misc.ServiceProvider
 import de.tobibrtnr.geofication.util.misc.getByteInput
 import de.tobibrtnr.geofication.util.misc.sendNotification
-import de.tobibrtnr.geofication.util.storage.Geofence
-import de.tobibrtnr.geofication.util.storage.GeofenceUtil
-import de.tobibrtnr.geofication.util.storage.Geofication
-import de.tobibrtnr.geofication.util.storage.LogUtil
+import de.tobibrtnr.geofication.util.storage.geofence.Geofence
+import de.tobibrtnr.geofication.util.storage.geofication.Geofication
+import de.tobibrtnr.geofication.util.storage.log.LogUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -38,14 +37,22 @@ fun handleGeofication(
 ) {
   CoroutineScope(Dispatchers.IO).launch {
 
+    val geofenceViewModel = ServiceProvider.geofenceViewModel()
+    val geoficationViewModel = ServiceProvider.geoficationViewModel()
+
     // If the flags equals the triggered one or is both, and the geofication is active:
     if ((tNotif.flags == geofenceTransition || tNotif.flags == 3) && tNotif.active) {
-      GeofenceUtil.incrementNotifTriggerCount(tNotif.id)
+      geofenceViewModel.incrementTriggerCount(tNotif.id)
     }
 
     when (tNotif.onTrigger) {
-      1 -> GeofenceUtil.setNotifActive(tNotif.id, false)
-      2 -> GeofenceUtil.deleteGeofence(tFence.id)
+      1 -> {
+        geofenceViewModel.setActive(false, tFence.id)
+        geoficationViewModel.setActive(false, tNotif.id)
+      }
+      2 -> {
+        geofenceViewModel.delete(tFence.id)
+      }
     }
 
     LogUtil.addLog("Attempt to send Notification \"${tNotif.message}\", \"${tFence.fenceName}\"")

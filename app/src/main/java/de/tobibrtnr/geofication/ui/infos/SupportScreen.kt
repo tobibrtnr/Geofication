@@ -141,4 +141,3 @@ fun openEmail(email: String, context: Context) {
   }
   context.startActivity(intent)
 }
-

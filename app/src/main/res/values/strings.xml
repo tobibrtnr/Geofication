@@ -5,7 +5,7 @@
     <string name="delete">Delete</string>
     <string name="cancel">Cancel</string>
     <string name="geofications">Geofications</string>
-    <string name="geofication_created">%1$s Geofication%2$s created.</string>
+    <string name="geofication_created">%1$s Geofication%2$s created</string>
     <string name="delete_geofication">Delete Geofication</string>
     <string name="trigger_count">Trigger Count: %1$s</string>
     <string name="faq_1_q">How does the App work?</string>
@@ -95,7 +95,7 @@
     <string name="show_popup_at_startup_if">Show popup at startup if power saving mode is turned on</string>
     <string name="clear_text">Clear text</string>
     <string name="open_source_licenses">Open Source Licenses</string>
-    <string name="create_just_on_map">Create your first Geofication just on the map.</string>
+    <string name="create_just_on_map">Create your first Geofication just on the map tab.</string>
     <string name="geofication_version">Geofication %1$s%2$s</string>
     <string name="faq_4_q">How to create a Geofication?</string>
     <string name="faq_5_q">How to edit a Geofication?</string>

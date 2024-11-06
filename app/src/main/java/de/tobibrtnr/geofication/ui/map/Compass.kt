@@ -54,7 +54,6 @@ fun Compass(modifier: Modifier, cameraPositionState: CameraPositionState, onPres
       rotate(angle) {
         // Draw the north red triangle with shadow
         paint.color = Color(0xFFDB4242)
-        //paint.setShadowLayer(10f, 0f, 0f, Color.Black.toArgb())
 
         drawIntoCanvas { canvas ->
           val path = Path().apply {
@@ -68,7 +67,6 @@ fun Compass(modifier: Modifier, cameraPositionState: CameraPositionState, onPres
 
         // Draw the south dark gray triangle with shadow
         paint.color = Color(0xFF6E6E6E)
-        //paint.setShadowLayer(10f, 0f, 0f, Color.Black.toArgb())
 
         drawIntoCanvas { canvas ->
           val path = Path().apply {

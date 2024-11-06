@@ -7,15 +7,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
 import de.tobibrtnr.geofication.ui.common.CircleWithColor
-import de.tobibrtnr.geofication.util.storage.Geofence
-import de.tobibrtnr.geofication.util.storage.Geofication
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
+import de.tobibrtnr.geofication.util.storage.geofence.Geofence
+import de.tobibrtnr.geofication.util.storage.geofication.Geofication
 
 @Composable
 fun GeoficationChip(geofence: Geofence, geofication: Geofication, meterText: String, cameraPositionState: CameraPositionState) {

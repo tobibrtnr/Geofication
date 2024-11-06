@@ -57,16 +57,14 @@ import de.tobibrtnr.geofication.ui.common.CircleWithColor
 import de.tobibrtnr.geofication.ui.common.DeleteConfirmPopup
 import de.tobibrtnr.geofication.util.misc.NumericUnitTransformation
 import de.tobibrtnr.geofication.util.misc.Vibrate
-import de.tobibrtnr.geofication.util.storage.Geofence
-import de.tobibrtnr.geofication.util.storage.GeofenceUtil
-import de.tobibrtnr.geofication.util.storage.Geofication
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
+import de.tobibrtnr.geofication.util.storage.geofence.Geofence
+import de.tobibrtnr.geofication.util.storage.geofence.GeofenceViewModel
+import de.tobibrtnr.geofication.util.storage.geofication.Geofication
 import kotlin.math.roundToInt
 
 fun processEdit(
   context: Context,
+  geofenceViewModel: GeofenceViewModel,
   geofence: Geofence,
   geofication: Geofication
 ) {
@@ -77,7 +75,7 @@ fun processEdit(
   geofence.lastEdit = System.currentTimeMillis()
   geofication.lastEdit = System.currentTimeMillis()
 
-  GeofenceUtil.addGeofence(
+  geofenceViewModel.addGeofence(
     context,
     geofence,
     geofication,
@@ -87,7 +85,9 @@ fun processEdit(
 
 @Composable
 fun EditGeoficationPopup(
-  selectedMarkerId: Int,
+  geofence: Geofence,
+  geofication: Geofication,
+  geofenceViewModel: GeofenceViewModel,
   onDismissRequest: () -> Unit,
   onDeleteRequest: () -> Unit
 ) {
@@ -96,8 +96,8 @@ fun EditGeoficationPopup(
   var initialGeofication by remember { mutableStateOf<Geofication?>(null) }
   var initialGeofence by remember { mutableStateOf<Geofence?>(null) }
 
-  var selectedGeofication by remember { mutableStateOf<Geofication?>(null) }
-  var selectedGeofence by remember { mutableStateOf<Geofence?>(null) }
+  var selectedGeofication by remember { mutableStateOf<Geofication?>(geofication.copy()) }
+  var selectedGeofence by remember { mutableStateOf<Geofence?>(geofence.copy()) }
 
   var enabled by remember { mutableStateOf(false) }
   var colorExpanded by remember { mutableStateOf(false) }
@@ -106,9 +106,6 @@ fun EditGeoficationPopup(
   var deletePopupVisible by remember { mutableStateOf(false) }
 
   LaunchedEffect(Unit) {
-    selectedGeofication = GeofenceUtil.getGeoficationByGeofence(selectedMarkerId)[0]
-    selectedGeofence = GeofenceUtil.getGeofenceById(selectedMarkerId)
-
     initialGeofication = selectedGeofication!!.copy()
     initialGeofence = selectedGeofence!!.copy()
     enabled = selectedGeofication!!.active
@@ -399,6 +396,7 @@ fun EditGeoficationPopup(
               onClick = {
                 processEdit(
                   context,
+                  geofenceViewModel,
                   selectedGeofence!!,
                   selectedGeofication!!
                 )

@@ -3,7 +3,6 @@ package de.tobibrtnr.geofication.util.receivers
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import de.tobibrtnr.geofication.util.storage.GeofenceUtil
 import de.tobibrtnr.geofication.util.misc.ServiceProvider
 import kotlinx.coroutines.runBlocking
 
@@ -23,9 +22,11 @@ class BootCompletedReceiver : BroadcastReceiver() {
 suspend fun addAllGeofences(context: Context) {
   ServiceProvider.setInstance(context)
 
-  val geofences = GeofenceUtil.getGeofences()
+  val geofenceViewModel = ServiceProvider.geofenceViewModel()
+  val geofences = geofenceViewModel.getAll()
+
   geofences.forEach {
-    GeofenceUtil.addGeofence(
+    geofenceViewModel.addGeofence(
       context,
       it
     )

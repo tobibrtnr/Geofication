@@ -9,6 +9,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,14 +22,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
@@ -52,13 +49,13 @@ import androidx.compose.ui.unit.dp
 import de.tobibrtnr.geofication.R
 import de.tobibrtnr.geofication.ui.common.DeleteAllConfirmPopup
 import de.tobibrtnr.geofication.ui.common.ResetSettingsPopup
-import de.tobibrtnr.geofication.util.storage.GeofenceUtil
 import de.tobibrtnr.geofication.util.storage.LocaleUtil
-import de.tobibrtnr.geofication.util.storage.LogEntry
-import de.tobibrtnr.geofication.util.storage.LogUtil
-import de.tobibrtnr.geofication.util.storage.SettingsUtil
 import de.tobibrtnr.geofication.util.storage.UnitUtil
 import de.tobibrtnr.geofication.BuildConfig
+import de.tobibrtnr.geofication.util.storage.geofence.GeofenceViewModel
+import de.tobibrtnr.geofication.util.storage.log.LogEntry
+import de.tobibrtnr.geofication.util.storage.log.LogUtil
+import de.tobibrtnr.geofication.util.storage.setting.SettingsUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -72,6 +69,8 @@ import java.util.Locale
 @Composable
 fun SettingsScreen(
   modifier: Modifier = Modifier,
+  innerPadding: PaddingValues,
+  geofenceViewModel: GeofenceViewModel
 ) {
 
   val context = LocalContext.current
@@ -112,9 +111,7 @@ fun SettingsScreen(
     DeleteAllConfirmPopup(
       onConfirm = {
         deleteAllPopupVisible = false
-        CoroutineScope(Dispatchers.Default).launch {
-          GeofenceUtil.deleteAllGeofications()
-        }
+        geofenceViewModel.deleteAllGeofences()
       },
       onCancel = { deleteAllPopupVisible = false }
     )
@@ -148,7 +145,12 @@ fun SettingsScreen(
   ) { paddingValues ->
     Box(
       modifier = Modifier
-        .padding(top = paddingValues.calculateTopPadding(), start = 16.dp, end = 16.dp)
+        .padding(
+          top = paddingValues.calculateTopPadding(),
+          start = 16.dp,
+          end = 16.dp,
+          bottom = innerPadding.calculateBottomPadding()
+        )
     ) {
       Column(Modifier.verticalScroll(rememberScrollState())) {
         // Dark / Light Theme

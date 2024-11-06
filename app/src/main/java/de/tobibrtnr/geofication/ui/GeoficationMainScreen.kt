@@ -3,10 +3,10 @@ package de.tobibrtnr.geofication.ui
 import android.Manifest
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.PowerManager
 import android.provider.Settings
 import androidx.annotation.StringRes
+import de.tobibrtnr.geofication.util.misc.ServiceProvider
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
@@ -50,7 +50,7 @@ import de.tobibrtnr.geofication.ui.geofications.GeoficationsScreen
 import de.tobibrtnr.geofication.ui.map.MapScreen
 import de.tobibrtnr.geofication.ui.settings.SettingsScreen
 import de.tobibrtnr.geofication.ui.startup.PermissionScreen
-import de.tobibrtnr.geofication.util.storage.SettingsUtil
+import de.tobibrtnr.geofication.util.storage.setting.SettingsUtil
 
 enum class GeoficationScreen(@StringRes val title: Int, val icon: ImageVector) {
   Start(title = R.string.map, icon = Icons.Outlined.Map),
@@ -65,6 +65,10 @@ fun GeoficationApp(
   intentQuery: String,
   navController: NavHostController = rememberNavController()
 ) {
+
+  val geofenceViewModel = ServiceProvider.geofenceViewModel()
+  val geoficationViewModel = ServiceProvider.geoficationViewModel()
+
   var navigationSelectedItem by remember {
     mutableStateOf(0)
   }
@@ -200,19 +204,26 @@ fun GeoficationApp(
               topPadding = innerPadding.calculateTopPadding(),
               intentQuery = intentQueryString,
               openGeoId = openGeofence,
-              edit = edit
+              edit = edit,
+              geoficationViewModel = geoficationViewModel,
+              geofenceViewModel = geofenceViewModel
             )
           }
         }
         composable(route = GeoficationScreen.Settings.name) {
-            SettingsScreen(
-              modifier = Modifier.fillMaxSize()
-            )
+          SettingsScreen(
+            modifier = Modifier.fillMaxSize(),
+            innerPadding = innerPadding,
+            geofenceViewModel
+          )
         }
         composable(route = GeoficationScreen.Geofications.name) {
           GeoficationsScreen(
             modifier = Modifier.fillMaxSize(),
-            navController = navController
+            navController = navController,
+            innerPadding = innerPadding,
+            geoficationViewModel,
+            geofenceViewModel
           )
         }
       }

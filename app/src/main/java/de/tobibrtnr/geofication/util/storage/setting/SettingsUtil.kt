@@ -1,4 +1,4 @@
-package de.tobibrtnr.geofication.util.storage
+package de.tobibrtnr.geofication.util.storage.setting
 
 import de.tobibrtnr.geofication.util.misc.ServiceProvider
 import kotlinx.coroutines.CoroutineScope

@@ -65,15 +65,16 @@ import de.tobibrtnr.geofication.ui.common.SegmentedButtons
 import de.tobibrtnr.geofication.ui.common.SegmentedRadioButtons
 import de.tobibrtnr.geofication.util.misc.NumericUnitTransformation
 import de.tobibrtnr.geofication.util.misc.Vibrate
-import de.tobibrtnr.geofication.util.storage.Geofence
-import de.tobibrtnr.geofication.util.storage.GeofenceUtil
-import de.tobibrtnr.geofication.util.storage.Geofication
 import de.tobibrtnr.geofication.util.storage.UnitUtil
+import de.tobibrtnr.geofication.util.storage.geofence.Geofence
+import de.tobibrtnr.geofication.util.storage.geofence.GeofenceViewModel
+import de.tobibrtnr.geofication.util.storage.geofication.Geofication
 import java.util.regex.Pattern
 import kotlin.math.roundToInt
 
 fun processInput(
   context: Context,
+  geofenceViewModel: GeofenceViewModel,
   name: String,
   radius: String,
   color: MarkerColor,
@@ -127,7 +128,7 @@ fun processInput(
     link = link
   )
 
-  GeofenceUtil.addGeofence(
+  geofenceViewModel.addGeofence(
     context,
     newGeofence,
     geofication
@@ -138,6 +139,7 @@ fun processInput(
 fun AddGeofencePopup(
   pos: LatLng,
   rad: Double,
+  geofenceViewModel: GeofenceViewModel,
   onDismissRequest: () -> Unit,
 ) {
   val initialName = stringResource(R.string.unnamed_geofence)
@@ -481,6 +483,7 @@ fun AddGeofencePopup(
             onClick = {
               processInput(
                 context,
+                geofenceViewModel,
                 name,
                 radius,
                 selectedColor,

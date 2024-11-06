@@ -11,9 +11,9 @@ import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.SphericalUtil
 import com.google.maps.android.compose.CameraPositionState
-import de.tobibrtnr.geofication.util.storage.Geofence
-import de.tobibrtnr.geofication.util.storage.Geofication
 import de.tobibrtnr.geofication.util.storage.UnitUtil
+import de.tobibrtnr.geofication.util.storage.geofence.Geofence
+import de.tobibrtnr.geofication.util.storage.geofication.Geofication
 import kotlin.math.roundToInt
 
 /**

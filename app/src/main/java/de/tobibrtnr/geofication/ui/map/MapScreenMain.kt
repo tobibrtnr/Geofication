@@ -85,11 +85,10 @@ import de.tobibrtnr.geofication.R
 import de.tobibrtnr.geofication.ui.common.MarkerColor
 import de.tobibrtnr.geofication.util.misc.ServiceProvider
 import de.tobibrtnr.geofication.util.misc.Vibrate
-import de.tobibrtnr.geofication.util.storage.Geofence
-import de.tobibrtnr.geofication.util.storage.GeofenceUtil
-import de.tobibrtnr.geofication.util.storage.SettingsUtil
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import de.tobibrtnr.geofication.util.storage.geofence.Geofence
+import de.tobibrtnr.geofication.util.storage.geofence.GeofenceViewModel
+import de.tobibrtnr.geofication.util.storage.geofication.GeoficationViewModel
+import de.tobibrtnr.geofication.util.storage.setting.SettingsUtil
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -103,8 +102,9 @@ fun MapScreenMain(
   openGeoId: Int?,
   edit: Boolean?,
   intentQuery: String,
-  mapViewModel: MapViewModel,
-  navController: NavHostController
+  navController: NavHostController,
+  geofenceViewModel: GeofenceViewModel,
+  geoficationViewModel: GeoficationViewModel
 ) {
   val context = LocalContext.current
 
@@ -147,8 +147,8 @@ fun MapScreenMain(
   var resultsShown by remember { mutableStateOf(false) }
 
   // Geofications and geofence data. Use mapState for holding data
-  val geofencesArray by mapViewModel.geofencesArray.collectAsState()
-  val geoficationsArray by mapViewModel.geoficationsArray.collectAsState()
+  val geofencesArray by geofenceViewModel.getAllFlow.collectAsState()
+  val geoficationsArray by geoficationViewModel.getAllFlow.collectAsState()
 
   // Temporary Geofence that is being created
   var tempGeofenceLocation by remember { mutableStateOf<LatLng?>(null) }
@@ -215,14 +215,16 @@ fun MapScreenMain(
 
   LaunchedEffect(Unit) {
     if (usedGeoId > 0) {
-      val tmpGeofence = GeofenceUtil.getGeofenceById(usedGeoId)
+      val tmpGeofence = geofencesArray.find { it.id == usedGeoId }
       if (usedEdit) {
         openedGeofence = tmpGeofence
       } else {
         MainScope().launch {
-          val geoLocation = LatLng(tmpGeofence.latitude, tmpGeofence.longitude)
-          cameraPositionState.position = CameraPosition(geoLocation, 15f, 0f, 0f)
-          animateCameraToGeofence(cameraPositionState, tmpGeofence)
+          tmpGeofence?.let {
+            val geoLocation = LatLng(tmpGeofence.latitude, tmpGeofence.longitude)
+            cameraPositionState.position = CameraPosition(geoLocation, 15f, 0f, 0f)
+            animateCameraToGeofence(cameraPositionState, tmpGeofence)
+          }
         }
 
       }
@@ -331,16 +333,25 @@ fun MapScreenMain(
 
   // Return Composable
   if (markerPopupVisible && selectedMarkerId >= 0) {
-    EditGeoficationPopup(selectedMarkerId, {
-      markerPopupVisible = false
-      openedGeofence = null
-    }, {
-      CoroutineScope(Dispatchers.Default).launch {
-        GeofenceUtil.deleteGeofence(selectedMarkerId)
+    val geofence = geofencesArray.find { it.id == selectedMarkerId }
+    val geofication = geoficationsArray.find { it.fenceid == selectedMarkerId }
+
+    geofence?.let {
+      geofication?.let {
+        EditGeoficationPopup(
+          geofence,
+          geofication,
+          geofenceViewModel, {
+            markerPopupVisible = false
+            openedGeofence = null
+          }, {
+            geofenceViewModel.delete(selectedMarkerId)
+            markerPopupVisible = false
+            openedGeofence = null
+          }
+        )
       }
-      markerPopupVisible = false
-      openedGeofence = null
-    })
+    }
   }
 
   // Move to geofence if one is selected on startup
@@ -358,7 +369,7 @@ fun MapScreenMain(
   }
 
   if (openDialogGeofence) {
-    AddGeofencePopup(selectedPosition, newRadius) {
+    AddGeofencePopup(selectedPosition, newRadius, geofenceViewModel) {
       openDialogGeofence = false
     }
   }
@@ -471,7 +482,7 @@ fun MapScreenMain(
         AnimatedVisibility(
           visible = resultsShown
         ) {
-          SearchResultList(searchInputState, searchGlobally = { query ->
+          SearchResultList(searchInputState, geoficationViewModel, searchGlobally = { query ->
             searchLocation(query, context, callback = {
               removeFocusFromSearchBar()
               animateCamera(cameraPositionState, it)

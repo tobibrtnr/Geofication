@@ -2,6 +2,7 @@ package de.tobibrtnr.geofication.util.storage
 
 import android.content.Context
 import de.tobibrtnr.geofication.util.misc.ServiceProvider
+import de.tobibrtnr.geofication.util.storage.setting.Setting
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
