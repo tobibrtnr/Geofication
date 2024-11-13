@@ -43,7 +43,8 @@ fun AddGeofencePopup(
     triggerCount = 0,
     created = System.currentTimeMillis(),
     lastEdit = System.currentTimeMillis(),
-    link = ""
+    link = "",
+    isAlarm = false
   )) }
 
   // New Geofence with default values

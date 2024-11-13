@@ -27,6 +27,7 @@ data class Geofication(
   val active: Boolean,
   var onTrigger: Int,
   var link: String,
+  var isAlarm: Boolean,
 
   val triggerCount: Int,
   val created: Long,

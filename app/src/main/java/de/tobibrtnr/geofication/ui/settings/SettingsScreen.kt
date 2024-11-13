@@ -49,6 +49,7 @@ import de.tobibrtnr.geofication.BuildConfig
 import de.tobibrtnr.geofication.R
 import de.tobibrtnr.geofication.ui.common.DeleteAllConfirmPopup
 import de.tobibrtnr.geofication.ui.common.ResetSettingsPopup
+import de.tobibrtnr.geofication.util.misc.Vibrate
 import de.tobibrtnr.geofication.util.storage.LocaleUtil
 import de.tobibrtnr.geofication.util.storage.UnitUtil
 import de.tobibrtnr.geofication.util.storage.geofence.GeofenceViewModel
@@ -269,6 +270,7 @@ fun SettingsScreen(
           modifier = Modifier.fillMaxWidth()
         ) {
           Switch(checked = powerPopup, onCheckedChange = {
+            Vibrate.vibrate(context, 50)
             powerPopup = !powerPopup; SettingsUtil.setPowerPopup(powerPopup)
           })
           Spacer(modifier = Modifier.width(8.dp))

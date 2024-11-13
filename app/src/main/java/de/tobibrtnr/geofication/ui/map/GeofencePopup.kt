@@ -205,6 +205,7 @@ fun GeofencePopup(
             if (editMode) {
               // Active State
               Switch(checked = geofication.active, onCheckedChange = {
+                Vibrate.vibrate(context, 50)
                 geofication = geofication.copy(active = it)
                 geofence = geofence.copy(active = it)
               })
@@ -323,7 +324,7 @@ fun GeofencePopup(
             },
             label = { Text(stringResource(R.string.geofence_name)) },
             trailingIcon = {
-              if (geofication.message.isNotEmpty()) {
+              if (geofence.fenceName.isNotEmpty()) {
                 IconButton(onClick = {
                   geofence = geofence.copy(fenceName = "")
 
@@ -395,7 +396,8 @@ fun GeofencePopup(
               opt3 = stringResource(R.string.delete),
               onValueChange = {
                 geofication = geofication.copy(onTrigger = it)
-              }
+              },
+              onTrigger = geofication.onTrigger
             )
 
             Spacer(Modifier.height(12.dp))
@@ -443,6 +445,22 @@ fun GeofencePopup(
 
         CategoryItem("Extras") {
           Column {
+            Row(Modifier.fillMaxWidth()) {
+              Switch(checked = geofication.isAlarm, onCheckedChange = {
+                Vibrate.vibrate(context, 50)
+                geofication = geofication.copy(isAlarm = it)
+              })
+              Spacer(modifier = Modifier.width(8.dp))
+              Text(
+                stringResource(
+                  R.string.set_the_alert_type_selected, if (geofication.isAlarm) {
+                    stringResource(R.string.alarm_clock)
+                  } else {
+                    stringResource(R.string.notification)
+                  }
+                )
+              )
+            }
             Row(
               modifier = Modifier.height(IntrinsicSize.Min)
             ) {
@@ -580,7 +598,7 @@ fun validateInput(
   val maxValue = UnitUtil.appendUnit(1000000)
 
   // Link format
-  val urlRegex = "(http(s)?://.)?(www\\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_+.~#?&/=]*)"
+  val urlRegex = "(http(s)?://.)(www\\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_+.~#?&/=]*)"
   val matcher = Pattern.compile(urlRegex).matcher(geofication.link)
 
   if (geofication.message.isEmpty()) {

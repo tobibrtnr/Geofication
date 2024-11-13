@@ -3,9 +3,11 @@ package de.tobibrtnr.geofication.util.receivers
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import de.tobibrtnr.geofication.AlarmActivity
 import de.tobibrtnr.geofication.util.misc.ServiceProvider
 import de.tobibrtnr.geofication.util.misc.getByteInput
 import de.tobibrtnr.geofication.util.misc.sendNotification
+import de.tobibrtnr.geofication.util.misc.serializeObject
 import de.tobibrtnr.geofication.util.storage.geofence.Geofence
 import de.tobibrtnr.geofication.util.storage.geofication.Geofication
 import de.tobibrtnr.geofication.util.storage.log.LogUtil
@@ -57,10 +59,22 @@ fun handleGeofication(
 
     LogUtil.addLog("Attempt to send Notification \"${tNotif.message}\", \"${tFence.fenceName}\"")
 
-    sendNotification(
-      context,
-      tFence,
-      tNotif
-    )
+    if (tNotif.isAlarm) {
+      // Create AlarmActivity
+      val notifBytes = serializeObject(tNotif)
+
+      val alarmIntent = Intent(context, AlarmActivity::class.java).apply {
+        putExtra("tNotif", notifBytes)
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+      }
+      context.startActivity(alarmIntent)
+    } else {
+      // Send Notification
+      sendNotification(
+        context,
+        tFence,
+        tNotif
+      )
+    }
   }
 }

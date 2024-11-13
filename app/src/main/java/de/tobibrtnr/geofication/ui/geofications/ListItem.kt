@@ -39,6 +39,7 @@ import de.tobibrtnr.geofication.R
 import de.tobibrtnr.geofication.ui.GeoficationScreen
 import de.tobibrtnr.geofication.ui.common.CircleWithColor
 import de.tobibrtnr.geofication.ui.common.DeleteConfirmPopup
+import de.tobibrtnr.geofication.util.misc.Vibrate
 import de.tobibrtnr.geofication.util.storage.LocaleUtil
 import de.tobibrtnr.geofication.util.storage.geofence.Geofence
 import de.tobibrtnr.geofication.util.storage.geofication.Geofication
@@ -109,6 +110,7 @@ fun ListItem(
           horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
           Switch(checked = geofication.active, onCheckedChange = {
+            Vibrate.vibrate(context, 50)
             setActive(geofence.id, geofication.id, it)
           })
 

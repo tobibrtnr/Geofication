@@ -84,9 +84,13 @@ fun PermissionScreen(
       Spacer(Modifier.height(32.dp))
       Text(
         text = stringResource(R.string.welcome_to_geofication),
-        style = MaterialTheme.typography.titleLarge
+        style = MaterialTheme.typography.titleLarge,
+        color = MaterialTheme.colorScheme.onSurface
       )
-      Text(stringResource(R.string.please_allow_all_required_permissions))
+      Text(
+        text = stringResource(R.string.please_allow_all_required_permissions),
+        color = MaterialTheme.colorScheme.onSurface
+      )
       Spacer(Modifier.height(48.dp))
       Row {
         Button(onClick = {
@@ -107,6 +111,7 @@ fun PermissionScreen(
         }) {
           Icon(
             imageVector = Icons.Outlined.Info,
+            tint = MaterialTheme.colorScheme.onSurface,
             contentDescription = stringResource(R.string.show_info)
           )
         }
@@ -131,6 +136,7 @@ fun PermissionScreen(
         }) {
           Icon(
             imageVector = Icons.Outlined.Info,
+            tint = MaterialTheme.colorScheme.onSurface,
             contentDescription = stringResource(R.string.show_info)
           )
         }
@@ -155,6 +161,7 @@ fun PermissionScreen(
         }) {
           Icon(
             imageVector = Icons.Outlined.Info,
+            tint = MaterialTheme.colorScheme.onSurface,
             contentDescription = stringResource(R.string.show_info)
           )
         }

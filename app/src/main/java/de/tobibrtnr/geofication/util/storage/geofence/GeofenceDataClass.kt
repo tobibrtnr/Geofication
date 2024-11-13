@@ -10,7 +10,7 @@ data class Geofence(
   @PrimaryKey(autoGenerate = true)
   val id: Int = 0,
 
-  val fenceName: String,
+  var fenceName: String,
   val latitude: Double,
   val longitude: Double,
   var radius: Float,

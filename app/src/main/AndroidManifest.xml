@@ -9,6 +9,7 @@
 
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
@@ -81,6 +82,9 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".AlarmActivity"
+            android:theme="@style/Theme.Geofication" />
 
         <!-- Google OSS Licenses library is a bit old, doesn't work with our theme. Set a compatible theme for its Activities -->
         <activity android:name="com.google.android.gms.oss.licenses.OssLicensesMenuActivity"

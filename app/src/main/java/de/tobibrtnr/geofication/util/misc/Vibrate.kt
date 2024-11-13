@@ -22,5 +22,19 @@ class Vibrate {
         }
       }
     }
+
+    fun startVibratePattern(context: Context, ms: Long) {
+      val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+
+      // Vibrate for x ms, pause for x ms
+      val pattern = longArrayOf(0, ms, ms)
+
+      // Check if device supports VibrationEffect for more control (API 26+)
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && vibrator.hasAmplitudeControl()) {
+        vibrator.vibrate(VibrationEffect.createWaveform(pattern, 0))
+      } else {
+        vibrator.vibrate(pattern, 0)
+      }
+    }
   }
 }
