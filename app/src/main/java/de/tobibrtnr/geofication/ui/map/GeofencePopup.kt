@@ -101,6 +101,9 @@ fun GeofencePopup(
   var geofication by remember { mutableStateOf(pGeofication) }
   var geofence by remember { mutableStateOf(pGeofence) }
 
+  var initialGeofication by remember { mutableStateOf(pGeofication.copy()) }
+  var initialGeofence by remember { mutableStateOf(pGeofence.copy()) }
+
   var colorExpanded by remember { mutableStateOf(false) }
   var radiusText by remember { mutableStateOf((geofence.radius * UnitUtil.distanceFactor()).toInt().toString()) }
 
@@ -533,7 +536,10 @@ fun GeofencePopup(
               )
               onDismissRequest()
             },
-            enabled = inputValid,
+            // Input has been valid and the popup may not be in
+            // edit mode or one of the objects has to have a change
+            enabled = inputValid && (!editMode ||
+                !(geofication == initialGeofication && geofence == initialGeofence)),
             modifier = Modifier.padding(8.dp),
           ) {
             Text(stringResource(R.string.save))
