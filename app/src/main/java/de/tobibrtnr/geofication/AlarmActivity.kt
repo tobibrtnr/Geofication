@@ -1,12 +1,17 @@
 package de.tobibrtnr.geofication
 
+import android.content.Context
 import android.media.Ringtone
 import android.media.RingtoneManager
+import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -27,17 +32,20 @@ import androidx.compose.ui.unit.dp
 import de.tobibrtnr.geofication.ui.infos.openLink
 import de.tobibrtnr.geofication.ui.theme.GeoficationTheme
 import de.tobibrtnr.geofication.util.misc.ServiceProvider
+import de.tobibrtnr.geofication.util.misc.Vibrate.Companion.cancelVibration
 import de.tobibrtnr.geofication.util.misc.Vibrate.Companion.startVibratePattern
 import de.tobibrtnr.geofication.util.misc.getByteInput
 import de.tobibrtnr.geofication.util.storage.LocaleUtil
 import de.tobibrtnr.geofication.util.storage.UnitUtil
 import de.tobibrtnr.geofication.util.storage.geofication.Geofication
+import de.tobibrtnr.geofication.util.storage.log.LogUtil
 import de.tobibrtnr.geofication.util.storage.setting.SettingsUtil
 
 class AlarmActivity : ComponentActivity() {
   private var ringtone: Ringtone? = null
   override fun onCreate(savedInstanceState: Bundle?) {
     enableEdgeToEdge()
+
     super.onCreate(savedInstanceState)
 
     ServiceProvider.setInstance(this)
@@ -46,7 +54,11 @@ class AlarmActivity : ComponentActivity() {
     UnitUtil.init(this)
     SettingsUtil.init()
 
+    LogUtil.addLog("AlarmActivity started.")
+
     val tNotif = getByteInput(intent.getByteArrayExtra("tNotif")) as Geofication
+
+    turnScreenOn()
 
     // Wake up the screen
     val powerManager = getSystemService(POWER_SERVICE) as PowerManager
@@ -55,6 +67,7 @@ class AlarmActivity : ComponentActivity() {
       "AlarmClock::WakeLockTag"
     )
     wakeLock.acquire(10 * 60 * 1000L /*10 minutes*/)
+
 
     // Play the default alarm ringtone
     ringtone = RingtoneManager.getRingtone(this, RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM))
@@ -81,6 +94,7 @@ class AlarmActivity : ComponentActivity() {
 
   private fun stopAlarm() {
     ringtone?.stop()
+    cancelVibration(this)
     finish()
   }
 
@@ -93,7 +107,38 @@ class AlarmActivity : ComponentActivity() {
     super.onDestroy()
     stopAlarm()
   }
+
+  /**
+   * Source: https://github.com/yuriykulikov/AlarmClock
+   * ## Turns the screen on
+   *
+   * See https://github.com/yuriykulikov/AlarmClock/issues/360 It seems that on some devices with
+   * API>=27 calling `setTurnScreenOn(true)` is not enough, so we will just add all flags regardless
+   * of the API level, and call `setTurnScreenOn(true)` if API level is 27+
+   *
+   * ### 3.07.01 reference In `3.07.01` we added these 4 flags:
+   * ```
+   * final Window win = getWindow();
+   * win.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+   * win.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+   *         | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+   *         | WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON);
+   * ```
+   */
+  private fun turnScreenOn() {
+    if (Build.VERSION.SDK_INT >= 27) {
+      setShowWhenLocked(true)
+      setTurnScreenOn(true)
+    }
+    // Deprecated flags are required on some devices, even with API>=27
+    window.addFlags(
+      WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or
+          WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON or
+          WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
+          WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON)
+  }
 }
+
 
 @Composable
 fun FullScreenAlarm(
@@ -102,8 +147,9 @@ fun FullScreenAlarm(
     onOpenLink: (String) -> Unit,
     onStopAlarm: () -> Unit
 ) {
+
   Box(
-    modifier = Modifier.fillMaxSize(),
+    modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface),
     contentAlignment = BiasAlignment(0f, -0.25f)
   ) {
     Column(

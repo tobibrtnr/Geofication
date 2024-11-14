@@ -36,5 +36,10 @@ class Vibrate {
         vibrator.vibrate(pattern, 0)
       }
     }
+
+    fun cancelVibration(context: Context) {
+      val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+      vibrator.cancel()
+    }
   }
 }

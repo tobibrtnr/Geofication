@@ -11,6 +11,11 @@
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
+    <uses-permission
+        android:name="android.permission.FOREGROUND_SERVICE_LOCATION"
+        android:minSdkVersion="34" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <uses-permission android:name="android.permission.VIBRATE" />
@@ -66,6 +71,11 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="${MAPS_API_KEY}" />
 
+        <service
+            android:name=".util.receivers.AlarmForegroundService"
+            android:exported="false"
+            android:foregroundServiceType="location" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -84,6 +94,9 @@
         </activity>
 
         <activity android:name=".AlarmActivity"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
+            android:exported="true"
             android:theme="@style/Theme.Geofication" />
 
         <!-- Google OSS Licenses library is a bit old, doesn't work with our theme. Set a compatible theme for its Activities -->

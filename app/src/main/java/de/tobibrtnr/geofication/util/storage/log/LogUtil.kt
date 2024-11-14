@@ -1,5 +1,6 @@
 package de.tobibrtnr.geofication.util.storage.log
 
+import android.util.Log
 import de.tobibrtnr.geofication.util.misc.ServiceProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -28,6 +29,7 @@ class LogUtil {
         LogEntry(message = message, severity = severity, timestamp = System.currentTimeMillis())
 
       CoroutineScope(SupervisorJob()).launch {
+        Log.d("AlarmReceiver", message)
         logDao.insertAll(entry)
       }
     }

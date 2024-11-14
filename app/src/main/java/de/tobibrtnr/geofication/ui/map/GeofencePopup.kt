@@ -101,11 +101,12 @@ fun GeofencePopup(
   var geofication by remember { mutableStateOf(pGeofication) }
   var geofence by remember { mutableStateOf(pGeofence) }
 
-  var initialGeofication by remember { mutableStateOf(pGeofication.copy()) }
-  var initialGeofence by remember { mutableStateOf(pGeofence.copy()) }
+  val initialGeofication by remember { mutableStateOf(pGeofication.copy()) }
+  val initialGeofence by remember { mutableStateOf(pGeofence.copy()) }
+  val initialRadiusText by remember { mutableStateOf((geofence.radius * UnitUtil.distanceFactor()).toInt().toString()) }
 
   var colorExpanded by remember { mutableStateOf(false) }
-  var radiusText by remember { mutableStateOf((geofence.radius * UnitUtil.distanceFactor()).toInt().toString()) }
+  var radiusText by remember { mutableStateOf(initialRadiusText) }
 
   var deletePopupVisible by remember { mutableStateOf(false) }
 
@@ -536,10 +537,13 @@ fun GeofencePopup(
               )
               onDismissRequest()
             },
-            // Input has been valid and the popup may not be in
-            // edit mode or one of the objects has to have a change
+            // Enable save button if the input is valid
+            // AND if the popup is not in edit mode
+            //     OR if geofication or geofence object changed
+            //     OR if the radius text changed
             enabled = inputValid && (!editMode ||
-                !(geofication == initialGeofication && geofence == initialGeofence)),
+                !(geofication == initialGeofication && geofence == initialGeofence) ||
+                initialRadiusText != radiusText),
             modifier = Modifier.padding(8.dp),
           ) {
             Text(stringResource(R.string.save))

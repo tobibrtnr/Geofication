@@ -3,7 +3,8 @@ package de.tobibrtnr.geofication.util.receivers
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import de.tobibrtnr.geofication.AlarmActivity
+import android.os.Build
+import androidx.annotation.RequiresApi
 import de.tobibrtnr.geofication.util.misc.ServiceProvider
 import de.tobibrtnr.geofication.util.misc.getByteInput
 import de.tobibrtnr.geofication.util.misc.sendNotification
@@ -31,21 +32,21 @@ class AlarmReceiver : BroadcastReceiver() {
   }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 fun handleGeofication(
   context: Context,
   tFence: Geofence,
   tNotif: Geofication,
   geofenceTransition: Int
 ) {
+  LogUtil.addLog("AlarmReceiver handleGeofence started.")
+
   CoroutineScope(Dispatchers.IO).launch {
 
     val geofenceViewModel = ServiceProvider.geofenceViewModel()
     val geoficationViewModel = ServiceProvider.geoficationViewModel()
 
-    // If the flags equals the triggered one or is both, and the geofication is active:
-    if ((tNotif.flags == geofenceTransition || tNotif.flags == 3) && tNotif.active) {
-      geofenceViewModel.incrementTriggerCount(tNotif.id)
-    }
+    geofenceViewModel.incrementTriggerCount(tNotif.id)
 
     when (tNotif.onTrigger) {
       1 -> {
@@ -57,18 +58,16 @@ fun handleGeofication(
       }
     }
 
-    LogUtil.addLog("Attempt to send Notification \"${tNotif.message}\", \"${tFence.fenceName}\"")
-
     if (tNotif.isAlarm) {
+      LogUtil.addLog("Attempt to send Alarm \"${tNotif.message}\", \"${tFence.fenceName}\"")
       // Create AlarmActivity
       val notifBytes = serializeObject(tNotif)
-
-      val alarmIntent = Intent(context, AlarmActivity::class.java).apply {
+      val serviceIntent = Intent(context, AlarmForegroundService::class.java).apply {
         putExtra("tNotif", notifBytes)
-        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
       }
-      context.startActivity(alarmIntent)
+      context.startForegroundService(serviceIntent)
     } else {
+      LogUtil.addLog("Attempt to send Notification \"${tNotif.message}\", \"${tFence.fenceName}\"")
       // Send Notification
       sendNotification(
         context,

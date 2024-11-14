@@ -123,7 +123,7 @@ fun sendNotification(context: Context, fence: Geofence, notif: Geofication) {
 /**
  * Create a Notification Channel, needed starting with Android O
  */
-private fun createNotificationChannel(context: Context) {
+fun createNotificationChannel(context: Context) {
   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
     val channel = NotificationChannel(
       CHANNEL_ID,

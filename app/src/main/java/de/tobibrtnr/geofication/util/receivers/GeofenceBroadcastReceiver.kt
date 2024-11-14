@@ -87,6 +87,12 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
             val tNotif = geoficationsList.find { it.fenceid == geofence.requestId.toInt() }
               ?: return@runBlocking
 
+            // If flags does not equal the transition flag and is not 3 (all transitions)
+            // --> Do not trigger
+            if (tNotif.flags != geofenceTransition && tNotif.flags != 3) {
+              return@runBlocking
+            }
+
             // Get current triggered geofication
 
             val fenceBytes = serializeObject(tFence)
