@@ -3,8 +3,6 @@ package de.tobibrtnr.geofication.util.receivers
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.os.Build
-import androidx.annotation.RequiresApi
 import de.tobibrtnr.geofication.util.misc.ServiceProvider
 import de.tobibrtnr.geofication.util.misc.getByteInput
 import de.tobibrtnr.geofication.util.misc.sendNotification
@@ -25,19 +23,15 @@ class AlarmReceiver : BroadcastReceiver() {
       val tFence = getByteInput(intent.getByteArrayExtra("tFence")) as Geofence
       val tNotif = getByteInput(intent.getByteArrayExtra("tNotif")) as Geofication
 
-      val geofenceTransition = intent.getIntExtra("geofenceTransition", 0)
-
-      handleGeofication(context, tFence, tNotif, geofenceTransition)
+      handleGeofication(context, tFence, tNotif)
     }
   }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 fun handleGeofication(
   context: Context,
   tFence: Geofence,
-  tNotif: Geofication,
-  geofenceTransition: Int
+  tNotif: Geofication
 ) {
   LogUtil.addLog("AlarmReceiver handleGeofence started.")
 
@@ -62,8 +56,10 @@ fun handleGeofication(
       LogUtil.addLog("Attempt to send Alarm \"${tNotif.message}\", \"${tFence.fenceName}\"")
       // Create AlarmActivity
       val notifBytes = serializeObject(tNotif)
+      val fenceBytes = serializeObject(tFence)
       val serviceIntent = Intent(context, AlarmForegroundService::class.java).apply {
         putExtra("tNotif", notifBytes)
+        putExtra("tFence", fenceBytes)
       }
       context.startForegroundService(serviceIntent)
     } else {

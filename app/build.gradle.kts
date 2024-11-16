@@ -20,7 +20,7 @@ android {
 
   defaultConfig {
     applicationId = "de.tobibrtnr.geofication"
-    minSdk = 24
+    minSdk = 26
     targetSdk = 34
     versionCode = 1
     versionName = appVersionName

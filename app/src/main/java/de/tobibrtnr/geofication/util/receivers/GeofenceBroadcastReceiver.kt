@@ -102,12 +102,11 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
               action = "de.tobibrtnr.geofication.GEOFICATION_ALARM"
               putExtra("tFence", fenceBytes)
               putExtra("tNotif", notifBytes)
-              putExtra("geofenceTransition", geofenceTransition)
             }
 
             if (tNotif.delay == 0) {
               // No delay, send notification immediately
-              handleGeofication(context, tFence, tNotif, geofenceTransition)
+              handleGeofication(context, tFence, tNotif)
             } else {
               // Delay is x minutes, schedule alarm
               val pendingIntent = PendingIntent.getBroadcast(

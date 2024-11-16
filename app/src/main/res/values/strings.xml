@@ -106,7 +106,8 @@
     <string name="link_explanation">You can set a website link here. When the Geofication is triggered, you can open that website by tapping on the notification.</string>
     <string name="stop_alarm">Stop Alarm</string>
     <string name="set_the_alert_type_selected">Set the alert type. Selected:\n%1$s</string>
-    <string name="alarm_clock">Full-screen, like an alarm clock</string>
+    <string name="alarm_clock">Alarm (sound and vibrate)</string>
     <string name="notification">Notification</string>
     <string name="open_notification_link">Open notification link</string>
+    <string name="alarm_notif">Alarm: %1$s</string>
 </resources>

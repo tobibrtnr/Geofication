@@ -16,6 +16,7 @@ import com.google.android.gms.maps.MapsInitializer
 import de.tobibrtnr.geofication.ui.GeoficationApp
 import de.tobibrtnr.geofication.ui.theme.GeoficationTheme
 import de.tobibrtnr.geofication.util.misc.ServiceProvider
+import de.tobibrtnr.geofication.util.receivers.AlarmForegroundService
 import de.tobibrtnr.geofication.util.storage.LocaleUtil
 import de.tobibrtnr.geofication.util.storage.UnitUtil
 import de.tobibrtnr.geofication.util.storage.setting.SettingsUtil
@@ -27,6 +28,10 @@ class MainActivity : ComponentActivity() {
     enableEdgeToEdge()
 
     super.onCreate(savedInstanceState)
+
+    // Stop alarm foreground service if one is running
+    val stopServiceIntent = Intent(this, AlarmForegroundService::class.java)
+    stopService(stopServiceIntent)
 
     var intentQuery = ""
     val uri: Uri? = intent.data

@@ -12,7 +12,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <uses-permission
-        android:name="android.permission.FOREGROUND_SERVICE_LOCATION"
+        android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
         android:minSdkVersion="34" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
@@ -74,7 +74,7 @@
         <service
             android:name=".util.receivers.AlarmForegroundService"
             android:exported="false"
-            android:foregroundServiceType="location" />
+            android:foregroundServiceType="mediaPlayback" />
 
         <activity
             android:name=".MainActivity"
@@ -92,12 +92,6 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".AlarmActivity"
-            android:showWhenLocked="true"
-            android:turnScreenOn="true"
-            android:exported="true"
-            android:theme="@style/Theme.Geofication" />
 
         <!-- Google OSS Licenses library is a bit old, doesn't work with our theme. Set a compatible theme for its Activities -->
         <activity android:name="com.google.android.gms.oss.licenses.OssLicensesMenuActivity"
