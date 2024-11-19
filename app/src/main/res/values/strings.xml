@@ -110,4 +110,6 @@
     <string name="notification">Notification</string>
     <string name="open_notification_link">Open notification link</string>
     <string name="alarm_notif">Alarm: %1$s</string>
+    <string name="location_processing">Your location is only processed locally on your device and via the integrated Google Play Services. We do not send or store your location online.</string>
+    <string name="privacy_policy">Privacy Policy</string>
 </resources>

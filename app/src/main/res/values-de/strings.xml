@@ -110,4 +110,6 @@
     <string name="open_notification_link">Benachrichtigungslink öffnen</string>
     <string name="alarm_clock">Alarm (Ton und Vibration)</string>
     <string name="alarm_notif">Alarm: %1$s</string>
+    <string name="location_processing">Ihr Standort wird nur lokal auf Ihrem Gerät und über die integrierten Google Play-Dienste verarbeitet. Wir senden oder speichern Ihren Standort nicht online.</string>
+    <string name="privacy_policy">Datenschutzerklärung</string>
 </resources>

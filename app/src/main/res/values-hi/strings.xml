@@ -110,4 +110,6 @@
     <string name="open_notification_link">नोटिफिकेशन लिंक खोलें</string>
     <string name="alarm_clock">अलार्म (ध्वनि और कंपन)</string>
     <string name="alarm_notif">अलार्म: %1$s</string>
+    <string name="location_processing">आपकी लोकेशन केवल आपके डिवाइस पर और एकीकृत Google Play सेवाओं के माध्यम से स्थानीय रूप से प्रोसेस की जाती है। हम आपकी लोकेशन को ऑनलाइन नहीं भेजते या संग्रहीत नहीं करते हैं।</string>
+    <string name="privacy_policy">गोपनीयता नीति</string>
 </resources>

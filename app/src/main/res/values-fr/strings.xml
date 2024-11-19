@@ -110,4 +110,6 @@
     <string name="open_notification_link">Ouvrir le lien de notification</string>
     <string name="alarm_clock">Réveil (son et vibration)</string>
     <string name="alarm_notif">Réveil : %1$s</string>
+    <string name="location_processing">Votre position est uniquement traitée localement sur votre appareil et via les services Google Play intégrés. Nous n\'envoyons ni ne stockons votre position en ligne.</string>
+    <string name="privacy_policy">Politique de confidentialité</string>
 </resources>

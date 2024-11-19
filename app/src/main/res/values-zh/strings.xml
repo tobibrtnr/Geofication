@@ -109,5 +109,6 @@
     <string name="notification">通知</string>
     <string name="open_notification_link">打開通知連結</string>
     <string name="alarm_clock">闹钟（声音和震动）</string>
-    <string name="alarm_notif">闹钟：%1$s</string>
+    <string name="alarm_notif">闹钟：%1$s</string><string name="location_processing">您的位置仅在您的设备上本地处理，并通过集成的 Google Play 服务处理。我们不会在线发送或存储您的位置。</string>
+    <string name="privacy_policy">隐私政策</string>
 </resources>
