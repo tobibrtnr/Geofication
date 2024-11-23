@@ -7,6 +7,7 @@ import android.location.Address
 import android.location.Geocoder
 import android.os.Build
 import android.os.Looper
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -374,6 +375,9 @@ fun MapScreenMain(
     }
   }
   Box(Modifier.fillMaxSize()) {
+    BackHandler(enabled = resultsShown) {
+      removeFocusFromSearchBar()
+    }
     Box(
       Modifier
         .align(Alignment.BottomEnd)

@@ -46,6 +46,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -113,7 +114,8 @@ fun GeofencePopup(
   val (initialErrorMessage, initialInputValid) = validateInput(
     geofication,
     radiusText,
-    ""
+    "",
+    context
   )
 
   var inputValid by remember { mutableStateOf(initialInputValid) }
@@ -124,32 +126,42 @@ fun GeofencePopup(
 
   val scrollState = rememberScrollState()
 
-  val geocoder = Geocoder(context)
 
-  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-    // Implementation of GeocodeListener
-    val listener = object : Geocoder.GeocodeListener {
-      override fun onGeocode(addresses: MutableList<Address>) {
-        if (addresses.isNotEmpty()) {
-          geofence = geofence.copy(fenceName =
-            context.getString(R.string.geofence_in_location, getLocationName(context, addresses[0])))
+  LaunchedEffect(Unit) {
+    if (!editMode) {
+      val geocoder = Geocoder(context)
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        // Implementation of GeocodeListener
+        val listener = object : Geocoder.GeocodeListener {
+          override fun onGeocode(addresses: MutableList<Address>) {
+            if (addresses.isNotEmpty()) {
+              geofence = geofence.copy(
+                fenceName =
+                context.getString(
+                  R.string.geofence_in_location,
+                  getLocationName(context, addresses[0])
+                )
+              )
+            }
+          }
+
+          override fun onError(errorMessage: String?) {
+            println("GEOCODER ERROR $errorMessage")
+          }
         }
-      }
-
-      override fun onError(errorMessage: String?) {
-        println("GEOCODER ERROR $errorMessage")
+        geocoder.getFromLocation(geofence.latitude, geofence.longitude, 1, listener)
+      } else {
+        val addresses = geocoder.getFromLocation(geofence.latitude, geofence.longitude, 1)
+        geofence = geofence.copy(
+          fenceName = if (!addresses.isNullOrEmpty()) {
+            context.getString(R.string.geofence_in_location, getLocationName(context, addresses[0]))
+          } else {
+            initialName
+          }
+        )
       }
     }
-    geocoder.getFromLocation(geofence.latitude, geofence.longitude, 1, listener)
-  } else {
-    val addresses = geocoder.getFromLocation(geofence.latitude, geofence.longitude, 1)
-    geofence = geofence.copy(fenceName = if (!addresses.isNullOrEmpty()) {
-      context.getString(R.string.geofence_in_location, getLocationName(context, addresses[0]))
-    } else {
-      initialName
-    })
   }
-
 
   if (deletePopupVisible) {
     DeleteConfirmPopup(
@@ -215,30 +227,32 @@ fun GeofencePopup(
               })
 
               // Delete Geofication
-              Icon(
-                imageVector = Icons.Filled.Delete,
-                contentDescription = stringResource(R.string.delete_geofication),
-                modifier = Modifier
-                  .size(32.dp)
-                  .clickable {
-                    if (geofence.active) {
-                      deletePopupVisible = true
-                    } else {
-                      onDeleteRequest()
-                    }
-                  }
-              )
+              IconButton(onClick = {
+                if (geofence.active) {
+                  deletePopupVisible = true
+                } else {
+                  onDeleteRequest()
+                }
+              }) {
+                Icon(
+                  imageVector = Icons.Filled.Delete,
+                  contentDescription = stringResource(R.string.delete_geofication),
+                  modifier = Modifier
+                    .size(28.dp)
+                )
+              }
             }
 
             // Marker Color
-            Box(Modifier.clip(CircleShape)) {
-              CircleWithColor(
-                color = geofence.color.color,
-                radius = 10.dp,
-                modifier = Modifier
-                  .clickable { colorExpanded = true }
-                  .padding(16.dp)
-              )
+            Box{
+              IconButton(onClick = {
+                colorExpanded = true
+              }) {
+                CircleWithColor(
+                  color = geofence.color.color,
+                  radius = 10.dp
+                )
+              }
               DropdownMenu(
                 modifier = Modifier.width(45.dp),
                 expanded = colorExpanded,
@@ -288,7 +302,7 @@ fun GeofencePopup(
           onValueChange = {
             geofication = geofication.copy(message = it)
 
-            val (newEM, newIV) = validateInput(geofication, radiusText, errorMessage)
+            val (newEM, newIV) = validateInput(geofication, radiusText, errorMessage, context)
             errorMessage = newEM
             inputValid = newIV
           },
@@ -298,7 +312,7 @@ fun GeofencePopup(
               IconButton(onClick = {
                 geofication = geofication.copy(message = "")
 
-                val (newEM, newIV) = validateInput(geofication, radiusText, errorMessage)
+                val (newEM, newIV) = validateInput(geofication, radiusText, errorMessage, context)
                 errorMessage = newEM
                 inputValid = newIV
               }) {
@@ -322,7 +336,7 @@ fun GeofencePopup(
             onValueChange = {
               geofence = geofence.copy(fenceName = it)
 
-              val (newEM, newIV) = validateInput(geofication, radiusText, errorMessage)
+              val (newEM, newIV) = validateInput(geofication, radiusText, errorMessage, context)
               errorMessage = newEM
               inputValid = newIV
             },
@@ -332,7 +346,7 @@ fun GeofencePopup(
                 IconButton(onClick = {
                   geofence = geofence.copy(fenceName = "")
 
-                  val (newEM, newIV) = validateInput(geofication, radiusText, errorMessage)
+                  val (newEM, newIV) = validateInput(geofication, radiusText, errorMessage, context)
                   errorMessage = newEM
                   inputValid = newIV
                 }) {
@@ -363,14 +377,14 @@ fun GeofencePopup(
             }
             radiusText = newValue
 
-            val (newEM, newIV) = validateInput(geofication, radiusText, errorMessage)
+            val (newEM, newIV) = validateInput(geofication, radiusText, errorMessage, context)
             errorMessage = newEM
             inputValid = newIV
           },
           visualTransformation = NumericUnitTransformation()
         )
 
-        CategoryItem(title = "Trigger Settings") {
+        CategoryItem(title = stringResource(R.string.trigger_settings)) {
           Column {
             Text(
               text = stringResource(R.string.trigger_event),
@@ -447,7 +461,7 @@ fun GeofencePopup(
 
         Spacer(Modifier.height(4.dp))
 
-        CategoryItem("Extras") {
+        CategoryItem(stringResource(R.string.extras)) {
           Column {
             Row(Modifier.fillMaxWidth()) {
               Switch(checked = geofication.isAlarm, onCheckedChange = {
@@ -479,7 +493,7 @@ fun GeofencePopup(
                 onValueChange = {
                   geofication = geofication.copy(link = it)
 
-                  val (newEM, newIV) = validateInput(geofication, radiusText, errorMessage)
+                  val (newEM, newIV) = validateInput(geofication, radiusText, errorMessage, context)
                   errorMessage = newEM
                   inputValid = newIV
                 },
@@ -488,7 +502,7 @@ fun GeofencePopup(
                     IconButton(onClick = {
                       geofication = geofication.copy(link = "")
 
-                      val (newEM, newIV) = validateInput(geofication, radiusText, errorMessage)
+                      val (newEM, newIV) = validateInput(geofication, radiusText, errorMessage, context)
                       errorMessage = newEM
                       inputValid = newIV
                     }) {
@@ -601,7 +615,8 @@ fun CategoryItem(title: String, content: @Composable () -> Unit) {
 fun validateInput(
   geofication: Geofication,
   radiusText: String,
-  errorMessage: String
+  errorMessage: String,
+  context: Context
 ): Pair<String, Boolean> {
   // Minimum geofence radius is 30 m, maximum is 1000 km
   val minValue = UnitUtil.appendUnit(30)
@@ -612,17 +627,17 @@ fun validateInput(
   val matcher = Pattern.compile(urlRegex).matcher(geofication.link)
 
   if (geofication.message.isEmpty()) {
-    return Pair("Please enter a notification message.", false)
+    return Pair(context.getString(R.string.please_enter_a_notification_message), false)
   }
   if (radiusText.toFloatOrNull() == null) {
-    return Pair("Please enter a valid radius.", false)
+    return Pair(context.getString(R.string.please_enter_a_valid_radius), false)
   }
   val fac = UnitUtil.distanceFactor()
   if (radiusText.toFloat() !in floor(30.0 * fac)..floor(1000000.0 * fac)) {
-    return Pair("Please enter a radius between $minValue and $maxValue.", false)
+    return Pair(context.getString(R.string.please_enter_a_radius_between_and, minValue, maxValue), false)
   }
   if (geofication.link.isNotEmpty() && !matcher.matches()) {
-    return Pair("Please enter a valid link format.", false)
+    return Pair(context.getString(R.string.please_enter_a_valid_link_format), false)
   }
 
   // No errors, input is valid

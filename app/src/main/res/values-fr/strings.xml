@@ -112,4 +112,14 @@
     <string name="alarm_notif">Réveil : %1$s</string>
     <string name="location_processing">Votre position est uniquement traitée localement sur votre appareil et via les services Google Play intégrés. Nous n\'envoyons ni ne stockons votre position en ligne.</string>
     <string name="privacy_policy">Politique de confidentialité</string>
+    <string name="tutorial_hold_down">Maintenez enfoncé sur la carte et faites glisser\npour créer votre première Geofication !</string>
+    <string name="visit_the_github_repository">Visitez le dépôt GitHub</string>
+    <string name="rate_the_app_in_the_google_play_store">Évaluez l\'application sur le Google Play Store</string>
+    <string name="contact_via_email">Contactez par e-mail</string>
+    <string name="trigger_settings">Paramètres de déclenchement</string>
+    <string name="extras">Extras</string>
+    <string name="please_enter_a_notification_message">Veuillez entrer un message de notification.</string>
+    <string name="please_enter_a_valid_radius">Veuillez entrer un rayon valide.</string>
+    <string name="please_enter_a_radius_between_and">Veuillez entrer un rayon entre %1$s et %2$s.</string>
+    <string name="please_enter_a_valid_link_format">Veuillez entrer un format de lien valide.</string>
 </resources>

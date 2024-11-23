@@ -112,4 +112,14 @@
     <string name="alarm_notif">अलार्म: %1$s</string>
     <string name="location_processing">आपकी लोकेशन केवल आपके डिवाइस पर और एकीकृत Google Play सेवाओं के माध्यम से स्थानीय रूप से प्रोसेस की जाती है। हम आपकी लोकेशन को ऑनलाइन नहीं भेजते या संग्रहीत नहीं करते हैं।</string>
     <string name="privacy_policy">गोपनीयता नीति</string>
+    <string name="tutorial_hold_down">मानचित्र पर दबाकर रखें और खींचें\nअपनी पहली Geofication बनाने के लिए!</string>
+    <string name="visit_the_github_repository">GitHub भंडार पर जाएँ</string>
+    <string name="rate_the_app_in_the_google_play_store">Google Play Store पर ऐप को रेट करें</string>
+    <string name="contact_via_email">ईमेल के माध्यम से संपर्क करें</string>
+    <string name="trigger_settings">ट्रिगर सेटिंग्स</string>
+    <string name="extras">अतिरिक्त</string>
+    <string name="please_enter_a_notification_message">कृपया एक अधिसूचना संदेश दर्ज करें।</string>
+    <string name="please_enter_a_valid_radius">कृपया एक मान्य त्रिज्या दर्ज करें।</string>
+    <string name="please_enter_a_radius_between_and">कृपया %1$s और %2$s के बीच की त्रिज्या दर्ज करें।</string>
+    <string name="please_enter_a_valid_link_format">कृपया एक मान्य लिंक प्रारूप दर्ज करें।</string>
 </resources>

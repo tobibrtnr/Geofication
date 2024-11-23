@@ -26,10 +26,12 @@ import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import de.tobibrtnr.geofication.R
 
 @Composable
 fun StartupTutorialScreen() {
@@ -65,7 +67,7 @@ fun StartupTutorialScreen() {
         ),
         textAlign = TextAlign.Center,
         fontWeight = FontWeight.Bold,
-        text = "Hold down on the map and drag\nto create your first Geofication!",
+        text = stringResource(R.string.tutorial_hold_down),
         color = Color(237, 237, 237)
 
       )
@@ -77,7 +79,8 @@ fun StartupTutorialScreen() {
         contentAlignment = Alignment.Center
       ) {
         Icon(
-          modifier = Modifier.size(70.dp)
+          modifier = Modifier
+            .size(70.dp)
             .blur(8.dp, edgeTreatment = BlurredEdgeTreatment.Unbounded),
           imageVector = Icons.Filled.SwipeDown,
           contentDescription = "Icon Shadow",

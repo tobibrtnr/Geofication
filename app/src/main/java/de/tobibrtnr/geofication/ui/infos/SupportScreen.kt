@@ -74,7 +74,7 @@ fun SupportScreen(navController: NavHostController) {
             modifier = Modifier.size(20.dp)
           )
           Spacer(modifier = Modifier.width(8.dp))
-          Text("Visit the GitHub repository")
+          Text(stringResource(R.string.visit_the_github_repository))
         }
 
         // Google Play Store
@@ -91,7 +91,7 @@ fun SupportScreen(navController: NavHostController) {
             modifier = Modifier.size(20.dp)
           )
           Spacer(modifier = Modifier.width(8.dp))
-          Text("Rate the app in the Google Play Store")
+          Text(stringResource(R.string.rate_the_app_in_the_google_play_store))
         }
 
         // Watch Ad Video
@@ -123,7 +123,7 @@ fun SupportScreen(navController: NavHostController) {
             modifier = Modifier.size(20.dp)
           )
           Spacer(modifier = Modifier.width(8.dp))
-          Text("Contact via Email")
+          Text(stringResource(R.string.contact_via_email))
         }
       }
     }
