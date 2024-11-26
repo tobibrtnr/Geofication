@@ -1,0 +1,252 @@
+@font-face {
+  font-family: 'Roboto';
+  src: url('../fonts/Roboto-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  src: url('../fonts/Roboto-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  src: url('../fonts/Roboto-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  src: url('../fonts/Roboto-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+}
+
+
+* {
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+  
+  -webkit-tap-highlight-color: transparent;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+html {
+  font-size: 16px;
+  font-family: Roboto, serif-sans;
+}
+
+body {
+  margin: 0;
+  background-color: white;
+}
+
+a {
+  color: inherit;
+} 
+
+#page-one {
+  height: 100vh;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: row;
+}
+
+#page-one-background-clip {
+  width: 100%;
+  height: 100%;
+  z-index: -2;
+  position: absolute;
+  clip-path: inset(0 0 0 0 round 0 0 0 360px);
+}
+
+#page-one-background {
+  left: -5%;
+  top: -5%;
+  width: 110%;
+  height: 110%;
+  position: absolute;
+
+  filter: blur(40px);
+  background-color: #F8ECD0;
+  opacity: 1;
+  background-image: radial-gradient(circle at center center, #C4F1D7, #F8ECD0), repeating-radial-gradient(circle at center center, #C4F1D7, #C4F1D7, 40px, transparent 80px, transparent 40px);
+  background-blend-mode: multiply;
+}
+
+#page-two {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+#headline-wrapper {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+  filter: drop-shadow(5px 5px 50px rgba(53, 105, 75, 1));
+}
+
+h1 {
+  margin: 0;
+  margin-block: 0;
+  margin-inline: 0;
+  font-weight: bold;
+  font-size: 5.6rem;
+  color: rgba(0, 0, 0, 0.7)
+}
+
+h2 {
+  font-size: 2.5rem;
+  margin: 0;
+  margin-block: 0;
+  margin-inline: 0;
+  color: rgba(0,0,0,0.5)
+}
+
+.link-badge {
+  height: 50px;
+  margin-top: 12.5px;
+  transition: transform 0.3s ease;
+}
+
+.link-badge:hover {
+  transform: scale(1.075);
+}
+
+.stressed {
+  color: #313B2B;
+}
+
+#screenshot-wrapper {
+  height: 100vh;
+  width: 45%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px
+}
+
+#app-screenshot {
+  height: 100%;
+  filter: drop-shadow(0px 0px 10px rgba(0,0,0,0.5));
+  animation: float 7s ease-in-out infinite;
+}
+
+/* Animation to make screenshot move a bit */
+@keyframes float {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate(-2px, 3px) rotate(-0.5deg);
+  }
+  50% {
+    transform: translate(3px, -2px) rotate(0.5deg);
+  }
+  75% {
+    transform: translate(-3px, -1px) rotate(-0.3deg);
+  }
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+}
+
+#info-wrapper {
+  width: 100%;
+  max-width: 1024px;
+  padding-top: 20px;
+  padding-left: 20px;
+  padding-right: 20px;
+  gap: 50px;
+  display: flex;
+  flex-direction: column;
+}
+
+.info-container {
+  background-color: #B2D69E;
+  padding: 20px;
+  border-radius: 40px;
+}
+
+#footer {
+  margin-top: 50px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  color: #7F7F7F;
+  z-index: 1;
+}
+
+.page-two-button {
+  background-color: white;
+  position: absolute;
+  bottom: 30px;
+  left: 30px;
+  padding: 10px;
+  height: 60px;
+  width: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  z-index: 5;
+  box-shadow: 0px 0px 12px -2px rgba(0, 0, 0, 0.2);
+  text-decoration: none;
+  color: #313B2C;
+}
+
+/* Mobile layout */
+@media only screen and (max-width: 960px) {
+  #page-one {
+    flex-direction: column;
+    height: fit-content;
+    align-items: center;
+  }
+
+  h1 {
+    font-size: 3.3rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  .page-two-button {
+    display: none;
+  }
+
+  #page-one-background-clip {
+    clip-path: none;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+ body {
+  background-color: #1f1f1f;
+ }
+
+ .light-font {
+  color: rgb(213, 217, 212);
+ }
+
+ .stressed {
+  color: #9EC591;
+ }
+
+}

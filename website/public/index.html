@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <link rel="apple-touch-icon" sizes="180x180" href="resources/img/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="resources/img/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="resources/img/favicon/favicon-16x16.png">
+  <link rel="manifest" href="resources/img/favicon/site.webmanifest">
+  <link rel="stylesheet" type="text/css" href="resources/css/styles.css">
+  <link rel="stylesheet" type="text/css" href="resources/css/materialsymbols.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Geofication</title>
+</head>
+
+<body>
+    <!-- First page -->
+    <div id="page-one">
+      <!-- Left side -->
+      <div id="headline-wrapper">
+        <div>
+          <h1>Geofication</h1>
+          <h2>location-based reminders</h2>
+          <div style="display: flex; flex-direction: row; gap: 12.5px">
+
+            <a href="https://www.github.com/tobibrtnr/Geofication" target="_blank">
+              <img src="resources/img/github_black.webp" class="link-badge">
+            </a>
+
+            <a href="https://play.google.com/store/apps/details?id=de.tobibrtnr.geofication" target="_blank">
+              <img src="resources/img/play_store.webp" class="link-badge">
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Right side -->
+      <div id="screenshot-wrapper">
+        <picture style="height: 100%">
+          <source srcset="resources/img/screenshot_dark.webp" media="(prefers-color-scheme: dark)">
+          <source srcset="resources/img/screenshot_light.webp" media="(prefers-color-scheme: light)">
+          <img src="resources/img/screenshot_light.webp" alt="App Screenshot" id="app-screenshot">
+      </picture>
+      </div>
+        
+      <!-- Background -->
+      <div id="page-one-background-clip">
+       <div id="page-one-background"></div>
+      </div>
+
+      <!-- Go down button -->
+      <a class="page-two-button" href="#page-two">
+        <span class="material-symbols-outlined">
+          arrow_downward
+        </span>
+      </a>
+    </div>
+
+    <!-- Second page -->
+    <div id="page-two">
+      <div id="info-wrapper">
+        <div>
+          <h2 class="light-font">
+            <span class="stressed">Never forget an important task again!</span> With Geofication, you can create, edit and
+            visualize location-based reminders. 
+          </h2>
+        </div>
+        <div class="info-container" style="padding: 30px">
+          <h2>
+            <span class="material-symbols-outlined">
+              lock
+            </span>
+            In order to handle the location-based notifications, only the Geofencing API of the
+            integrated Google Play Services is used. This means that the app does not send your
+            location and we do not process it on a server.
+          </h2>
+        </div>
+        <div>
+          <h2 class="light-font" style="text-align: right;">
+            This app is <span class="stressed">free, open-source</span> and will be improved with your help and feedback.
+            You can find the code in a <a href="https://www.github.com/tobibrtnr/Geofication" target="_blank">public repository on GitHub</a>.
+          </h2>
+        </div>
+      </div>
+      
+        <div id="footer">
+          <div>
+            © 2025 TobiBrtnr.
+          </div>
+          <a href="privacy">
+            Privacy Policy
+          </a>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 100">
+            <defs>
+              <linearGradient id="repeating-gradient" x1="0%" y1="0%" x2="100%" y2="0%" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#A9D49D" />
+                <stop offset="25%" stop-color="#C5D59C" />
+                <stop offset="50%" stop-color="#A9D49D" />
+                <stop offset="75%" stop-color="#A3CB96" />
+                <stop offset="100%" stop-color="#A9D49D" />
+              </linearGradient>
+            </defs>
+            <path transform="scale(1, 0.33)" fill="url(#repeating-gradient)" fill-opacity="1" d="M0,64L26.7,101.3C53.3,139,107,213,160,250.7C213.3,288,267,288,320,266.7C373.3,245,427,203,480,160C533.3,117,587,75,640,85.3C693.3,96,747,160,800,176C853.3,192,907,160,960,154.7C1013.3,149,1067,171,1120,197.3C1173.3,224,1227,256,1280,240C1333.3,224,1387,160,1413,128L1440,96L1440,320L1413.3,320C1386.7,320,1333,320,1280,320C1226.7,320,1173,320,1120,320C1066.7,320,1013,320,960,320C906.7,320,853,320,800,320C746.7,320,693,320,640,320C586.7,320,533,320,480,320C426.7,320,373,320,320,320C266.7,320,213,320,160,320C106.7,320,53,320,27,320L0,320Z"></path>
+          </svg>
+        </div>
+
+    </div>
+      
+  </div>
+</body>
+
+</html>

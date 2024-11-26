@@ -7,3 +7,7 @@ An Android app that lets you create custom notifications triggered by your locat
 Android Studio has been used for development, with the SonarLint plugin installed.
 
 If you have SonarQube installed, you can run a check with ```./gradlew sonarqube```. You need to specify the ```sonar.token``` in the ```local.properties``` file. For more insights, you can run ```./gradlew lint``` first.
+
+## Website
+
+The website is hosted on Google Firebase. In order to use it, you have to login first (```firebase login```) and then deploy it (```firebase deploy```).
