@@ -122,4 +122,5 @@
     <string name="please_enter_a_valid_radius">请输入有效的半径。</string>
     <string name="please_enter_a_radius_between_and">请输入 %1$s 和 %2$s 之间的半径。</string>
     <string name="please_enter_a_valid_link_format">请输入有效的链接格式。</string>
+    <string name="visit_the_app_homepage">访问应用主页</string>
 </resources>

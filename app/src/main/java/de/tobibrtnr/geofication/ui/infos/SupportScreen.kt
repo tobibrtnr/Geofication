@@ -60,6 +60,23 @@ fun SupportScreen(navController: NavHostController) {
           text = stringResource(R.string.give_support_and_feedback)
         )
 
+        // Home Page
+        Button(
+          modifier = Modifier.fillMaxWidth(),
+          onClick = {
+            openLink("https://geofication.tobibrtnr.de", context)
+          },
+          contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+        ) {
+          Icon(
+            painter = painterResource(id = R.drawable.ic_notification),
+            contentDescription = "Homepage Icon",
+            modifier = Modifier.size(20.dp)
+          )
+          Spacer(modifier = Modifier.width(8.dp))
+          Text(stringResource(R.string.visit_the_app_homepage))
+        }
+
         // Github Repository
         Button(
           modifier = Modifier.fillMaxWidth(),

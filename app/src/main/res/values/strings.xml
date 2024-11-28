@@ -122,4 +122,5 @@
     <string name="please_enter_a_valid_radius">Please enter a valid radius.</string>
     <string name="please_enter_a_radius_between_and">Please enter a radius between %1$s and %2$s.</string>
     <string name="please_enter_a_valid_link_format">Please enter a valid link format.</string>
+    <string name="visit_the_app_homepage">Visit the app homepage</string>
 </resources>

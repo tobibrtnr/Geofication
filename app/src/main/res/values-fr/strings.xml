@@ -122,4 +122,5 @@
     <string name="please_enter_a_valid_radius">Veuillez entrer un rayon valide.</string>
     <string name="please_enter_a_radius_between_and">Veuillez entrer un rayon entre %1$s et %2$s.</string>
     <string name="please_enter_a_valid_link_format">Veuillez entrer un format de lien valide.</string>
+    <string name="visit_the_app_homepage">Visitez la page d\'accueil de l\'application</string>
 </resources>

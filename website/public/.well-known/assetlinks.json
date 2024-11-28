@@ -1,0 +1,14 @@
+[
+    {
+      "relation": [
+        "delegate_permission/common.handle_all_urls"
+      ],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "de.tobibrtnr.geofication",
+        "sha256_cert_fingerprints": [
+          "E8:DE:0E:06:B8:DA:E8:19:85:97:CA:D8:01:98:D9:7B:07:DB:E3:6A:0A:28:D5:E8:07:65:0F:92:2C:6C:FE:F9"
+        ]
+      }
+    }
+  ]

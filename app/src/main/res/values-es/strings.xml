@@ -122,4 +122,5 @@
     <string name="please_enter_a_valid_radius">Por favor, introduce un radio válido.</string>
     <string name="please_enter_a_radius_between_and">Por favor, introduce un radio entre %1$s y %2$s.</string>
     <string name="please_enter_a_valid_link_format">Por favor, introduce un formato de enlace válido.</string>
+    <string name="visit_the_app_homepage">Visita la página de inicio de la aplicación</string>
 </resources>

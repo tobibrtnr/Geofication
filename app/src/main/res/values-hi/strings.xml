@@ -122,4 +122,5 @@
     <string name="please_enter_a_valid_radius">कृपया एक मान्य त्रिज्या दर्ज करें।</string>
     <string name="please_enter_a_radius_between_and">कृपया %1$s और %2$s के बीच की त्रिज्या दर्ज करें।</string>
     <string name="please_enter_a_valid_link_format">कृपया एक मान्य लिंक प्रारूप दर्ज करें।</string>
+    <string name="visit_the_app_homepage">ऐप होमपेज पर जाएं</string>
 </resources>
