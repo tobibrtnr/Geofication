@@ -10,7 +10,7 @@ data class Setting(
   val value: ByteArray
 ) {
 
-  // Generated
+  // Generated equals function
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (javaClass != other?.javaClass) return false

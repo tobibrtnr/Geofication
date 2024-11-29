@@ -8,10 +8,6 @@ class GeoficationRepository(private val geoficationDao: GeoficationDao) {
 
   fun getAllFlow(): Flow<List<Geofication>> = geoficationDao.getAllFlow()
 
-  suspend fun loadById(geoId: Int): Geofication = geoficationDao.loadById(geoId)
-
-  suspend fun getByGeofence(fenceId: Int): List<Geofication> = geoficationDao.getByGeofence(fenceId)
-
   suspend fun insertAll(vararg geofications: Geofication) = geoficationDao.insertAll(*geofications)
 
   suspend fun delete(gid: Int) = geoficationDao.delete(gid)

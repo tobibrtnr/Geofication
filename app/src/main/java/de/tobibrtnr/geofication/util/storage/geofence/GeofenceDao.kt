@@ -14,9 +14,6 @@ interface GeofenceDao {
   @Query("SELECT * FROM geofence")
   fun getAllFlow(): Flow<List<Geofence>>
 
-  @Query("SELECT * FROM geofence WHERE id = :geoId")
-  suspend fun loadById(geoId: Int): Geofence
-
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   suspend fun insert(geofence: Geofence): Long
 

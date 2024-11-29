@@ -16,8 +16,9 @@ import java.util.Locale
 class LocaleUtil {
   companion object {
 
-    // true is meter, false is foot
+    // currently set locale
     private var currentLocale: String = ""
+
 
     fun init(context: Context) {
       CoroutineScope(SupervisorJob()).launch {
@@ -30,7 +31,7 @@ class LocaleUtil {
         } catch (e: NullPointerException) {
           // locale not set, use auto language or english as fallback.
           val languageCodes by lazy { context.resources.getStringArray(R.array.language_codes) }
-          val localeStrings = (Locale.getDefault().language.split("[-_]+"))
+          val localeStrings = Locale.getDefault().language.split("[-_]+")
 
           if (languageCodes.contains(localeStrings[0])) {
             setLocale(context, localeStrings[0])

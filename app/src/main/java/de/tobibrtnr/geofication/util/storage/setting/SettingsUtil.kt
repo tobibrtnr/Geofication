@@ -17,35 +17,41 @@ class SettingsUtil {
       CoroutineScope(SupervisorJob()).launch {
         val db = ServiceProvider.database()
         val setDao = db.settingsDao()
+
+        // Set theme mode setting
         themeMode = try {
           String(setDao.getSetting("themeMode"))
         } catch (e: NullPointerException) {
-          // Setting does not exist yet
+          // Default setting: Use device theme
           "auto"
         }
 
+        // Set power saving popup setting
         powerPopup = try {
           val byteArray = setDao.getSetting("powerPopup")
           byteArray.isNotEmpty() && byteArray[0] == 1.toByte()
         } catch (e: NullPointerException) {
-          // Setting does not exist yet
+          // Default setting: Show popup on startup
           true
         }
 
+        // Set if this is the first startup of the app
         firstStartup = try {
           val byteArray = setDao.getSetting("firstStartup")
           byteArray.isNotEmpty() && byteArray[0] == 1.toByte()
         } catch (e: NullPointerException) {
-          // Setting does not exist yet
+          // Default: yes
           true
         }
       }
     }
 
+    // Get theme mode setting
     fun getThemeMode(): String {
       return themeMode
     }
 
+    // Set theme mode setting
     fun setThemeMode(new: String) {
       themeMode = new;
       CoroutineScope(SupervisorJob()).launch {
@@ -56,10 +62,12 @@ class SettingsUtil {
       }
     }
 
+    // Get power popup setting
     fun getPowerPopup(): Boolean {
       return powerPopup
     }
 
+    // Set power popup setting
     fun setPowerPopup(new: Boolean) {
       powerPopup = new;
       CoroutineScope(SupervisorJob()).launch {
@@ -70,10 +78,12 @@ class SettingsUtil {
       }
     }
 
+    // Get first startup setting
     fun getFirstStartup(): Boolean {
       return firstStartup
     }
 
+    // Set first startup setting
     fun setFirstStartup(new: Boolean) {
       firstStartup = new;
       CoroutineScope(SupervisorJob()).launch {
@@ -84,6 +94,7 @@ class SettingsUtil {
       }
     }
 
+    // Reset all settings
     fun resetSettings() {
       CoroutineScope(SupervisorJob()).launch {
         val db = ServiceProvider.database()

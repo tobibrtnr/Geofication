@@ -16,12 +16,6 @@ interface GeoficationDao {
   @Query("SELECT * FROM geofication")
   fun getAllFlow(): Flow<List<Geofication>>
 
-  @Query("SELECT * FROM geofication WHERE id = :geoId")
-  suspend fun loadById(geoId: Int): Geofication
-
-  @Query("SELECT * FROM geofication WHERE fenceid = :fenceId")
-  suspend fun getByGeofence(fenceId: Int): List<Geofication>
-
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   suspend fun insertAll(vararg geofications: Geofication)
 

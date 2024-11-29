@@ -10,6 +10,7 @@ import android.os.Looper
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -46,6 +47,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
@@ -181,6 +183,14 @@ fun MapScreenMain(
     targetValue = if (firstStartup) 4.dp else 0.dp,
     animationSpec = tween(durationMillis = 200),
     label = "blur_animation"
+  )
+
+  // Animate alpaha on Map Load
+  var isMapLoaded by remember { mutableStateOf(false) }
+
+  val alpha by animateFloatAsState(
+    targetValue = if (isMapLoaded) 1f else 0.1f,
+    animationSpec = tween(durationMillis = 200), label = "mapAlpha"
   )
 
   /*
@@ -555,6 +565,10 @@ fun MapScreenMain(
       onMapClick = {
         removeFocusFromSearchBar()
       },
+      onMapLoaded = {
+        println("MAP LOADED!!!")
+        isMapLoaded = true
+      },
       onMapLongClick = {
         Vibrate.vibrate(context, 15)
         tempGeofenceLocation = it
@@ -626,7 +640,9 @@ fun MapScreenMain(
           }
         }
         .then(
-          Modifier.blur(blurRadius)
+          Modifier
+            .blur(blurRadius)
+            .alpha(alpha)
         ),
       cameraPositionState = cameraPositionState,
       contentPadding = PaddingValues.Absolute(0.dp, 60.dp, 0.dp, 0.dp),

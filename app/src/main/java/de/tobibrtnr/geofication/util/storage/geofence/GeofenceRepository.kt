@@ -8,8 +8,6 @@ class GeofenceRepository(private val geofenceDao: GeofenceDao) {
 
   fun getAllFlow(): Flow<List<Geofence>> = geofenceDao.getAllFlow()
 
-  suspend fun loadById(geoId: Int): Geofence = geofenceDao.loadById(geoId)
-
   suspend fun insert(geofence: Geofence): Long = geofenceDao.insert(geofence)
 
   suspend fun delete(gid: Int) = geofenceDao.delete(gid)

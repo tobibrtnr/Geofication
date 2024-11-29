@@ -1,6 +1,5 @@
 package de.tobibrtnr.geofication.util.storage
 
-import android.content.Context
 import de.tobibrtnr.geofication.util.misc.ServiceProvider
 import de.tobibrtnr.geofication.util.storage.setting.Setting
 import kotlinx.coroutines.CoroutineScope
@@ -11,10 +10,12 @@ import java.util.Locale
 class UnitUtil {
   companion object {
 
-    // true is meter, false is foot
+    // "true" is meter, "false" is foot
     private var currentUnit: Boolean = true
 
-    fun init(context: Context) {
+    // Initialize utility. If the setting does not exist yet,
+    // check by locale if the current country uses m or ft.
+    fun init() {
       CoroutineScope(SupervisorJob()).launch {
         currentUnit = try {
           val db = ServiceProvider.database()
@@ -29,6 +30,7 @@ class UnitUtil {
       }
     }
 
+    // Set new distance unit
     fun setDistanceUnit(value: Boolean) {
       currentUnit = value
       CoroutineScope(SupervisorJob()).launch {
@@ -39,10 +41,12 @@ class UnitUtil {
       }
     }
 
+    // Get distance unit
     fun getDistanceUnit(): Boolean {
       return currentUnit
     }
 
+    // Get distance unit specifier
     fun distanceUnit(): String {
       return if (currentUnit) {
         "m"
@@ -51,6 +55,8 @@ class UnitUtil {
       }
     }
 
+    // Append the unit specifier to a given value in meters and
+    // convert it to a bigger unit if suitable.
     fun appendUnit(meterValue: Int): String {
       return if (currentUnit) {
         if (meterValue >= 1000) {
@@ -68,6 +74,7 @@ class UnitUtil {
       }
     }
 
+    // Get the distance factor to get the current unit from meters.
     fun distanceFactor(): Double {
       return if (currentUnit) 1.0 else 3.2808398950131
     }

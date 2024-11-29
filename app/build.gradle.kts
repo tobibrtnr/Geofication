@@ -1,5 +1,3 @@
-import com.android.build.api.dsl.Lint
-import com.android.build.api.dsl.LintOptions
 import java.util.Properties
 import java.io.FileInputStream
 
@@ -75,65 +73,96 @@ android {
 }
 
 dependencies {
-  implementation("com.google.maps.android:maps-compose:5.0.1")
-  // Optionally, you can include the Compose utils library
-  implementation("com.google.maps.android:maps-compose-utils:5.0.1")
-  // Optionally, you can include the widgets library for ScaleBar, etc.
-  implementation("com.google.maps.android:maps-compose-widgets:5.0.1")
-
-  // lifecycle aware view model
-  // https://developer.android.com/codelabs/basic-android-kotlin-compose-viewmodel-and-state#4
-  implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
-
-  implementation("androidx.core:core-ktx:1.13.1")
-  implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
-  implementation("androidx.activity:activity-compose:1.9.3")
-  implementation("androidx.activity:activity-ktx:1.9.3")
   implementation(platform("androidx.compose:compose-bom:2024.04.00"))
-  implementation("androidx.compose.ui:ui:1.7.5")
-  implementation("androidx.compose.ui:ui-graphics:1.7.5")
-  implementation("androidx.compose.ui:ui-tooling-preview:1.7.5")
-  implementation("androidx.compose.material3:material3:1.3.1")
-  implementation("androidx.compose.material:material-icons-extended:1.7.5")
 
-  implementation("com.google.android.gms:play-services-maps:19.0.0")
+  // Android Kotlin core
+  val coreVersion = "1.13.1"
+  implementation("androidx.core:core-ktx:$coreVersion")
+
+  // Lifecycle aware view model
+  // https://developer.android.com/codelabs/basic-android-kotlin-compose-viewmodel-and-state#4
+  val lifecycleVersion = "2.8.7"
+  implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycleVersion")
+  implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion")
+
+  // Navigation for Jetpack Compose
+  val navigationVersion = "2.8.4"
+  implementation("androidx.navigation:navigation-compose:$navigationVersion")
+
+  // Activities for Jetpack Compose
+  val activityVersion = "1.9.3"
+  implementation("androidx.activity:activity-compose:$activityVersion")
+  implementation("androidx.activity:activity-ktx:$activityVersion")
+
+  // Jetpack compose libaries
+  val composeVersion = "1.7.5"
+  implementation("androidx.compose.ui:ui:$composeVersion")
+  implementation("androidx.compose.ui:ui-graphics:$composeVersion")
+  implementation("androidx.compose.ui:ui-tooling-preview:$composeVersion")
+  implementation("androidx.compose.material:material-icons-extended:$composeVersion")
+  implementation("androidx.compose.animation:animation-graphics-android:$composeVersion")
+
+  // WorkManager for Geofication trigger handling after x minutes
+  val workVersion = "2.9.1"
+  implementation("androidx.work:work-runtime-ktx:$workVersion")
+
+  // Android Material implementation
+  val materialVersion = "1.12.0"
+  implementation("com.google.android.material:material:$materialVersion")
+
+  // Material 3 for Jetpack Compose
+  val material3Version = "1.3.1"
+  implementation("androidx.compose.material3:material3:$material3Version")
 
   // await
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.0")
+  val awaitVersion = "1.8.0"
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:$awaitVersion")
 
-  // Geofencing
-  implementation("com.google.android.gms:play-services-location:21.3.0")
+  // Google Play Services for using Google Maps SDK
+  val playMapsVersion = "19.0.0"
+  implementation("com.google.android.gms:play-services-maps:$playMapsVersion")
 
-  // Nav - From Cupcake
-  implementation("androidx.navigation:navigation-compose:2.8.3")
+  // Google Play Services for using Geofencing API
+  val playLocationVersion = "21.3.0"
+  implementation("com.google.android.gms:play-services-location:$playLocationVersion")
 
-  implementation("com.google.android.material:material:1.12.0")
+  // In-app Play Store rating
+  val playReviewVersion = "2.0.2"
+  implementation("com.google.android.play:review:$playReviewVersion")
+  implementation("com.google.android.play:review-ktx:$playReviewVersion")
+
+  // Google Maps SDK for Jetpack Compose
+  val mapsVersion = "5.0.1"
+  implementation("com.google.maps.android:maps-compose:$mapsVersion")
+  implementation("com.google.maps.android:maps-compose-utils:$mapsVersion")
+  implementation("com.google.maps.android:maps-compose-widgets:$mapsVersion")
 
   // Room - Data Storage
   val roomVersion = "2.6.1"
-  implementation("androidx.room:room-runtime:$roomVersion")
-  annotationProcessor("androidx.room:room-compiler:$roomVersion")
-  // To use Kotlin Symbol Processing (KSP)
-  ksp("androidx.room:room-compiler:$roomVersion")
-  // optional - Kotlin Extensions and Coroutines support for Room
   implementation("androidx.room:room-ktx:$roomVersion")
+  implementation("androidx.room:room-runtime:$roomVersion")
 
   // Accompanist, utilities for e.g. permission handling
-  implementation("com.google.accompanist:accompanist-permissions:0.34.0")
-
-  // WorkManager for Geofication trigger handling after x minutes
-  implementation("androidx.work:work-runtime-ktx:2.9.1")
-
-  // In-app Play Store rating
-  implementation("com.google.android.play:review:2.0.2")
-  implementation("com.google.android.play:review-ktx:2.0.2")
+  val accompanistVersion = "0.34.0"
+  implementation("com.google.accompanist:accompanist-permissions:$accompanistVersion")
 
   // Display OSS licenses
-  implementation("com.google.android.gms:play-services-oss-licenses:17.1.0")
+  val ossVersion = "17.1.0"
+  implementation("com.google.android.gms:play-services-oss-licenses:$ossVersion")
 
-  implementation("androidx.core:core-splashscreen:1.0.1")
+  // Custom splash screen
+  val splashScreenVersion = "1.0.1"
+  implementation("androidx.core:core-splashscreen:$splashScreenVersion")
 
-  testImplementation("junit:junit:4.13.2")
+  // Kotlin Symbol Processor for Room library
+  ksp("androidx.room:room-compiler:$roomVersion")
+
+  // Annotations for Room library
+  annotationProcessor("androidx.room:room-compiler:$roomVersion")
+
+  // jUnit for testing
+  val jUnitVersion = "4.13.2"
+  testImplementation("junit:junit:$jUnitVersion")
 
   androidTestImplementation("androidx.test.ext:junit:1.2.1")
   androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
@@ -142,6 +171,10 @@ dependencies {
 
   debugImplementation("androidx.compose.ui:ui-tooling")
   debugImplementation("androidx.compose.ui:ui-test-manifest")
+}
+
+ksp {
+  arg("room.schemaLocation", "$projectDir/schemas")
 }
 
 secrets {

@@ -32,6 +32,7 @@ fun Compass(modifier: Modifier, cameraPositionState: CameraPositionState, onPres
     derivedStateOf { cameraPositionState.position.bearing }
   }
 
+  // Use default Material Theme colors for the compass
   val bgColor = MaterialTheme.colorScheme.primaryContainer
   val borderColor = MaterialTheme.colorScheme.onSurface.copy(alpha=0.12f)
 

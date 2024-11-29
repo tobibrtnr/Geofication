@@ -29,12 +29,6 @@ class GeoficationViewModel(
       .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
   }
 
-  suspend fun getByGeofence(fenceId: Int): List<Geofication> {
-    return withContext(dispatcher) {
-      repository.getByGeofence(fenceId)
-    }
-  }
-
   suspend fun searchGeofications(query: String): List<GeoficationGeofence> {
     return withContext(dispatcher) {
       repository.searchGeofications(query)
