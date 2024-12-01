@@ -12,6 +12,8 @@ import android.media.RingtoneManager
 import android.os.Build
 import android.os.IBinder
 import android.os.PowerManager
+import de.tobibrtnr.geofication.ACTION_EXECUTE_FUNCTION
+import de.tobibrtnr.geofication.NOTIFICATION_ID
 import de.tobibrtnr.geofication.util.misc.Vibrate
 import de.tobibrtnr.geofication.util.misc.createNotification
 import de.tobibrtnr.geofication.util.misc.getByteInput
@@ -19,9 +21,6 @@ import de.tobibrtnr.geofication.util.storage.geofence.Geofence
 import de.tobibrtnr.geofication.util.storage.geofication.Geofication
 import de.tobibrtnr.geofication.util.storage.log.LogUtil
 
-
-const val ACTION_EXECUTE_FUNCTION = "de.tobibrtnr.ACTION_EXECUTE_FUNCTION"
-private const val NOTIFICATION_ID = 1
 class AlarmForegroundService : Service() {
 
   private var mediaPlayer: MediaPlayer = MediaPlayer()
@@ -72,7 +71,7 @@ class AlarmForegroundService : Service() {
     // Start vibrate with pattern
     Vibrate.startVibratePattern(this, 1000)
 
-    return START_NOT_STICKY;
+    return START_NOT_STICKY
   }
 
   override fun onBind(intent: Intent?): IBinder? {

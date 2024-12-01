@@ -52,8 +52,8 @@
             android:enabled="true"
             android:exported="false">
             <intent-filter>
-                <action android:name="DISABLE_ACTION" />
-                <action android:name="DELETE_ACTION" />
+                <action android:name="de.tobibrtnr.geofication.DISABLE_ACTION" />
+                <action android:name="de.tobibrtnr.geofication.DELETE_ACTION" />
             </intent-filter>
         </receiver>
 

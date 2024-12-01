@@ -71,7 +71,6 @@ fun SettingsScreen(
   innerPadding: PaddingValues,
   geofenceViewModel: GeofenceViewModel
 ) {
-
   val context = LocalContext.current
   val activity = context as? ComponentActivity
 

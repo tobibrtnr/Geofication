@@ -6,7 +6,8 @@ import android.content.Intent
 import de.tobibrtnr.geofication.util.misc.ServiceProvider
 import kotlinx.coroutines.runBlocking
 
-
+// When the phone is rebooted, you have to re-add all
+// existing geofences in order to be triggered correctly
 class BootCompletedReceiver : BroadcastReceiver() {
   override fun onReceive(context: Context, intent: Intent) {
     if (intent.action != Intent.ACTION_BOOT_COMPLETED) {
@@ -19,6 +20,7 @@ class BootCompletedReceiver : BroadcastReceiver() {
   }
 }
 
+// Re-add all existing geofences
 suspend fun addAllGeofences(context: Context) {
   ServiceProvider.setInstance(context)
 

@@ -15,18 +15,18 @@ import android.os.Build
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import de.tobibrtnr.geofication.ACTION_EXECUTE_FUNCTION
+import de.tobibrtnr.geofication.DELETE_ACTION
+import de.tobibrtnr.geofication.DISABLE_ACTION
+import de.tobibrtnr.geofication.CHANNEL_ID
+import de.tobibrtnr.geofication.NOTIFICATION_ID
 import de.tobibrtnr.geofication.MainActivity
 import de.tobibrtnr.geofication.R
-import de.tobibrtnr.geofication.util.receivers.ACTION_EXECUTE_FUNCTION
 import de.tobibrtnr.geofication.util.receivers.AlarmForegroundService
 import de.tobibrtnr.geofication.util.receivers.NotificationReceiver
 import de.tobibrtnr.geofication.util.storage.geofence.Geofence
 import de.tobibrtnr.geofication.util.storage.geofication.Geofication
 import kotlin.random.Random
-
-// Constants
-private const val CHANNEL_ID = "geofication_general"
-private const val NOTIFICATION_ID = 1
 
 /**
  * Send a notification with a title and message.
@@ -121,7 +121,7 @@ fun createNotification(context: Context, fence: Geofence, notif: Geofication): N
     // Add quick action buttons depending on trigger mode and alarm clock
     if (notif.onTrigger == 0 || notif.onTrigger == 1) {
       val deleteIntent = Intent(context, NotificationReceiver::class.java).apply {
-        action = "DELETE_ACTION"
+        action = DELETE_ACTION
         putExtra("id", fence.id)
       }
       val deletePendingIntent = PendingIntent.getBroadcast(
@@ -138,7 +138,7 @@ fun createNotification(context: Context, fence: Geofence, notif: Geofication): N
     }
     if (notif.onTrigger == 0) {
       val disableIntent = Intent(context, NotificationReceiver::class.java).apply {
-        action = "DISABLE_ACTION"
+        action = DISABLE_ACTION
         putExtra("id", notif.id)
       }
       val deletePendingIntent = PendingIntent.getBroadcast(
