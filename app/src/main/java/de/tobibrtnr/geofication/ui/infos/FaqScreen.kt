@@ -45,7 +45,7 @@ import androidx.core.content.ContextCompat.getString
 import androidx.navigation.NavHostController
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import de.tobibrtnr.geofication.R
-import de.tobibrtnr.geofication.util.storage.UnitUtil
+import de.tobibrtnr.geofication.util.storage.setting.UnitUtil
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

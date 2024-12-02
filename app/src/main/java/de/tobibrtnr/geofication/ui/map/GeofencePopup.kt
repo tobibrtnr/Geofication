@@ -53,7 +53,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -72,7 +71,7 @@ import de.tobibrtnr.geofication.ui.common.SegmentedRadioButtons
 import de.tobibrtnr.geofication.ui.startup.InfoDialog
 import de.tobibrtnr.geofication.util.misc.NumericUnitTransformation
 import de.tobibrtnr.geofication.util.misc.Vibrate
-import de.tobibrtnr.geofication.util.storage.UnitUtil
+import de.tobibrtnr.geofication.util.storage.setting.UnitUtil
 import de.tobibrtnr.geofication.util.storage.geofence.Geofence
 import de.tobibrtnr.geofication.util.storage.geofence.GeofenceViewModel
 import de.tobibrtnr.geofication.util.storage.geofication.Geofication

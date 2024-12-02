@@ -36,7 +36,7 @@ fun GeoficationTheme(
   if (!view.isInEditMode) {
     SideEffect {
       val window = (view.context as Activity).window
-      window.statusBarColor = Color.Transparent.toArgb() //colorScheme.surface.toArgb() //colorScheme.primary.toArgb()
+      window.statusBarColor = Color.Transparent.toArgb()
       WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
     }
   }

@@ -50,8 +50,8 @@ import de.tobibrtnr.geofication.R
 import de.tobibrtnr.geofication.ui.common.DeleteAllConfirmPopup
 import de.tobibrtnr.geofication.ui.common.ResetSettingsPopup
 import de.tobibrtnr.geofication.util.misc.Vibrate
-import de.tobibrtnr.geofication.util.storage.LocaleUtil
-import de.tobibrtnr.geofication.util.storage.UnitUtil
+import de.tobibrtnr.geofication.util.storage.setting.LocaleUtil
+import de.tobibrtnr.geofication.util.storage.setting.UnitUtil
 import de.tobibrtnr.geofication.util.storage.geofence.GeofenceViewModel
 import de.tobibrtnr.geofication.util.storage.log.LogEntry
 import de.tobibrtnr.geofication.util.storage.log.LogUtil
@@ -239,7 +239,7 @@ fun SettingsScreen(
                 selected = isSelected,
                 onClick = {
                   selectedLocale = languageCodes[index]
-                  LocaleUtil.setLocale(context, languageCodes[index])
+                  LocaleUtil.setLocale(languageCodes[index])
 
                   activity?.restartApp()
                 },

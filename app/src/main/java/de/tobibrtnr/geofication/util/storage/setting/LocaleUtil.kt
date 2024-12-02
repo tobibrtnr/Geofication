@@ -1,13 +1,9 @@
-package de.tobibrtnr.geofication.util.storage
+package de.tobibrtnr.geofication.util.storage.setting
 
 import android.content.Context
-import android.content.res.Configuration
 import de.tobibrtnr.geofication.R
 import de.tobibrtnr.geofication.util.misc.ServiceProvider
-import de.tobibrtnr.geofication.util.storage.setting.Setting
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.nio.charset.Charset
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -16,69 +12,62 @@ import java.util.Locale
 class LocaleUtil {
   companion object {
 
-    // currently set locale
+    // Currently set locale
     private var currentLocale: String = ""
 
-
+    // Suppress "This key/object cannot ever be present in the collection"
+    // at "if (languageCodes.contains(localeStrings[0])) {"
+    @SuppressWarnings("kotlin:S2175")
     fun init(context: Context) {
-      CoroutineScope(SupervisorJob()).launch {
+      runBlocking {
         currentLocale = try {
           val db = ServiceProvider.database()
           val setDao = db.settingsDao()
           val curLoc = setDao.getSetting("locale").toString(Charset.defaultCharset())
-          setLocale(context, curLoc)
+          setLocale(curLoc)
           curLoc
         } catch (e: NullPointerException) {
-          // locale not set, use auto language or english as fallback.
+          // Locale not set, use auto language or english as fallback.
           val languageCodes by lazy { context.resources.getStringArray(R.array.language_codes) }
           val localeStrings = Locale.getDefault().language.split("[-_]+")
 
           if (languageCodes.contains(localeStrings[0])) {
-            setLocale(context, localeStrings[0])
+            setLocale(localeStrings[0])
             localeStrings[0]
           } else {
-            setLocale(context, "en")
+            // Default locale is english
+            setLocale("en")
             "en"
           }
-
         }
       }
     }
 
-    fun setLocale(context: Context, value: String) {
+    // Set a new locale setting
+    fun setLocale(value: String) {
       currentLocale = value
-      CoroutineScope(SupervisorJob()).launch {
-        val db = ServiceProvider.database()
-        val setDao = db.settingsDao()
-        val localeSetting = Setting("locale", value.toByteArray(Charset.defaultCharset()))
+
+      val db = ServiceProvider.database()
+      val setDao = db.settingsDao()
+      val localeSetting = Setting("locale", value.toByteArray(Charset.defaultCharset()))
+
+      runBlocking {
         setDao.setSetting(localeSetting)
-        setContextLocale(context, value)
       }
     }
 
+    // Get currently set locale
     fun getLocale(): String {
       return currentLocale
     }
 
+    // Get date time by currently set locale
     fun getLocalDateTime(timestamp: Long, context: Context): String {
       val locale = Locale(currentLocale)
       val dateFormat = SimpleDateFormat(context.getString(R.string.date_time_format), locale)
       val date = Date(timestamp)
 
       return dateFormat.format(date)
-    }
-
-    private fun setContextLocale(context: Context, language: String) {
-      context.resources.apply {
-        val locale = Locale(language)
-        val config = Configuration(configuration)
-
-        context.createConfigurationContext(configuration)
-        Locale.setDefault(locale)
-        config.setLocale(locale)
-        // TODO use non deprecated method
-        context.resources.updateConfiguration(config, displayMetrics)
-      }
     }
   }
 }

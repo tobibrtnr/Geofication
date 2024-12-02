@@ -175,8 +175,6 @@ fun GeoficationApp(
         startDestination = "${GeoficationScreen.Start.name}/{openGeofence}/{edit}",
         modifier = Modifier
           .fillMaxSize()
-        //.verticalScroll(rememberScrollState())
-        //.padding(innerPadding)
       ) {
         composable(
           route = "${GeoficationScreen.Start.name}/{openGeofence}/{edit}",

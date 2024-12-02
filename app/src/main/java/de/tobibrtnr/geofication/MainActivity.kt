@@ -11,6 +11,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import android.animation.ObjectAnimator
+import android.app.Activity
+import android.content.Context
 import android.view.View
 import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
@@ -20,11 +22,13 @@ import de.tobibrtnr.geofication.ui.GeoficationApp
 import de.tobibrtnr.geofication.ui.theme.GeoficationTheme
 import de.tobibrtnr.geofication.util.misc.ServiceProvider
 import de.tobibrtnr.geofication.util.receivers.AlarmForegroundService
-import de.tobibrtnr.geofication.util.storage.LocaleUtil
-import de.tobibrtnr.geofication.util.storage.UnitUtil
+import de.tobibrtnr.geofication.util.storage.setting.LocaleUtil
+import de.tobibrtnr.geofication.util.storage.setting.UnitUtil
 import de.tobibrtnr.geofication.util.storage.setting.SettingsUtil
+import java.util.Locale
 
 class MainActivity : ComponentActivity() {
+
   override fun onCreate(savedInstanceState: Bundle?) {
     // Create custom splash screen with fade out animation
     val splashScreen = installSplashScreen()
@@ -38,6 +42,8 @@ class MainActivity : ComponentActivity() {
       }
       fadeOut.start()
     }
+
+    enableEdgeToEdge()
 
     super.onCreate(savedInstanceState)
 
@@ -77,11 +83,21 @@ class MainActivity : ComponentActivity() {
     }
   }
 
-  // Implementing this method stops recreating the activity when
-  // dark mode is enabled or disabled.
+  // Implementing this method restarts the activity
+  // when dark mode is enabled or disabled.
   override fun onConfigurationChanged(newConfig: Configuration) {
-    LocaleUtil.setLocale(this, LocaleUtil.getLocale())
     super.onConfigurationChanged(newConfig)
+    restartActivity(this)
+  }
+
+  // Set locale when attaching the base context at the
+  // start of the application
+  override fun attachBaseContext(newBase: Context) {
+    ServiceProvider.setInstance(newBase)
+    LocaleUtil.init(newBase)
+
+    val newContext = setContextLocale(newBase, LocaleUtil.getLocale())
+    super.attachBaseContext(newContext)
   }
 
   // Get and handle an intent query (if you select "Open with Geofication"
@@ -102,4 +118,25 @@ class MainActivity : ComponentActivity() {
     }
     return ""
   }
+}
+
+// Create a new Context object with the current
+// language applied.
+private fun setContextLocale(context: Context, language: String): Context {
+  val configuration = context.resources.configuration
+
+  val locale = Locale(language)
+  Locale.setDefault(locale)
+
+  return context.createConfigurationContext(configuration.apply {
+    setLocale(locale)
+  })
+}
+
+// Restart the app
+private fun restartActivity(activity: Activity) {
+  val intent = Intent(activity, activity::class.java)
+  intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+  activity.startActivity(intent)
+  activity.finish()
 }

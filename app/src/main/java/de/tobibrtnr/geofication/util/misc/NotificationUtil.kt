@@ -106,7 +106,13 @@ fun createNotification(context: Context, fence: Geofence, notif: Geofication): N
     val clickIntent = Intent(context, AlarmForegroundService::class.java).apply {
       action = ACTION_EXECUTE_FUNCTION
     }
-    val deleteIntent = PendingIntent.getService(context, System.currentTimeMillis().toInt(), clickIntent, PendingIntent.FLAG_IMMUTABLE)
+
+    val deleteIntent = PendingIntent.getService(
+      context,
+      System.currentTimeMillis().toInt(),
+      clickIntent,
+      PendingIntent.FLAG_IMMUTABLE
+    )
 
     builder
       .setDeleteIntent(deleteIntent)
