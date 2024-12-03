@@ -28,9 +28,6 @@ interface GeoficationDao {
   @Query("UPDATE geofication SET active = :isActive WHERE id = :gid")
   suspend fun setActive(isActive: Boolean, gid: Int)
 
-  @Query("UPDATE geofication SET active = 0 WHERE fenceid = :fenceid")
-  suspend fun deactivateAll(fenceid: Int)
-
   @Transaction
   @Query("SELECT geofication.message, geofication.active, geofence.fenceName, geofence.latitude, geofence.longitude, geofence.radius, geofence.color FROM geofication INNER JOIN geofence ON geofication.fenceId = geofence.id WHERE geofication.message LIKE '%' || :query || '%' OR geofence.fenceName LIKE '%' || :query || '%'")
   suspend fun searchGeofications(query: String): List<GeoficationGeofence>

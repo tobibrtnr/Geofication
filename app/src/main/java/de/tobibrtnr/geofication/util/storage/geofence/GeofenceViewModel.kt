@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -17,11 +18,11 @@ import de.tobibrtnr.geofication.util.misc.ServiceProvider
 import de.tobibrtnr.geofication.util.receivers.GeofenceBroadcastReceiver
 import de.tobibrtnr.geofication.util.storage.geofication.Geofication
 import de.tobibrtnr.geofication.util.storage.geofication.GeoficationRepository
+import de.tobibrtnr.geofication.util.storage.log.LogUtil
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
@@ -32,79 +33,68 @@ class GeofenceViewModel(
   private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ): ViewModel() {
 
+  // Repositories and geofencing client that will be used
   private val repository: GeofenceRepository
   private val geoficationRepository: GeoficationRepository
   private val geofencingClient: GeofencingClient
 
+  // State flow to get live view of the data
   val getAllFlow : StateFlow<List<Geofence>>
 
+  // Initialize both repositories, the GeofencingClient and state flow.
   init {
     val geofenceDao = ServiceProvider.database().geofenceDao()
     repository = GeofenceRepository(geofenceDao)
+
     val geoficationDao = ServiceProvider.database().geoficationDao()
     geoficationRepository = GeoficationRepository(geoficationDao)
+
     getAllFlow = repository.getAllFlow()
       .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
     geofencingClient = ServiceProvider.geofence()
   }
 
-  /**
-   * Add a new Geofence to database and geofencing client
-   */
+  // Add a new Geofence to the database and geofencing client
   fun addGeofence(
     context: Context,
-    daoGeofence: Geofence,
-    daoGeofication: Geofication? = null,
+    newGeofence: Geofence,
+    newGeofication: Geofication? = null,
     forceAddGeofence: Boolean = false
   ) {
     // Coroutine in order to add geofence asynchronously to storage
     CoroutineScope(SupervisorJob()).launch {
-      val newId = if (daoGeofence.id <= 0 || forceAddGeofence) {
+      val newId = if (newGeofence.id <= 0 || forceAddGeofence) {
         // Add geofence to local database
-        val idToAdd = repository.insert(daoGeofence).toInt()
+        val idToAdd = repository.insert(newGeofence).toInt()
 
         // If 8 Geofications have been created, show a rating popup
-        // TODO test internally
         if(idToAdd == 8) {
-          val manager = ReviewManagerFactory.create(context)
-          val request = manager.requestReviewFlow()
-          request.addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-              // We got the ReviewInfo object
-              val reviewInfo = task.result
-              val flow = manager.launchReviewFlow(context as Activity, reviewInfo)
-              flow.addOnCompleteListener { _ ->
-                // The flow has finished. The API does not indicate whether the user
-                // reviewed or not, or even whether the review dialog was shown. Thus, no
-                // matter the result, we continue our app flow.
-              }
-            } else {
-              // There was some problem, log or handle the error code.
-              @ReviewErrorCode val reviewErrorCode = (task.exception as ReviewException).errorCode
-              println(reviewErrorCode)
-            }
-          }
+          showReviewPopup(context)
         }
 
         idToAdd
       } else {
-        daoGeofence.id
+        newGeofence.id
       }
 
-      val newGeofence = com.google.android.gms.location.Geofence.Builder()
+      // Create Geofencing API object
+      val newGoogleGeofence = com.google.android.gms.location.Geofence.Builder()
         .setRequestId(newId.toString())
-        .setCircularRegion(daoGeofence.latitude, daoGeofence.longitude, daoGeofence.radius)
+        .setCircularRegion(newGeofence.latitude, newGeofence.longitude, newGeofence.radius)
         .setExpirationDuration(com.google.android.gms.location.Geofence.NEVER_EXPIRE)
         .setTransitionTypes(
           com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_ENTER or
               com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_EXIT)
         .build()
 
+      // Request to add new geofence
       val geofenceRequest = GeofencingRequest.Builder()
         .setInitialTrigger(com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_ENTER)
-        .addGeofence(newGeofence)
+        .addGeofence(newGoogleGeofence)
         .build()
 
+      // Intent that will be called when the geofence is triggered
       val geofencePendingIntent: PendingIntent by lazy {
         val intent = Intent(context, GeofenceBroadcastReceiver::class.java)
         PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_MUTABLE)
@@ -117,31 +107,49 @@ class GeofenceViewModel(
       ) {
         geofencingClient.addGeofences(geofenceRequest, geofencePendingIntent)
           .addOnSuccessListener {
-            // Geofence added successfully
-            println("Geofence Added:")
-            println(newGeofence)
-
-            if(daoGeofication != null) {
-              daoGeofication.fenceid = newId
+            // Geofence added successfully. If a Geofication is given, too,
+            // we also insert it and set the fence id to the new one.
+            if(newGeofication != null) {
+              newGeofication.fenceid = newId
               viewModelScope.launch {
-                geoficationRepository.insertAll(daoGeofication)
+                geoficationRepository.insertAll(newGeofication)
               }
             }
           }
           .addOnFailureListener { e ->
-            // Geofence addition failed
-            println("Add Geofence Error:")
-            println(e)
-            // TODO THIS ERROR IS IMPORTANT TO SHOW AS IT IS THROWN E.G. WHEN
-            // LOCATION PRECISION ENHANCEMENT IS DISABLED
-          }
+            // Geofence creation failed
+            LogUtil.addLog("Error while adding Geofence: $e", severity = 5)
+            Toast.makeText(context, "Error while adding Geofence.", Toast.LENGTH_SHORT).show()
+        }
       }
     }
   }
 
-  /**
-   * Delete a Geofence from database and geofencing client
-   */
+  // Opens a popup that asks the user to
+  // leave a review for the app on Google Play Store.
+  private fun showReviewPopup(context: Context) {
+    val manager = ReviewManagerFactory.create(context)
+    val request = manager.requestReviewFlow()
+    request.addOnCompleteListener { task ->
+      if (task.isSuccessful) {
+        // We got the ReviewInfo object
+        val reviewInfo = task.result
+        val flow = manager.launchReviewFlow(context as Activity, reviewInfo)
+        flow.addOnCompleteListener { _ ->
+          // The flow has finished. The API does not indicate whether the user
+          // reviewed or not, or even whether the review dialog was shown. Thus, no
+          // matter the result, we continue our app flow.
+        }
+      } else {
+        // There was some problem, log or handle the error code.
+        @ReviewErrorCode val reviewErrorCode = (task.exception as ReviewException).errorCode
+        println(reviewErrorCode)
+      }
+    }
+  }
+
+  // Delete a Geofence from database and geofencing client
+  // This also deletes all Geofications that use this Geofence with cascade.
   fun delete(gid: Int) {
     viewModelScope.launch {
       repository.delete(gid)
@@ -149,36 +157,29 @@ class GeofenceViewModel(
     }
   }
 
-  /**
-   * Increment trigger count for a Geofence
-   */
+  // Increment trigger count for a Geofence
   fun incrementTriggerCount(gid: Int) {
     viewModelScope.launch {
       repository.incrementTriggerCount(gid)
     }
   }
 
-  /**
-   * Set active state for a Geofence
-   */
+  // Set the active property for a Geofence
   fun setActive(isActive: Boolean, gid: Int) {
     viewModelScope.launch {
       repository.setActive(isActive, gid)
     }
   }
 
-  /**
-   * Delete all Geofences and Geofications
-   */
+  // Delete all Geofences (and Geofications with cascade)
   fun deleteAllGeofences() {
     viewModelScope.launch {
       repository.deleteAllGeofences()
     }
   }
 
-  /**
-   * Get current State of view model data
-   */
+  // Get current State of view model data
+  @SuppressWarnings("kotlin:S6313")
   suspend fun getAll(): List<Geofence> {
     return withContext(dispatcher) {
       repository.getAll()

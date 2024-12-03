@@ -48,7 +48,6 @@ fun SupportScreen(navController: NavHostController) {
       )
     }
   ) {
-
     Box(
       modifier = Modifier
         .padding(start = 16.dp, end = 16.dp)
@@ -61,97 +60,76 @@ fun SupportScreen(navController: NavHostController) {
         )
 
         // Home Page
-        Button(
-          modifier = Modifier.fillMaxWidth(),
+        SupportScreenButton(
+          iconId = R.drawable.ic_notification,
+          iconDesc = "Homepage Icon",
+          buttonText = stringResource(R.string.visit_the_app_homepage),
           onClick = {
             openLink("https://geofication.tobibrtnr.de", context)
-          },
-          contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
-        ) {
-          Icon(
-            painter = painterResource(id = R.drawable.ic_notification),
-            contentDescription = "Homepage Icon",
-            modifier = Modifier.size(20.dp)
-          )
-          Spacer(modifier = Modifier.width(8.dp))
-          Text(stringResource(R.string.visit_the_app_homepage))
-        }
+          }
+        )
 
         // Github Repository
-        Button(
-          modifier = Modifier.fillMaxWidth(),
+        SupportScreenButton(
+          iconId = R.drawable.github,
+          iconDesc = "GitHub Icon",
+          buttonText = stringResource(R.string.visit_the_github_repository),
           onClick = {
             openLink("https://github.com/tobibrtnr/Geofication", context)
-          },
-          contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
-        ) {
-          Icon(
-            painter = painterResource(id = R.drawable.github),
-            contentDescription = "GitHub Icon",
-            modifier = Modifier.size(20.dp)
-          )
-          Spacer(modifier = Modifier.width(8.dp))
-          Text(stringResource(R.string.visit_the_github_repository))
-        }
+          }
+        )
 
-        // Google Play Store
-        Button(
-          modifier = Modifier.fillMaxWidth(),
+        // Google Play Store page
+        SupportScreenButton(
+          iconId = R.drawable.google_play,
+          iconDesc = "Google Play Store icon",
+          buttonText = stringResource(R.string.rate_the_app_in_the_google_play_store),
           onClick = {
             openLink("https://play.google.com/store/apps/details?id=de.tobibrtnr.geofication", context)
-          },
-          contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
-        ) {
-          Icon(
-            painter = painterResource(id = R.drawable.google_play),
-            contentDescription = "Google Play Store icon",
-            modifier = Modifier.size(20.dp)
-          )
-          Spacer(modifier = Modifier.width(8.dp))
-          Text(stringResource(R.string.rate_the_app_in_the_google_play_store))
-        }
+          }
+        )
 
-        // Watch Ad Video
-        /*Button(
-          modifier = Modifier.fillMaxWidth(),
-          onClick = { /* TODO */ },
-          contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
-        ) {
-          Icon(
-            painter = painterResource(id = R.drawable.gift),
-            contentDescription = "Gift icon",
-            modifier = Modifier.size(20.dp)
-          )
-          Spacer(modifier = Modifier.width(8.dp))
-          Text("Watch a paid ad")
-        }*/
-
-        // Email
-        Button(
-          modifier = Modifier.fillMaxWidth(),
+        // Contact via email
+        SupportScreenButton(
+          iconId = R.drawable.email,
+          iconDesc = "Email icon",
+          buttonText = stringResource(R.string.contact_via_email),
           onClick = {
             openEmail("mailto:hello@tobibrtnr.de", context)
-          },
-          contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
-        ) {
-          Icon(
-            painter = painterResource(id = R.drawable.email),
-            contentDescription = "Email icon",
-            modifier = Modifier.size(20.dp)
-          )
-          Spacer(modifier = Modifier.width(8.dp))
-          Text(stringResource(R.string.contact_via_email))
-        }
+          }
+        )
       }
     }
   }
 }
 
+// A custom button with a given style suiting to the screen.
+@Composable
+fun SupportScreenButton(iconId: Int, iconDesc: String, buttonText: String, onClick: () -> Unit) {
+  Button(
+    modifier = Modifier.fillMaxWidth(),
+    onClick = {
+      onClick()
+    },
+    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+  ) {
+    Icon(
+      painter = painterResource(id = iconId),
+      contentDescription = iconDesc,
+      modifier = Modifier.size(20.dp)
+    )
+    Spacer(modifier = Modifier.width(8.dp))
+    Text(buttonText)
+  }
+}
+
+// Open a given link in the browser.
 fun openLink(link: String, context: Context) {
   val intent = Intent(Intent.ACTION_VIEW, Uri.parse(link))
   context.startActivity(intent)
 }
 
+// Open a new email to the given address.
 fun openEmail(email: String, context: Context) {
   val intent = Intent(Intent.ACTION_SENDTO).apply {
     data = Uri.parse(email)

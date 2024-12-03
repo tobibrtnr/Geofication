@@ -16,8 +16,6 @@ class GeoficationRepository(private val geoficationDao: GeoficationDao) {
 
   suspend fun setActive(isActive: Boolean, gid: Int) = geoficationDao.setActive(isActive, gid)
 
-  suspend fun deactivateAll(fenceid: Int) = geoficationDao.deactivateAll(fenceid)
-
   suspend fun searchGeofications(query: String): List<GeoficationGeofence>
     = geoficationDao.searchGeofications(query)
 }

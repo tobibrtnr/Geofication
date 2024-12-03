@@ -47,6 +47,7 @@ import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import de.tobibrtnr.geofication.R
 import de.tobibrtnr.geofication.util.storage.setting.UnitUtil
 
+// This screen displays a list of cards with frequently asked questions and their answers.
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FaqScreen(navController: NavHostController) {
@@ -109,15 +110,9 @@ fun FaqScreen(navController: NavHostController) {
         .padding(top = it.calculateTopPadding(), start = 16.dp, end = 16.dp)
     ) {
       Column {
-        //Text(
-        //  text = stringResource(R.string.further_information),
-        //  modifier = Modifier.padding(bottom = 16.dp)
-        //)
-
         LazyColumn(
           modifier = Modifier
             .fillMaxSize()
-            //.padding(vertical = 16.dp)
         ) {
           items(faqList.size) { index ->
             FaqItem(question = faqList[index].first, answer = faqList[index].second)
@@ -128,6 +123,7 @@ fun FaqScreen(navController: NavHostController) {
   }
 }
 
+// Expandable Card with question and answer texts.
 @Composable
 fun FaqItem(question: String, answer: String) {
   var isExpanded by remember { mutableStateOf(false) }

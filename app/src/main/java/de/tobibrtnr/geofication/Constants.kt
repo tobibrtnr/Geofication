@@ -9,4 +9,7 @@ const val DELETE_ACTION = "de.tobibrtnr.geofication.DELETE_ACTION"
 const val DISABLE_ACTION = "de.tobibrtnr.geofication.DISABLE_ACTION"
 
 // Alarm foreground receiver
-const val ACTION_EXECUTE_FUNCTION = "de.tobibrtnr.ACTION_EXECUTE_FUNCTION"
+const val ACTION_EXECUTE_FUNCTION = "de.tobibrtnr.geofication.ACTION_EXECUTE_FUNCTION"
+
+// Handle Geofication delayed
+const val ACTION_DELAY = "de.tobibrtnr.geofication.GEOFICATION_DELAY"
