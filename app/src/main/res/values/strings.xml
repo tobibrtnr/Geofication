@@ -77,9 +77,9 @@
     <string name="geofication_notifications">Geofication Notifications</string>
     <string name="geofication">Geofication</string>
     <string name="language">Language</string>
-    <string name="creation_time">Creation Time: %1$s</string>
+    <string name="creation_time">Created on %1$s</string>
     <string name="last_edit">Last Edit: %1$s</string>
-    <string name="date_time_format">yyyy-MM-dd HH:mm</string>
+    <string name="date_time_format">yyyy-MM-dd, HH:mm</string>
     <string name="battery_alert_icon">Battery Alert Icon</string>
     <string name="battery_saver_mode_is_active">Battery Saver Mode</string>
     <string name="battery_saver_mode_text">Having the Battery Saver Mode activated can lead to Geofications being triggered delayed or not at all. Do you want to disable it?</string>

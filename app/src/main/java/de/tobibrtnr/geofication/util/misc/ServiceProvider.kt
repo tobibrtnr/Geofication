@@ -10,23 +10,28 @@ import de.tobibrtnr.geofication.util.storage.geofence.GeofenceViewModel
 import de.tobibrtnr.geofication.util.storage.geofication.GeoficationViewModel
 import java.lang.IllegalStateException
 
+// Once initialized at the start of the app, this class allows
+// us to access different services like storage or location
+// without having to pass a context or check for initialization
 class ServiceProvider private constructor(context: Context) {
-  private var fusedLocationClient: FusedLocationProviderClient
-  private var geofencingClient: GeofencingClient
-  private var appDatabase: AppDatabase
+  // Location client
+  private var fusedLocationClient: FusedLocationProviderClient =
+    LocationServices.getFusedLocationProviderClient(context)
 
+  // Geofencing client
+  private var geofencingClient: GeofencingClient =
+    LocationServices.getGeofencingClient(context)
+
+  // Room database
+  private var appDatabase: AppDatabase =
+    Room.databaseBuilder(
+      context,
+      AppDatabase::class.java, "geofication-database"
+    ).build()
+
+  // ViewModels for Geofences and Geofications
   private lateinit var geofenceVM: GeofenceViewModel
   private lateinit var geoficationVM: GeoficationViewModel
-
-  init {
-    fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
-    geofencingClient = LocationServices.getGeofencingClient(context)
-    appDatabase =
-      Room.databaseBuilder(
-        context,
-        AppDatabase::class.java, "geofication-database"
-      ).build()
-  }
 
   fun geofenceViewModelInitialized(): Boolean {
     return ::geofenceVM.isInitialized
@@ -36,6 +41,8 @@ class ServiceProvider private constructor(context: Context) {
     return ::geoficationVM.isInitialized
   }
 
+  // This companion object allows as to access
+  // the different services over static methods.
   companion object {
     @Volatile
     private var INSTANCE: ServiceProvider? = null

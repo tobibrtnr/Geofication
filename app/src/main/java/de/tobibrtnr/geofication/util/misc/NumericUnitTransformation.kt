@@ -7,8 +7,11 @@ import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import de.tobibrtnr.geofication.util.storage.setting.UnitUtil
 
+// A VisualTransformation that allows us to append the currently
+// set distance unit symbol to a number in a TextField.
+
 @Composable
-fun NumericUnitTransformation() = VisualTransformation { text ->
+fun numericUnitTransformation() = VisualTransformation { text ->
   TransformedText(
     text = buildAnnotatedString {
       append(text)

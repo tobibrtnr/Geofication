@@ -77,9 +77,9 @@
     <string name="geofication_notifications">Geofication-Benachrichtigungen</string>
     <string name="geofication">Geofication</string>
     <string name="language">Sprache</string>
-    <string name="creation_time">Erstellungszeit: %1$s</string>
+    <string name="creation_time">Erstellt am %1$s</string>
     <string name="last_edit">Letzte Bearbeitung: %1$s</string>
-    <string name="date_time_format">yyyy-MM-dd HH:mm</string>
+    <string name="date_time_format">dd.MM.yyyy, HH:mm</string>
     <string name="battery_alert_icon">Batterie-Warnsymbol</string>
     <string name="battery_saver_mode_is_active">Batteriesparmodus</string>
     <string name="battery_saver_mode_text">Mit aktiviertem Batteriesparmodus kann es zu Verzögerungen oder Nichtauslösungen bei Geofications kommen. Möchten Sie ihn deaktivieren?</string>

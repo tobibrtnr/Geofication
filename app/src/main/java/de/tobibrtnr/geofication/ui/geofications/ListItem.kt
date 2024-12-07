@@ -140,13 +140,6 @@ fun ListItem(
           LocaleUtil.getLocalDateTime(geofication.created, context)
         )
       )
-      Spacer(modifier = Modifier.height(4.dp))
-      Text(
-        stringResource(
-          R.string.last_edit,
-          LocaleUtil.getLocalDateTime(geofication.lastEdit, context)
-        )
-      )
     }
   }
   Spacer(modifier = Modifier.height(8.dp))

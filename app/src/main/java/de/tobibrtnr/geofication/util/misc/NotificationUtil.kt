@@ -28,9 +28,7 @@ import de.tobibrtnr.geofication.util.storage.geofence.Geofence
 import de.tobibrtnr.geofication.util.storage.geofication.Geofication
 import kotlin.random.Random
 
-/**
- * Send a notification with a title and message.
- */
+// Send a notification / alarm with a title and message.
 fun sendNotification(
   context: Context,
   fence: Geofence,
@@ -56,10 +54,13 @@ fun sendNotification(
   }
 }
 
+// Create the notification that will be displayed.
 fun createNotification(context: Context, fence: Geofence, notif: Geofication): Notification {
   // Create a notification channel for devices running Android Oreo (API level 26) and above
   createNotificationChannel(context, CHANNEL_ID)
 
+  // If a link is set, it will be opened on press on the notification.
+  // Otherwise, the app will be opened with the triggered Geofence selected.
   val pendingIntent = if(notif.link.isNotEmpty()) {
     val linkIntent = Intent(Intent.ACTION_VIEW, Uri.parse(notif.link))
     linkIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -165,9 +166,7 @@ fun createNotification(context: Context, fence: Geofence, notif: Geofication): N
   return builder.build()
 }
 
-/**
- * Create a Notification Channel, needed starting with Android O
- */
+// Create a Notification Channel, this is needed starting with Android O
 fun createNotificationChannel(context: Context, channelName: String) {
   val channel = NotificationChannel(
     channelName,

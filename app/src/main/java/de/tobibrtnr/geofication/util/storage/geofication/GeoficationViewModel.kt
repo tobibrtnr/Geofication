@@ -51,6 +51,13 @@ class GeoficationViewModel(
     }
   }
 
+  // Adds a Geofication to the repository
+  fun addGeofication(geofication: Geofication) {
+    viewModelScope.launch {
+      repository.insertAll(geofication)
+    }
+  }
+
   // All existing geofications
   @SuppressWarnings("kotlin:S6313")
   suspend fun getAll(): List<Geofication> {

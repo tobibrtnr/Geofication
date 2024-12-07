@@ -27,10 +27,20 @@ suspend fun addAllGeofences(context: Context) {
   val geofenceViewModel = ServiceProvider.geofenceViewModel()
   val geofences = geofenceViewModel.getAll()
 
-  geofences.forEach {
+  val geoficationsViewModel = ServiceProvider.geoficationViewModel()
+  val geofications = geoficationsViewModel.getAll()
+
+  geofences.forEach { geofence ->
+    // Update last edit time for Geofences in order to not get triggered instantly
+    geofence.lastEdit = System.currentTimeMillis()
+
+    // We also need to re-add all geofications, as they are removed when
+    // their foreign key geofence is removed / re-added
     geofenceViewModel.addGeofence(
       context,
-      it
+      geofence,
+      geofications.find { geofence.id == it.fenceid},
+      forceAddGeofence = true
     )
   }
 }

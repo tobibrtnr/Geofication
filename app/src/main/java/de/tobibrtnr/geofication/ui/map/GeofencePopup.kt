@@ -69,7 +69,7 @@ import de.tobibrtnr.geofication.ui.common.MarkerColor
 import de.tobibrtnr.geofication.ui.common.SegmentedButtons
 import de.tobibrtnr.geofication.ui.common.SegmentedRadioButtons
 import de.tobibrtnr.geofication.ui.startup.InfoDialog
-import de.tobibrtnr.geofication.util.misc.NumericUnitTransformation
+import de.tobibrtnr.geofication.util.misc.numericUnitTransformation
 import de.tobibrtnr.geofication.util.misc.Vibrate
 import de.tobibrtnr.geofication.util.storage.setting.UnitUtil
 import de.tobibrtnr.geofication.util.storage.geofence.Geofence
@@ -380,7 +380,7 @@ fun GeofencePopup(
             errorMessage = newEM
             inputValid = newIV
           },
-          visualTransformation = NumericUnitTransformation()
+          visualTransformation = numericUnitTransformation()
         )
 
         CategoryItem(title = stringResource(R.string.trigger_settings)) {

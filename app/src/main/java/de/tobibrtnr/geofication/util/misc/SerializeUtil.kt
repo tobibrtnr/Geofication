@@ -5,11 +5,10 @@ import java.io.ByteArrayOutputStream
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 
-// Source
-// https://github.com/febaisi/LambdaWithWorkers
-
+// Allows us to serialize any object into a ByteArray,
+// for example in order to pass it with an Intent.
+// Source: https://github.com/febaisi/LambdaWithWorkers
 fun serializeObject(any: Any): ByteArray {
-  //Serialize request
   val bos = ByteArrayOutputStream()
   ObjectOutputStream(bos).apply {
     writeObject(any)
