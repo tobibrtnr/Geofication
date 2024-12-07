@@ -11,6 +11,7 @@ import de.tobibrtnr.geofication.util.storage.geofence.Geofence
 import de.tobibrtnr.geofication.util.storage.geofence.GeofenceViewModel
 import de.tobibrtnr.geofication.util.storage.geofication.Geofication
 
+// Function that adds a new Geofication to storage.
 fun addGeofence(
   context: Context,
   geofenceViewModel: GeofenceViewModel,
@@ -24,6 +25,8 @@ fun addGeofence(
   )
 }
 
+// Composable that displays a popup where
+// the user can create a new Geofication.
 @Composable
 fun AddGeofencePopup(
   pos: LatLng,

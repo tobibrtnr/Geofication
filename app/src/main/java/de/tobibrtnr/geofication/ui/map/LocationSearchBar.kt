@@ -30,6 +30,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import com.google.android.gms.maps.model.LatLng
 import de.tobibrtnr.geofication.R
+import de.tobibrtnr.geofication.util.storage.log.LogUtil
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
@@ -40,13 +41,13 @@ fun LocationSearchBar(
   callback: (LatLng) -> Unit,
   clearFocus: () -> Unit
 ) {
-
   val context = LocalContext.current
   val keyboardController = LocalSoftwareKeyboardController.current
   val focusManager = LocalFocusManager.current
 
   var locationName by input
 
+  // Custom text field with placeholders, transparency, icons and custom keyboard actions
   TextField(
     value = locationName,
     leadingIcon = { Icon(Icons.Outlined.Search, contentDescription = stringResource(R.string.search_location)) },
@@ -90,44 +91,24 @@ fun LocationSearchBar(
   )
 }
 
+// Function to search for a location globally.
 fun searchLocation(
   locString: String,
   context: Context,
   callback: (LatLng) -> Unit,
   clearFocus: () -> Unit
 ) {
-
   if (locString.isNotEmpty()) {
-    val geocoder = Geocoder(context)
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-      // Implementation of GeocodeListener
-      val listener = object : GeocodeListener {
-        override fun onGeocode(p0: MutableList<Address>) {
-          if (p0.isEmpty()) {
-            showNoResultsToast(context, clearFocus)
-          } else {
-            handleAddresses(p0, callback)
-          }
-        }
-
-        override fun onError(errorMessage: String?) {
-          println(errorMessage)
-        }
-      }
-      geocoder.getFromLocationName(locString, 1, listener)
-    } else {
-      val addresses = geocoder.getFromLocationName(locString, 1)
-      if (addresses != null) {
-        handleAddresses(addresses, callback)
-      } else {
-        showNoResultsToast(context, clearFocus)
-      }
-    }
-
+    searchGlobally(context, locString, {
+      handleAddresses(it, callback)
+    }, {
+      showNoResultsToast(context, clearFocus)
+    })
   }
 }
 
+// Function to show a Toast when no global result has been found.
 private fun showNoResultsToast(context: Context, clearFocus: () -> Unit) {
   MainScope().launch {
     Toast.makeText(context, context.getString(R.string.no_global_location), Toast.LENGTH_SHORT)
@@ -136,12 +117,55 @@ private fun showNoResultsToast(context: Context, clearFocus: () -> Unit) {
   clearFocus()
 }
 
+// Function to receive a position from a list of addresses
 fun handleAddresses(addresses: List<Address>, callback: (LatLng) -> Unit) {
   if (addresses.isNotEmpty()) {
-
     val address = addresses[0]
     val latLng = LatLng(address.latitude, address.longitude)
 
     callback(latLng)
+  }
+}
+
+// Function to search for a location name globally.
+// Custom callbacks if a result has been found or not.
+fun searchGlobally(
+  context: Context,
+  query: String,
+  resultFoundCallback: (List<Address>) -> Unit,
+  noResultFoundCallback: () -> Unit = {}
+) {
+  val geocoder = Geocoder(context)
+
+  // Use different implementations for finding a
+  // location globally, depending on the Android version.
+  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+    // New implementation of GeocodeListener
+    val listener = object : GeocodeListener {
+      override fun onGeocode(p0: MutableList<Address>) {
+        if (p0.isEmpty()) {
+          noResultFoundCallback()
+        } else {
+          resultFoundCallback(p0)
+        }
+      }
+
+      // Log any error messages
+      override fun onError(errorMessage: String?) {
+        errorMessage?.let {
+          LogUtil.addLog(errorMessage)
+        }
+      }
+    }
+    geocoder.getFromLocationName(query, 1, listener)
+  } else {
+    // Geocoder implementation for older versions of Android
+    @Suppress("DEPRECATION")
+    val addresses = geocoder.getFromLocationName(query, 1)
+    if (addresses != null) {
+      resultFoundCallback(addresses)
+    } else {
+      noResultFoundCallback()
+    }
   }
 }

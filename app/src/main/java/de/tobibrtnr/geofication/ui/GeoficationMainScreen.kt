@@ -25,6 +25,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -54,6 +55,7 @@ import de.tobibrtnr.geofication.ui.startup.DummyPermissionState
 import de.tobibrtnr.geofication.ui.startup.PermissionScreen
 import de.tobibrtnr.geofication.util.storage.setting.SettingsUtil
 
+// Enum that holds all screens with their titles and icons for navigation.
 enum class GeoficationScreen(@StringRes val title: Int, val icon: ImageVector) {
   Start(title = R.string.map, icon = Icons.Outlined.Map),
   Geofications(title = R.string.geofications, icon = Icons.Outlined.Notifications),
@@ -67,14 +69,16 @@ fun GeoficationApp(
   intentQuery: String,
   navController: NavHostController = rememberNavController()
 ) {
+  val context = LocalContext.current
 
   val geofenceViewModel = ServiceProvider.geofenceViewModel()
   val geoficationViewModel = ServiceProvider.geoficationViewModel()
 
   var navigationSelectedItem by remember {
-    mutableStateOf(0)
+    mutableIntStateOf(0)
   }
 
+  // Permission to access coarse and fine location.
   val locPerm = rememberMultiplePermissionsState(
     permissions = listOf(
       Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -82,9 +86,11 @@ fun GeoficationApp(
     ),
   )
 
+  // Permission to send notifications.
+  // Only needed starting with Android Tiramisu
   val notifPerm = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
     DummyPermissionState(
-      Manifest.permission.POST_NOTIFICATIONS
+      "android.permission.POST_NOTIFICATIONS"
     )
   } else {
     rememberPermissionState(
@@ -92,9 +98,11 @@ fun GeoficationApp(
     )
   }
 
+  // Permission to access background location.
+  // Only needed starting with Android Q
   val bgPerm = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
     DummyPermissionState(
-      Manifest.permission.ACCESS_BACKGROUND_LOCATION
+      "android.permission.ACCESS_BACKGROUND_LOCATION"
     )
   } else {
     rememberPermissionState(
@@ -102,19 +110,20 @@ fun GeoficationApp(
     )
   }
 
+  // If all permissions have been granted
   var permissionsGranted by remember {
     mutableStateOf(
       locPerm.allPermissionsGranted && bgPerm.status.isGranted && notifPerm.status.isGranted
     )
   }
 
-  val context = LocalContext.current
-
   val esEnabled = isPowerSaveMode(context)
   var isInPowerSaveMode by remember { mutableStateOf(esEnabled) }
 
   var navigateByBottomBar by remember { mutableStateOf(false) }
 
+  // If not all permissions have been granted yet,
+  // show PermissionScreen
   if (!permissionsGranted) {
     PermissionScreen(
       locPerm,
@@ -124,7 +133,6 @@ fun GeoficationApp(
       permissionsGranted = true
     }
   } else {
-
     // Popup to notify user that battery saver mode is enabled
     if(isInPowerSaveMode && SettingsUtil.getPowerPopup()) {
       BatterySavingPopup(onConfirm = {
@@ -139,7 +147,7 @@ fun GeoficationApp(
       modifier = Modifier.fillMaxSize(),
       bottomBar = {
         NavigationBar {
-          GeoficationScreen.values().forEachIndexed { index, navItem ->
+          GeoficationScreen.entries.forEachIndexed { index, navItem ->
             val sel = index == navigationSelectedItem
             NavigationBarItem(
               selected = sel,
@@ -150,6 +158,8 @@ fun GeoficationApp(
                 )
               },
               onClick = {
+                // On click on the navigation icon, navigate to the
+                // desired screen and add the optional parameters.
                 navigationSelectedItem = index
                 var target = navItem.name
                 if (target == GeoficationScreen.Start.name) {
@@ -173,9 +183,11 @@ fun GeoficationApp(
       NavHost(
         navController = navController,
         startDestination = "${GeoficationScreen.Start.name}/{openGeofence}/{edit}",
-        modifier = Modifier
-          .fillMaxSize()
+        modifier = Modifier.fillMaxSize()
       ) {
+        // Map screen
+        // Here, additional logic is needed in order to handle
+        // the different, optional parameters.
         composable(
           route = "${GeoficationScreen.Start.name}/{openGeofence}/{edit}",
           arguments = listOf(
@@ -192,7 +204,7 @@ fun GeoficationApp(
             intentQueryString = ""
           } else {
             if (navController.currentDestination?.route?.startsWith(GeoficationScreen.Start.name) == true) {
-              // manually set bottom navigation selected tab to "Map", if this screen
+              // Manually set bottom navigation selected tab to "Map", if this screen
               // is really selected
               navigationSelectedItem = 0
             }
@@ -212,7 +224,6 @@ fun GeoficationApp(
             )
           ) {
             MapScreen(
-              modifier = Modifier.fillMaxHeight(),
               topPadding = innerPadding.calculateTopPadding(),
               intentQuery = intentQueryString,
               openGeoId = openGeofence,
@@ -222,16 +233,16 @@ fun GeoficationApp(
             )
           }
         }
+        // Settings screen
         composable(route = GeoficationScreen.Settings.name) {
           SettingsScreen(
-            modifier = Modifier.fillMaxSize(),
             innerPadding = innerPadding,
             geofenceViewModel
           )
         }
+        // Geofications list screen
         composable(route = GeoficationScreen.Geofications.name) {
           GeoficationsScreen(
-            modifier = Modifier.fillMaxSize(),
             navController = navController,
             innerPadding = innerPadding,
             geoficationViewModel,
@@ -243,15 +254,16 @@ fun GeoficationApp(
   }
 }
 
+// Check if the device is in power saver mode
 @Composable
 fun isPowerSaveMode(context: Context): Boolean {
   val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
   return powerManager.isPowerSaveMode
 }
 
+// Open settings to disable battery saver mode
 fun openBatterySaverSettings(context: Context) {
   val intent =
     Intent(Settings.ACTION_BATTERY_SAVER_SETTINGS)
   context.startActivity(intent)
 }
-

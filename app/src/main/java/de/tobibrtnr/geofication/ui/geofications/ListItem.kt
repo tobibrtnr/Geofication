@@ -41,9 +41,8 @@ import de.tobibrtnr.geofication.util.storage.setting.LocaleUtil
 import de.tobibrtnr.geofication.util.storage.geofence.Geofence
 import de.tobibrtnr.geofication.util.storage.geofication.Geofication
 
-/**
- * Item of the Geofications list
- */
+// Item of the Geofications screen list, displaying
+// attributes and actions for a Geofications.
 @Composable
 fun ListItem(
   geofication: Geofication,
@@ -53,9 +52,9 @@ fun ListItem(
   delete: (Int) -> Unit,
   setActive: (Int, Int, Boolean) -> Unit
 ) {
-
   val context = LocalContext.current
 
+  // Popup if user really wants to delete the Geofication, if it is active
   var deletePopupVisible by remember { mutableStateOf(false) }
 
   if (deletePopupVisible) {
@@ -130,9 +129,17 @@ fun ListItem(
         }
       }
       Spacer(modifier = Modifier.height(4.dp))
-      Text(geofence.fenceName, maxLines = 1, overflow = TextOverflow.Ellipsis)
+      Text(
+        geofence.fenceName,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis
+      )
       Spacer(modifier = Modifier.height(4.dp))
-      Text(stringResource(R.string.trigger_count, geofication.triggerCount))
+      Text(
+        stringResource(R.string.trigger_count, geofication.triggerCount),
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis
+      )
       Spacer(modifier = Modifier.height(4.dp))
       Text(
         stringResource(

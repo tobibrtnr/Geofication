@@ -10,6 +10,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import de.tobibrtnr.geofication.R
 
+// A popup to confirm that the user wants to
+// delete a Geofication, even if it is active.
 @Composable
 fun DeleteConfirmPopup(onConfirm: () -> Unit, onCancel: () -> Unit) {
   AlertDialog(

@@ -14,12 +14,11 @@ import com.google.maps.android.compose.CameraPositionState
 import de.tobibrtnr.geofication.util.storage.setting.UnitUtil
 import de.tobibrtnr.geofication.util.storage.geofence.Geofence
 import de.tobibrtnr.geofication.util.storage.geofication.Geofication
+import de.tobibrtnr.geofication.util.storage.log.LogUtil
 import kotlin.math.roundToInt
 
-/**
- * A horizontal list of chips that displays every active Geofication with the
- * distance to the current position.
- */
+// A horizontal list of chips that displays every active
+// Geofication with the distance to the current position.
 @Composable
 fun GeoficationsChipList(
   geoficationsArray: List<Geofication>,
@@ -27,7 +26,6 @@ fun GeoficationsChipList(
   currentLocation: LatLng,
   cameraPositionState: CameraPositionState
 ) {
-
   val geoficationsRow = rememberScrollState()
 
   Row(Modifier.horizontalScroll(geoficationsRow)) {
@@ -55,6 +53,8 @@ fun GeoficationsChipList(
           it2.id == it.fenceid
         }
 
+        // If the distance between the current location and the center is
+        // smaller than the radius, the user is inside of the geofence.
         val distance = (SphericalUtil.computeDistanceBetween(
           LatLng(fence.latitude, fence.longitude),
           currentLocation
@@ -67,7 +67,7 @@ fun GeoficationsChipList(
             UnitUtil.appendUnit(distance)
           }
       } catch (e: NoSuchElementException) {
-        println("no such element exception")
+        LogUtil.addLog("No geofence found for Geofication #${it}")
       }
 
       fence?.let { _ ->

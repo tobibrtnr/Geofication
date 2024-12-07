@@ -3,7 +3,6 @@ package de.tobibrtnr.geofication.ui.common
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -17,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,6 +25,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
+// A custom composable that displays a button with two options.
+// At leas one option has to be set and is set initially, but
+// optionally, also both settings can me set simultaneously.
 @Composable
 fun SegmentedButtons(
   label1: String,
@@ -42,7 +45,7 @@ fun SegmentedButtons(
     initialList.add(opt2)
   }
 
-  val selectedOptions by remember { mutableStateOf(initialList) }
+  var selectedOptions by remember { mutableStateOf(initialList.toList()) }
 
   Row(
     modifier = Modifier
@@ -89,6 +92,8 @@ fun SegmentedButtons(
   }
 }
 
+// One side of the segmented buttons composable,
+// with text, selection, icon and action.
 @Composable
 fun SegmentedButton(
   modifier: Modifier,
@@ -133,5 +138,6 @@ fun SegmentedButtonsPreview() {
     label2 = "exiting",
     opt1 = "entering",
     opt2 = "exiting",
-    onValueChange = {})
+    onValueChange = {}
+  )
 }

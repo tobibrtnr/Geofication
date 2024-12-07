@@ -10,6 +10,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import de.tobibrtnr.geofication.R
 
+// Dialog that displays some information (here why a
+// permission is needed) together with an info icon.
 @Composable
 fun InfoDialog(title: String, text: String, onDismiss: () -> Unit) {
   AlertDialog(

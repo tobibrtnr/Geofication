@@ -31,6 +31,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import de.tobibrtnr.geofication.R
 
+// A button that is next to the search bar and opens a
+// dropdown with links to the faq and feedback screens.
 @Composable
 fun DropdownInfoButton(
   navController: NavHostController,

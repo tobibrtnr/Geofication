@@ -6,6 +6,7 @@ import de.tobibrtnr.geofication.util.storage.geofence.Geofence
 import de.tobibrtnr.geofication.util.storage.geofence.GeofenceViewModel
 import de.tobibrtnr.geofication.util.storage.geofication.Geofication
 
+// Function to update an existing Geofication and geofence.
 fun processEdit(
   context: Context,
   geofenceViewModel: GeofenceViewModel,
@@ -24,6 +25,8 @@ fun processEdit(
   )
 }
 
+// A composable that display a popup where
+// the user can edit their Geofication.
 @Composable
 fun EditGeoficationPopup(
   geofence: Geofence,

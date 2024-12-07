@@ -3,9 +3,6 @@ package de.tobibrtnr.geofication.ui.map
 import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Point
-import android.location.Address
-import android.location.Geocoder
-import android.os.Build
 import android.os.Looper
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -40,6 +37,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -97,10 +96,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlin.math.abs
 
-
+// The main screen of the app. Here, the all Geofications
+// are displayed on a map, and you can also add and edit
+// Geofications.
 @Composable
 fun MapScreenMain(
-  modifier: Modifier = Modifier,
   topPadding: Dp,
   openGeoId: Int?,
   edit: Boolean?,
@@ -114,7 +114,7 @@ fun MapScreenMain(
   val isDarkTheme = isSystemInDarkTheme()
   val currentThemeState by rememberUpdatedState(isDarkTheme)
 
-  // Map Settings
+  // Map style settings
   var uiSettings by remember {
     mutableStateOf(
       MapUiSettings(
@@ -155,15 +155,15 @@ fun MapScreenMain(
 
   // Temporary Geofence that is being created
   var tempGeofenceLocation by remember { mutableStateOf<LatLng?>(null) }
-  var tempGeofenceRadius by remember { mutableStateOf(30.0) }
+  var tempGeofenceRadius by remember { mutableDoubleStateOf(30.0) }
 
   var openDialogGeofence by remember { mutableStateOf(false) }
 
   var selectedPosition by remember { mutableStateOf(LatLng(0.0, 0.0)) }
-  var newRadius by remember { mutableStateOf(0.0) }
+  var newRadius by remember { mutableDoubleStateOf(0.0) }
 
   var markerPopupVisible by remember { mutableStateOf(false) }
-  var selectedMarkerId by remember { mutableStateOf(-1) }
+  var selectedMarkerId by remember { mutableIntStateOf(-1) }
 
 
   val cameraPositionState = rememberCameraPositionState {
@@ -185,7 +185,7 @@ fun MapScreenMain(
     label = "blur_animation"
   )
 
-  // Animate alpaha on Map Load
+  // Animate alpha on Map Load
   var isMapLoaded by remember { mutableStateOf(false) }
 
   val alpha by animateFloatAsState(
@@ -193,22 +193,20 @@ fun MapScreenMain(
     animationSpec = tween(durationMillis = 200), label = "mapAlpha"
   )
 
-  /*
-   * Check Composable Route Parameters
-   */
-
+  // Composable route parameters
   var openedGeofence by remember { mutableStateOf<Geofence?>(null) }
-  var usedGeoId by remember { mutableStateOf(openGeoId ?: 0) }
+  var usedGeoId by remember { mutableIntStateOf(openGeoId ?: 0) }
 
   var usedEdit by remember { mutableStateOf(edit ?: false) }
 
+  // Outline for the custom search bar
   var searchBarOutline = if (currentThemeState) {
     Color.DarkGray
   } else {
     Color.LightGray
   }
 
-  // on Theme Update, update outline and Map style
+  // On Theme Update, update outline and Map style
   LaunchedEffect(currentThemeState) {
     searchBarOutline = if (currentThemeState) {
       Color.DarkGray
@@ -224,6 +222,8 @@ fun MapScreenMain(
     properties = properties.copy(mapStyleOptions = newMapStyleOptions)
   }
 
+  // When the map is opened, go to the
+  // currently selected Geofication entry.
   LaunchedEffect(Unit) {
     if (usedGeoId > 0) {
       val tmpGeofence = geofencesArray.find { it.id == usedGeoId }
@@ -294,55 +294,55 @@ fun MapScreenMain(
     }
   }
 
-  fun longClick(latLng: LatLng, tempGeofenceRadius: Double) {
-    newRadius = tempGeofenceRadius
-    selectedPosition = latLng
-    openDialogGeofence = true
-  }
-
-  fun removeFocusFromSearchBar() {
-    focusManager.clearFocus()
-    resultsShown = false
-  }
-
+  // Launched effect: Everything that should
+  // be executed when the screen is opened.
   LaunchedEffect(Unit) {
+    // If the app was opened with an intent query ("geo:"),
+    // try to search for the location and go to it.
     if (intentQuery.isNotEmpty()) {
-      val geocoder = Geocoder(context)
-
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        // Implementation of GeocodeListener
-        val listener = object : Geocoder.GeocodeListener {
-          override fun onGeocode(p0: MutableList<Address>) {
-            if (p0.isNotEmpty()) {
-              handleAddresses(p0) {
-                MainScope().launch {
-                  cameraPositionState.position =
-                    CameraPosition(it, 15f, 0f, 0f)
-                }
-              }
-            }
-          }
-
-          override fun onError(errorMessage: String?) {
-            println(errorMessage)
-          }
-        }
-        geocoder.getFromLocationName(intentQuery, 1, listener)
-      } else {
-        val addresses = geocoder.getFromLocationName(intentQuery, 1)
-        if (addresses != null) {
-          handleAddresses(addresses) {
+      searchGlobally(
+        context,
+        intentQuery, {
+          handleAddresses(it) {
             MainScope().launch {
               cameraPositionState.position =
                 CameraPosition(it, 15f, 0f, 0f)
             }
           }
         }
+      )
+    }
+
+    // Move to geofence if one is selected on startup
+    if (openedGeofence != null) {
+      markerPopupVisible = true
+      selectedMarkerId = openedGeofence!!.id
+      MainScope().launch {
+        val geoLocation = LatLng(openedGeofence!!.latitude, openedGeofence!!.longitude)
+
+        cameraPositionState.position =
+          CameraPosition(geoLocation, 15f, 0f, 0f)
+
+        animateCameraToGeofence(cameraPositionState, openedGeofence!!)
       }
     }
   }
 
-  // Return Composable
+  // On long press on the map, a new Geofication can be created
+  fun longClick(latLng: LatLng, tempGeofenceRadius: Double) {
+    newRadius = tempGeofenceRadius
+    selectedPosition = latLng
+    openDialogGeofence = true
+  }
+
+  // Function to remove focus from search bar
+  fun removeFocusFromSearchBar() {
+    focusManager.clearFocus()
+    resultsShown = false
+  }
+
+
+  // Popup that is used to edit a Geofication.
   if (markerPopupVisible && selectedMarkerId >= 0) {
     val geofence = geofencesArray.find { it.id == selectedMarkerId }
     val geofication = geoficationsArray.find { it.fenceid == selectedMarkerId }
@@ -365,25 +365,14 @@ fun MapScreenMain(
     }
   }
 
-  // Move to geofence if one is selected on startup
-  if (openedGeofence != null) {
-    markerPopupVisible = true
-    selectedMarkerId = openedGeofence!!.id
-    MainScope().launch {
-      val geoLocation = LatLng(openedGeofence!!.latitude, openedGeofence!!.longitude)
-
-      cameraPositionState.position =
-        CameraPosition(geoLocation, 15f, 0f, 0f)
-
-      animateCameraToGeofence(cameraPositionState, openedGeofence!!)
-    }
-  }
-
+  // Popup to add a new Geofication
   if (openDialogGeofence) {
     AddGeofencePopup(selectedPosition, newRadius, geofenceViewModel) {
       openDialogGeofence = false
     }
   }
+
+  // UI
   Box(Modifier.fillMaxSize()) {
     BackHandler(enabled = resultsShown) {
       removeFocusFromSearchBar()
@@ -394,6 +383,8 @@ fun MapScreenMain(
         .zIndex(1f)
         .padding(16.dp)
     ) {
+      // Floating action buttons that can be used to go
+      // to current location and toggle satellite view.
       Column {
         FloatingActionButton(
           onClick = {
@@ -453,6 +444,7 @@ fun MapScreenMain(
       }
     }
 
+    // UI elements at the top of the screen
     Box(
       modifier = Modifier
         .fillMaxWidth()
@@ -460,19 +452,13 @@ fun MapScreenMain(
         .padding(0.dp, topPadding + 8.dp, 0.dp, 8.dp),
     ) {
       Column {
+        // Search bar text field with dropdown button
         Row(
           modifier = Modifier
             .padding(horizontal = 16.dp)
             .clip(CircleShape)
-            .border(
-              1.dp,
-              searchBarOutline,
-              CircleShape
-            )
-            .shadow(
-              elevation = 16.dp,
-              shape = CircleShape
-            )
+            .border(1.dp, searchBarOutline, CircleShape)
+            .shadow(elevation = 16.dp, shape = CircleShape)
         ) {
           LocationSearchBar(
             modifier = Modifier
@@ -493,6 +479,8 @@ fun MapScreenMain(
           DropdownInfoButton(navController) { removeFocusFromSearchBar() }
         }
 
+        // List of results for a search query.
+        // Shown, if the focus is on the search bar.
         AnimatedVisibility(
           visible = resultsShown
         ) {
@@ -509,11 +497,12 @@ fun MapScreenMain(
           })
         }
 
+        // Geofication Chips below the search bar. They
+        // are only visible if no search results are shown.
         AnimatedVisibility(
           visible = !resultsShown
         ) {
           Column {
-            // Geofication Chips below the search bar
             GeoficationsChipList(
               geoficationsArray,
               geofencesArray,
@@ -541,7 +530,6 @@ fun MapScreenMain(
                   animateCamera(cameraPositionState, currPos.target, currPos.zoom, currPos.tilt)
                 }
               }
-
             }
           }
         }
@@ -566,7 +554,6 @@ fun MapScreenMain(
         removeFocusFromSearchBar()
       },
       onMapLoaded = {
-        println("MAP LOADED!!!")
         isMapLoaded = true
       },
       onMapLongClick = {
@@ -583,12 +570,14 @@ fun MapScreenMain(
       modifier = Modifier
         .fillMaxSize()
         .pointerInput(Unit) {
-
+          // On first startup, the first press is
+          // used to remove the tutorial screen.
           if (firstStartup) {
             firstStartup = false
             SettingsUtil.setFirstStartup(false)
           }
 
+          // Use gestures to draw a new geofence.
           awaitEachGesture {
             do {
               val event = awaitPointerEvent()
@@ -647,7 +636,8 @@ fun MapScreenMain(
       cameraPositionState = cameraPositionState,
       contentPadding = PaddingValues.Absolute(0.dp, 60.dp, 0.dp, 0.dp),
     ) {
-
+      // Marker and Circle for temporary geofence
+      // that is being dragged and created right now.
       tempGeofenceLocation?.let {
         Marker(
           state = MarkerState(
@@ -658,7 +648,6 @@ fun MapScreenMain(
           )
         )
       }
-
       tempGeofenceLocation?.let {
         Circle(
           center = LatLng(it.latitude, it.longitude),
@@ -680,9 +669,8 @@ fun MapScreenMain(
   }
 }
 
-/**
- * Animate the camera to a new position and optional zoom, tilt and bearing.
- */
+// Animate the camera to a new position
+// and optional zoom, tilt and bearing.
 fun animateCamera(
   cameraPositionState: CameraPositionState,
   position: LatLng,
@@ -701,9 +689,7 @@ fun animateCamera(
   }
 }
 
-/**
- * Animate the camera to a new position and optional zoom, tilt and bearing.
- */
+// Animate the camera to a given geofence by its properties.
 fun animateCameraToGeofence(
   cameraPositionState: CameraPositionState,
   lat: Double,
@@ -723,6 +709,7 @@ fun animateCameraToGeofence(
   }
 }
 
+// Animate the camera to a given geofence.
 fun animateCameraToGeofence(
   cameraPositionState: CameraPositionState,
   geofence: Geofence

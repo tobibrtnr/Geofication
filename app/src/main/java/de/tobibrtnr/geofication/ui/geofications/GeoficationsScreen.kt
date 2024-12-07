@@ -28,15 +28,12 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import de.tobibrtnr.geofication.R
 import de.tobibrtnr.geofication.ui.common.DeleteAllConfirmPopup
-import de.tobibrtnr.geofication.util.storage.geofence.Geofence
 import de.tobibrtnr.geofication.util.storage.geofence.GeofenceViewModel
-import de.tobibrtnr.geofication.util.storage.geofication.Geofication
 import de.tobibrtnr.geofication.util.storage.geofication.GeoficationViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GeoficationsScreen(
-  modifier: Modifier = Modifier,
   navController: NavController,
   innerPadding: PaddingValues,
   geoficationViewModel: GeoficationViewModel,
@@ -45,6 +42,7 @@ fun GeoficationsScreen(
   val geoficationsArray by geoficationViewModel.getAllFlow.collectAsState()
   val geofencesArray by geofenceViewModel.getAllFlow.collectAsState()
 
+  // Popup to confirm that all Geofications should be deleted.
   var deleteAllPopupVisible by remember { mutableStateOf(false) }
 
   if (deleteAllPopupVisible) {
@@ -57,7 +55,7 @@ fun GeoficationsScreen(
     )
   }
 
-  // UI
+  // UI with top app bar.
   Scaffold(
     topBar = {
       TopAppBar(title = {
@@ -89,6 +87,7 @@ fun GeoficationsScreen(
           Text(stringResource(R.string.create_just_on_map))
         }
 
+        // Lazy, animated column that displays all created Geofications
         AnimatedVisibility(visible = geoficationsArray.isNotEmpty()) {
           LazyColumn(modifier = Modifier.fillMaxSize()) {
             items(geoficationsArray, key = { it.id }) { geofication ->
@@ -102,7 +101,8 @@ fun GeoficationsScreen(
                   modifier = Modifier.animateItem(),
                   delete = { gid ->
                     geofenceViewModel.delete(gid)
-                  }, setActive = { geofenceId, geoficationId, active ->
+                  },
+                  setActive = { geofenceId, geoficationId, active ->
                     geofenceViewModel.setActive(active, geofenceId)
                     geoficationViewModel.setActive(active, geoficationId)
                   }
@@ -114,11 +114,4 @@ fun GeoficationsScreen(
       }
     }
   }
-}
-
-fun findGeofenceByFenceId(geofences: List<Geofence>, geofications: List<Geofication>): Geofence {
-  val fenceIds = geofications.map { it.fenceid }.toSet()
-  val foundGeofences = geofences.filter { it.id in fenceIds }
-
-  return foundGeofences[0]
 }

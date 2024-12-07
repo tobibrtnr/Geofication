@@ -33,19 +33,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import de.tobibrtnr.geofication.R
 
+// A composable that displays a text on how to create
+// a first Geofication, along with a moving icon.
 @Composable
 fun StartupTutorialScreen() {
-
-  val offsetY by rememberInfiniteTransition(label = "pmy").animateValue(
-    initialValue = 0.dp,
-    targetValue = 25.dp,
-    typeConverter = Dp.VectorConverter,
-    animationSpec = infiniteRepeatable(
-      animation = tween(durationMillis = 2000),
-      repeatMode = RepeatMode.Reverse
-    ), label = "pointer_move_y"
-  )
-
+  // Value to animate x movement of the pointer
   val offsetX by rememberInfiniteTransition(label = "pmx").animateValue(
     initialValue = 5.dp,
     targetValue = (-5).dp,
@@ -54,6 +46,17 @@ fun StartupTutorialScreen() {
       animation = tween(durationMillis = 2000),
       repeatMode = RepeatMode.Reverse
     ), label = "pointer_move_x"
+  )
+
+  // Value to animate y movement of the pointer
+  val offsetY by rememberInfiniteTransition(label = "pmy").animateValue(
+    initialValue = 0.dp,
+    targetValue = 25.dp,
+    typeConverter = Dp.VectorConverter,
+    animationSpec = infiniteRepeatable(
+      animation = tween(durationMillis = 2000),
+      repeatMode = RepeatMode.Reverse
+    ), label = "pointer_move_y"
   )
 
   Box(

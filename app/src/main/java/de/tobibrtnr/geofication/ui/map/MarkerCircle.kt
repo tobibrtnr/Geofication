@@ -9,17 +9,15 @@ import com.google.maps.android.compose.MarkerInfoWindow
 import com.google.maps.android.compose.MarkerState
 import de.tobibrtnr.geofication.util.storage.geofence.Geofence
 
-/**
- * A composable that consists of a circle and a marker in its center in order
- * to show a Geofication on the map.
- */
+// A composable that consists of a circle and a marker
+// in its center in order to show a Geofication on the map.
 @Composable
 fun MarkerCircle(geofence: Geofence, onClick: () -> Unit) {
   val bdf = BitmapDescriptorFactory.defaultMarker(geofence.color.hue)
   val mState = MarkerState(position = LatLng(geofence.latitude, geofence.longitude))
 
-  // I suppose there has been a reason for choosing MarkerInfoWindow. Maybe in order
-  // to use a icon with custom hue.
+  // I suppose there has been a reason for choosing MarkerInfoWindow.
+  // Maybe in order to use a icon with custom hue.
   MarkerInfoWindow(alpha = if (geofence.active) 1.0f else 0.25f,
     state = mState,
     title = geofence.fenceName,

@@ -10,6 +10,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import de.tobibrtnr.geofication.R
 
+// A popup that displays a warning that Geofications may be
+// inaccurate, if the battery saver mode is activated.
 @Composable
 fun BatterySavingPopup(onConfirm: () -> Unit, onCancel: () -> Unit) {
   AlertDialog(

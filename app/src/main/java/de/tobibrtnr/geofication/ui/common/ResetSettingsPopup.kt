@@ -10,6 +10,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import de.tobibrtnr.geofication.R
 
+// A popup that will be shown to confirm
+// that all user settings should be reset.
 @Composable
 fun ResetSettingsPopup(onConfirm: () -> Unit, onCancel: () -> Unit) {
   AlertDialog(

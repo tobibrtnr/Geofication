@@ -10,6 +10,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 
+// A simple composable of a circle with a certain color and radius.
 @Composable
 fun CircleWithColor(modifier: Modifier = Modifier, color: Color, radius: Dp) {
   Box(

@@ -3,8 +3,8 @@ package de.tobibrtnr.geofication.ui.common
 import androidx.compose.ui.graphics.Color
 import java.io.Serializable
 
-// Enum that holds possible Geofication category colors and
-// the corresponding hue to color the map marker.
+// Enum that holds possible Geofication category colors
+// and the corresponding hue to color the map marker.
 enum class MarkerColor(val color: Color, val hue: Float) : Serializable {
   RED(Color(0xFFEA3535), 0f),
   ORANGE(Color(0xFFEA9035), 30f),

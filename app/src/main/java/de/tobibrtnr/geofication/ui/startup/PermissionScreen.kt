@@ -27,7 +27,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -54,16 +54,18 @@ fun PermissionScreen(
   notifState: PermissionState,
   callback: () -> Unit
 ) {
-  var dialogInfoIndex by remember { mutableStateOf(-1) }
+  val context = LocalContext.current
 
+  var dialogInfoIndex by remember { mutableIntStateOf(-1) }
+
+  // Information texts for the needed permissions.
   val infoDialogContent: List<Pair<String, String>> = listOf(
     stringResource(R.string.permissions_1_h) to stringResource(R.string.permissions_1_a),
     stringResource(R.string.permissions_2_h) to stringResource(R.string.permissions_2_a),
     stringResource(R.string.permissions_3_h) to stringResource(R.string.permissions_3_a)
   )
 
-  val context = LocalContext.current
-
+  // Display a requested information dialog
   if (dialogInfoIndex >= 0) {
     InfoDialog(
       title = infoDialogContent[dialogInfoIndex].first,
@@ -102,6 +104,7 @@ fun PermissionScreen(
             color = MaterialTheme.colorScheme.onSurface
           )
           Spacer(Modifier.height(48.dp))
+          // Permission requests for notifications.
           Row {
             Button(onClick = {
               MainScope().launch {
@@ -127,6 +130,7 @@ fun PermissionScreen(
             }
           }
           Spacer(Modifier.height(8.dp))
+          // Permission request for coarse and fine location
           Row {
             Button(onClick = {
               MainScope().launch {
@@ -152,6 +156,7 @@ fun PermissionScreen(
             }
           }
           Spacer(Modifier.height(8.dp))
+          // Permission request for background location
           Row {
             Button(enabled = locState.allPermissionsGranted, onClick = {
               MainScope().launch {
@@ -177,6 +182,7 @@ fun PermissionScreen(
             }
           }
           Spacer(Modifier.height(16.dp))
+          // Continue to the main screen if all permissions have been granted
           Button(
             enabled = notifState.status.isGranted && locState.allPermissionsGranted && bgState.status.isGranted,
             onClick = { callback() },
@@ -187,6 +193,7 @@ fun PermissionScreen(
         }
       }
 
+      // Footer with information and privacy policy
       Row(
         Modifier
           .padding(WindowInsets.navigationBars.asPaddingValues())

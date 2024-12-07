@@ -75,6 +75,7 @@ import de.tobibrtnr.geofication.util.storage.setting.UnitUtil
 import de.tobibrtnr.geofication.util.storage.geofence.Geofence
 import de.tobibrtnr.geofication.util.storage.geofence.GeofenceViewModel
 import de.tobibrtnr.geofication.util.storage.geofication.Geofication
+import de.tobibrtnr.geofication.util.storage.log.LogUtil
 import java.util.regex.Pattern
 import kotlin.math.floor
 import kotlin.math.roundToInt
@@ -126,39 +127,24 @@ fun GeofencePopup(
   val scrollState = rememberScrollState()
 
 
+  // If a Geofication is added, get the name of the location.
   LaunchedEffect(Unit) {
     if (!editMode) {
-      val geocoder = Geocoder(context)
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        // Implementation of GeocodeListener
-        val listener = object : Geocoder.GeocodeListener {
-          override fun onGeocode(addresses: MutableList<Address>) {
-            if (addresses.isNotEmpty()) {
-              geofence = geofence.copy(
-                fenceName =
-                context.getString(
-                  R.string.geofence_in_location,
-                  getLocationName(context, addresses[0])
-                )
-              )
-            }
-          }
-
-          override fun onError(errorMessage: String?) {
-            println("GEOCODER ERROR $errorMessage")
-          }
+      searchGloballyByLocation(
+        context,
+        geofence.latitude,
+        geofence.longitude, {
+          geofence = geofence.copy(
+            fenceName =
+            context.getString(
+              R.string.geofence_in_location,
+              getLocationName(context, it)
+            )
+          )
+        }, {
+          geofence = geofence.copy(fenceName = initialName)
         }
-        geocoder.getFromLocation(geofence.latitude, geofence.longitude, 1, listener)
-      } else {
-        val addresses = geocoder.getFromLocation(geofence.latitude, geofence.longitude, 1)
-        geofence = geofence.copy(
-          fenceName = if (!addresses.isNullOrEmpty()) {
-            context.getString(R.string.geofence_in_location, getLocationName(context, addresses[0]))
-          } else {
-            initialName
-          }
-        )
-      }
+      )
     }
   }
 
@@ -257,7 +243,7 @@ fun GeofencePopup(
                 expanded = colorExpanded,
                 onDismissRequest = { colorExpanded = false },
               ) {
-                MarkerColor.values().filter {
+                MarkerColor.entries.filter {
                   it != geofence.color
                 }.forEach {
                   DropdownMenuItem(
@@ -567,6 +553,7 @@ fun GeofencePopup(
   }
 }
 
+// Composable that displays a expandable category card.
 @Composable
 fun CategoryItem(title: String, content: @Composable () -> Unit) {
   var isExpanded by remember { mutableStateOf(false) }
@@ -611,6 +598,7 @@ fun CategoryItem(title: String, content: @Composable () -> Unit) {
   }
 }
 
+// Check if the given input values are valid.
 fun validateInput(
   geofication: Geofication,
   radiusText: String,
@@ -643,6 +631,7 @@ fun validateInput(
   return Pair(errorMessage, true)
 }
 
+// Calculate the trigger flag from the given list.
 fun getFlagsFromList(list: List<String>): Int {
   var flags = 0
   if (list.contains("entering")) {
@@ -655,6 +644,7 @@ fun getFlagsFromList(list: List<String>): Int {
   return flags
 }
 
+// Get the most specific location name from a given address.
 fun getLocationName(context: Context, address: Address): String {
   if (address.locality != null) {
     return address.locality
@@ -673,4 +663,47 @@ fun getLocationName(context: Context, address: Address): String {
   }
 
   return context.getString(R.string.unnamed_area)
+}
+
+// Function to search for a location globally. Custom
+// callbacks if a result has been found or not.
+fun searchGloballyByLocation(
+  context: Context,
+  latitude: Double,
+  longitude: Double,
+  resultFoundCallback: (Address) -> Unit,
+  noResultFoundCallback: () -> Unit
+) {
+  val geocoder = Geocoder(context)
+
+  // Use different implementations for finding a
+  // location globally, depending on the Android version.
+  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+    // New implementation of GeocodeListener
+    val listener = object : Geocoder.GeocodeListener {
+      override fun onGeocode(addresses: MutableList<Address>) {
+        if (addresses.isNotEmpty()) {
+          resultFoundCallback(addresses[0])
+        } else {
+          noResultFoundCallback()
+        }
+      }
+
+      override fun onError(errorMessage: String?) {
+        errorMessage?.let {
+          LogUtil.addLog(errorMessage)
+        }
+      }
+    }
+    geocoder.getFromLocation(latitude, longitude, 1, listener)
+  } else {
+    // Geocoder implementation for older versions of Android
+    @Suppress("DEPRECATION")
+    val addresses = geocoder.getFromLocation(latitude, longitude, 1)
+    if (!addresses.isNullOrEmpty()) {
+      resultFoundCallback(addresses[0])
+    } else {
+      noResultFoundCallback()
+    }
+  }
 }

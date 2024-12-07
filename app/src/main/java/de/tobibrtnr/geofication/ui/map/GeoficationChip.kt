@@ -12,6 +12,8 @@ import de.tobibrtnr.geofication.ui.common.CircleWithColor
 import de.tobibrtnr.geofication.util.storage.geofence.Geofence
 import de.tobibrtnr.geofication.util.storage.geofication.Geofication
 
+// A chip that will be displayed below the search bar in
+// order to quickly navigate to an active Geofication.
 @Composable
 fun GeoficationChip(geofence: Geofence, geofication: Geofication, meterText: String, cameraPositionState: CameraPositionState) {
   AssistChip(
@@ -33,5 +35,6 @@ fun GeoficationChip(geofence: Geofence, geofication: Geofication, meterText: Str
         color = geofence.color.color,
         radius = 8.dp
       )
-    })
+    }
+  )
 }

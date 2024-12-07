@@ -22,6 +22,7 @@ import de.tobibrtnr.geofication.util.storage.log.LogUtil
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -119,8 +120,10 @@ class GeofenceViewModel(
           .addOnFailureListener { e ->
             // Geofence creation failed
             LogUtil.addLog("Error while adding Geofence: $e", severity = 5)
-            Toast.makeText(context, "Error while adding Geofence.", Toast.LENGTH_SHORT).show()
-        }
+            MainScope().launch {
+              Toast.makeText(context, "Error while adding Geofence.", Toast.LENGTH_SHORT).show()
+            }
+          }
       }
     }
   }

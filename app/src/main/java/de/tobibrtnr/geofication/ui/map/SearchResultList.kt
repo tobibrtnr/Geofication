@@ -48,6 +48,7 @@ fun SearchResultList(
 
   var results by remember { mutableStateOf(emptyList<GeoficationGeofence>()) }
 
+  // When the query string changes, start a new local search.
   LaunchedEffect(queryString) {
     results = if (queryString.isNotEmpty()) {
       geoficationViewModel.searchGeofications(queryString.trim())
@@ -56,6 +57,7 @@ fun SearchResultList(
     }
   }
 
+  // UI with different cards that will be displayed depending on the search results.
   Column(
     modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 25.dp)
   ) {
@@ -74,6 +76,8 @@ fun SearchResultList(
   }
 }
 
+// Card that displays all found Geofications. By pressing
+// on a result, the user can go directly to the Geofication.
 @Composable
 fun SearchResultsCard(results: List<GeoficationGeofence>, goToLocation: (Double, Double, Float) -> Unit) {
   val keyboardController = LocalSoftwareKeyboardController.current
@@ -82,9 +86,7 @@ fun SearchResultsCard(results: List<GeoficationGeofence>, goToLocation: (Double,
   Card(
     shape = RoundedCornerShape(28.dp),
     colors = CardDefaults.cardColors(),
-    modifier = Modifier
-      //.shadow(elevation = 16.dp, shape = RoundedCornerShape(28.dp))
-      .padding(top = 8.dp)
+    modifier = Modifier.padding(top = 8.dp)
   ) {
     results.forEachIndexed { index, result ->
       Column(
@@ -135,6 +137,7 @@ fun SearchResultsCard(results: List<GeoficationGeofence>, goToLocation: (Double,
   }
 }
 
+// Card that offers the ability to search for a query globally on the map.
 @Composable
 fun SearchLocationCard(query: String, searchGlobally: (String) -> Unit) {
   val keyboardController = LocalSoftwareKeyboardController.current
@@ -162,14 +165,13 @@ fun SearchLocationCard(query: String, searchGlobally: (String) -> Unit) {
   }
 }
 
+// Card that will be displayed if no Geofication has been found.
 @Composable
 fun NoResultCard() {
   Card(
     shape = RoundedCornerShape(28.dp),
     colors = CardDefaults.cardColors(),
-    modifier = Modifier
-      //.shadow(elevation = 16.dp, shape = RoundedCornerShape(28.dp))
-      .padding(top = 8.dp),
+    modifier = Modifier.padding(top = 8.dp),
   ) {
     Box(
       Modifier

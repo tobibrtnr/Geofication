@@ -1,7 +1,6 @@
 package de.tobibrtnr.geofication.ui.map
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -11,9 +10,10 @@ import de.tobibrtnr.geofication.ui.infos.SupportScreen
 import de.tobibrtnr.geofication.util.storage.geofence.GeofenceViewModel
 import de.tobibrtnr.geofication.util.storage.geofication.GeoficationViewModel
 
+// Starting point for the map tab, where you can
+// also navigate to the faq and feedback screens.
 @Composable
 fun MapScreen(
-  modifier: Modifier = Modifier,
   topPadding: Dp,
   openGeoId: Int?,
   edit: Boolean?,
