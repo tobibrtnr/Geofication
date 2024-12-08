@@ -19,3 +19,18 @@ If you have SonarQube installed, you can run a local scan with the command blow.
 ## Website
 
 The website is hosted on Google Firebase. In order to use it, you have to login first (```firebase login```) and then deploy it (```firebase deploy```).
+
+## Future
+
+Features that are planned for the future:
+
+- Widget that shows active Geofications
+- Custom high precision mode
+- Optional account feature for e.g. shared Geofications
+- Set polygonial Geofences
+- Sharable Geofications
+- More settings for Geofications, e.g. active days  
+
+## Current version
+
+Version 1.0
