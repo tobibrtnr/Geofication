@@ -105,7 +105,7 @@
     <string name="link_to_open">Lien à ouvrir</string>
     <string name="link_explanation">Vous pouvez définir un lien vers un site ici. Lorsque la Geofication est déclenchée, vous pouvez ouvrir le site en appuyant sur la notification.</string>
     <string name="stop_alarm">Arrêter l\'alarme</string>
-    <string name="set_the_alert_type_selected">Définir le type d\'alerte. Sélectionné :\n%1$s</string>
+    <string name="set_the_alert_type_selected">Son et vibration supplémentaires similaires à un réveil</string>
     <string name="notification">Notification</string>
     <string name="open_notification_link">Ouvrir le lien de notification</string>
     <string name="alarm_clock">Réveil (son et vibration)</string>

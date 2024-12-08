@@ -105,7 +105,7 @@
     <string name="link_to_open">打開連結</string>
     <string name="link_explanation">您可以在此處設置網站連結。當 Geofication 觸發時，您可以通過點擊通知中的連結來打開它。</string>
     <string name="stop_alarm">停止警報</string>
-    <string name="set_the_alert_type_selected">設置警報類型。選擇：\n%1$s</string>
+    <string name="set_the_alert_type_selected">额外的类似闹钟的声音和振动</string>
     <string name="notification">通知</string>
     <string name="open_notification_link">打開通知連結</string>
     <string name="alarm_clock">闹钟（声音和震动）</string>

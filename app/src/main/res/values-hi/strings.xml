@@ -105,7 +105,7 @@
     <string name="link_to_open">खोलने के लिए लिंक</string>
     <string name="link_explanation">यहां आप एक वेबसाइट लिंक सेट कर सकते हैं। जब Geofication ट्रिगर होती है, तो आप उस लिंक को नोटिफिकेशन पर क्लिक करके खोल सकते हैं।</string>
     <string name="stop_alarm">अलार्म बंद करें</string>
-    <string name="set_the_alert_type_selected">चेतावनी प्रकार सेट करें। चयनित:\n%1$s</string>
+    <string name="set_the_alert_type_selected">अतिरिक्त घड़ी जैसी ध्वनि और कंपन</string>
     <string name="notification">नोटिफिकेशन</string>
     <string name="open_notification_link">नोटिफिकेशन लिंक खोलें</string>
     <string name="alarm_clock">अलार्म (ध्वनि और कंपन)</string>

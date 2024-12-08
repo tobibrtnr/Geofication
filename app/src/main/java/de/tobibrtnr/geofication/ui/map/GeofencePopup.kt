@@ -179,7 +179,7 @@ fun GeofencePopup(
       Column(
         modifier = Modifier
           .fillMaxWidth()
-          .padding(vertical = 8.dp)
+          .padding(vertical = 16.dp)
           .verticalScroll(scrollState),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start,
@@ -189,12 +189,12 @@ fun GeofencePopup(
           verticalAlignment = Alignment.CenterVertically,
           modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp)
+            .padding(horizontal = 16.dp)
         ) {
           Text(
             popupTitle,
             style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(start = 16.dp),
+            modifier = Modifier.padding(start = 8.dp),
             fontWeight = FontWeight.Bold
           )
 
@@ -280,7 +280,7 @@ fun GeofencePopup(
         OutlinedTextField(
           modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 16.dp, end = 16.dp, bottom = 10.dp),
+            .padding(start = 24.dp, end = 24.dp, bottom = 10.dp),
           singleLine = true,
           shape = CircleShape,
           value = geofication.message,
@@ -314,7 +314,7 @@ fun GeofencePopup(
           OutlinedTextField(
             modifier = Modifier
               .fillMaxWidth()
-              .padding(start = 16.dp, end = 16.dp, bottom = 10.dp),
+              .padding(start = 24.dp, end = 24.dp, bottom = 10.dp),
             singleLine = true,
             shape = CircleShape,
             value = geofence.fenceName,
@@ -348,7 +348,7 @@ fun GeofencePopup(
         OutlinedTextField(
           modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
+            .padding(start = 24.dp, end = 24.dp, bottom = 8.dp),
           keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Decimal
           ),
@@ -456,14 +456,11 @@ fun GeofencePopup(
               Spacer(modifier = Modifier.width(8.dp))
               Text(
                 stringResource(
-                  R.string.set_the_alert_type_selected, if (geofication.isAlarm) {
-                    stringResource(R.string.alarm_clock)
-                  } else {
-                    stringResource(R.string.notification)
-                  }
+                  R.string.set_the_alert_type_selected
                 )
               )
             }
+            Spacer(Modifier.height(8.dp))
             Row(
               modifier = Modifier.height(IntrinsicSize.Min)
             ) {
@@ -568,7 +565,7 @@ fun CategoryItem(title: String, content: @Composable () -> Unit) {
       .clickable { isExpanded = !isExpanded },
   ) {
     Column(
-      modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
+      modifier = Modifier.padding(start = 24.dp, end = 24.dp, bottom = 8.dp)
     ) {
       Row(
         verticalAlignment = Alignment.CenterVertically
