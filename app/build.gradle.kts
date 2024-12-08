@@ -7,7 +7,7 @@ plugins {
   id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
   id("com.google.devtools.ksp")
   id("com.google.android.gms.oss-licenses-plugin")
-  id("org.sonarqube")
+  id("org.sonarqube") version "6.0.1.5171"
 }
 
 android {
@@ -94,7 +94,7 @@ dependencies {
   implementation("androidx.activity:activity-compose:$activityVersion")
   implementation("androidx.activity:activity-ktx:$activityVersion")
 
-  // Jetpack compose libaries
+  // Jetpack compose libraries
   val composeVersion = "1.7.5"
   implementation("androidx.compose.ui:ui:$composeVersion")
   implementation("androidx.compose.ui:ui-graphics:$composeVersion")
@@ -182,28 +182,4 @@ secrets {
   // 1. Add this line to your local.properties file, where YOUR_API_KEY is your API key:
   //        MAPS_API_KEY=YOUR_API_KEY
   defaultPropertiesFileName = "local.properties"
-}
-
-// SonarQube configuration
-// This configuration is only valid for local check
-sonarqube {
-  properties {
-    property("sonar.projectKey", "Geofication")
-    property("sonar.host.url", "http://localhost:9000")
-
-    val localProperties = Properties()
-    val localPropertiesFile = rootProject.file("local.properties")
-    if (localPropertiesFile.exists()) {
-      localProperties.load(FileInputStream(localPropertiesFile))
-      property("sonar.token", localProperties.getProperty("sonar.token"))
-    }
-
-    property("sonar.language", "kotlin")
-    property("sonar.sourceEncoding", "UTF-8")
-
-    // Android specific properties
-    property("sonar.sources", "src/main/java")
-    property("sonar.tests", "src/test/java")
-    property("sonar.java.binaries", "build/intermediates/classes/release")
-  }
 }
