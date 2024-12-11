@@ -20,7 +20,7 @@ android {
     applicationId = "de.tobibrtnr.geofication"
     minSdk = 26
     targetSdk = 34
-    versionCode = 2
+    versionCode = 3
     versionName = appVersionName
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

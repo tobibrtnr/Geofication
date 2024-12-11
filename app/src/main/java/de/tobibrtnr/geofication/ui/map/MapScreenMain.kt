@@ -31,8 +31,10 @@ import androidx.compose.material.icons.filled.LocationSearching
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Satellite
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -59,6 +61,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -92,6 +95,7 @@ import de.tobibrtnr.geofication.util.storage.geofence.GeofenceViewModel
 import de.tobibrtnr.geofication.util.storage.geofication.GeoficationViewModel
 import de.tobibrtnr.geofication.util.storage.setting.SettingsUtil
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlin.math.abs
@@ -178,6 +182,8 @@ fun MapScreenMain(
 
   var firstStartup by remember { mutableStateOf(SettingsUtil.getFirstStartup()) }
 
+  var showLoadingHints by remember { mutableIntStateOf(0) }
+
   // Animate the blur effect
   val blurRadius by animateDpAsState(
     targetValue = if (firstStartup) 4.dp else 0.dp,
@@ -244,6 +250,14 @@ fun MapScreenMain(
     } else {
       openedGeofence = null
     }
+  }
+
+  // Show hints when loading the map takes too long
+  LaunchedEffect(Unit) {
+    delay(1000)
+    showLoadingHints += 1
+    delay(3000)
+    showLoadingHints += 1
   }
 
   // If location permission is given, get it and set the camera position to it
@@ -544,6 +558,32 @@ fun MapScreenMain(
       exit = fadeOut(animationSpec = tween(durationMillis = 200))
     ) {
       StartupTutorialScreen()
+    }
+
+    Box(
+      modifier = Modifier.fillMaxSize(),
+      contentAlignment = Alignment.Center
+    ) {
+      AnimatedVisibility(
+        modifier = Modifier.zIndex(100f),
+        visible = showLoadingHints > 0 && !isMapLoaded,
+        enter = fadeIn(animationSpec = tween(durationMillis = 200)),
+        exit = fadeOut(animationSpec = tween(durationMillis = 200))
+      ) {
+        CircularProgressIndicator(Modifier.size(50.dp), strokeWidth = 6.dp)
+      }
+      AnimatedVisibility(
+        modifier = Modifier.zIndex(100f),
+        visible = showLoadingHints > 1 && !isMapLoaded,
+        enter = fadeIn(animationSpec = tween(durationMillis = 200)),
+        exit = fadeOut(animationSpec = tween(durationMillis = 200))
+      ) {
+        Text(
+          text = stringResource(R.string.check_internet_connection),
+          modifier = Modifier.padding(top = 110.dp, start = 20.dp, end = 20.dp),
+          textAlign = TextAlign.Center
+        )
+      }
     }
 
     // Main map composable
