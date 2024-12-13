@@ -399,61 +399,67 @@ fun MapScreenMain(
     ) {
       // Floating action buttons that can be used to go
       // to current location and toggle satellite view.
-      Column {
-        FloatingActionButton(
-          onClick = {
-            removeFocusFromSearchBar()
+      AnimatedVisibility(
+        visible = isMapLoaded,
+        enter = fadeIn(animationSpec = tween(durationMillis = 200)),
+        exit = fadeOut(animationSpec = tween(durationMillis = 200))
+      ) {
+        Column {
+          FloatingActionButton(
+            onClick = {
+              removeFocusFromSearchBar()
 
-            if (SphericalUtil.computeDistanceBetween(
-                cameraPositionState.position.target,
-                currentLocation
-              ) > 0.1
-            ) {
-              MainScope().launch {
-                // Asynchronously set the position of the map camera to current position
-                val locationClient = ServiceProvider.location()
-                val location = locationClient.lastLocation.await()
+              if (SphericalUtil.computeDistanceBetween(
+                  cameraPositionState.position.target,
+                  currentLocation
+                ) > 0.1
+              ) {
+                MainScope().launch {
+                  // Asynchronously set the position of the map camera to current position
+                  val locationClient = ServiceProvider.location()
+                  val location = locationClient.lastLocation.await()
 
-                if (location == null) {
-                  println("location is null!?")
-                  return@launch
+                  if (location == null) {
+                    println("location is null!?")
+                    return@launch
+                  }
+
+                  currentLocation = LatLng(location.latitude, location.longitude)
+
+                  // Update the camera position state with the current location
+                  animateCamera(cameraPositionState, currentLocation)
                 }
-
-                currentLocation = LatLng(location.latitude, location.longitude)
-
-                // Update the camera position state with the current location
-                animateCamera(cameraPositionState, currentLocation)
               }
-            }
-          },
-          shape = CircleShape
-        ) {
-          Icon(
-            imageVector = if (SphericalUtil.computeDistanceBetween(
-                cameraPositionState.position.target,
-                currentLocation
-              ) < 0.1
-            ) Icons.Filled.MyLocation else Icons.Filled.LocationSearching,
-            contentDescription = stringResource(R.string.get_location)
-          )
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-        FloatingActionButton(
-          onClick = {
-            properties = properties.copy(
-              mapType = if (properties.mapType == MapType.NORMAL) {
-                MapType.HYBRID
-              } else {
-                MapType.NORMAL
-              }
+            },
+            shape = CircleShape
+          ) {
+            Icon(
+              imageVector = if (SphericalUtil.computeDistanceBetween(
+                  cameraPositionState.position.target,
+                  currentLocation
+                ) < 0.1
+              ) Icons.Filled.MyLocation else Icons.Filled.LocationSearching,
+              contentDescription = stringResource(R.string.get_location)
             )
-            removeFocusFromSearchBar()
-          },
-        ) {
-          Icon(
-            if (properties.mapType == MapType.NORMAL) Icons.Filled.Satellite else Icons.Filled.Map,
-            contentDescription = stringResource(R.string.switch_map_type)
-          )
+          }
+          Spacer(modifier = Modifier.height(8.dp))
+          FloatingActionButton(
+            onClick = {
+              properties = properties.copy(
+                mapType = if (properties.mapType == MapType.NORMAL) {
+                  MapType.HYBRID
+                } else {
+                  MapType.NORMAL
+                }
+              )
+              removeFocusFromSearchBar()
+            },
+          ) {
+            Icon(
+              if (properties.mapType == MapType.NORMAL) Icons.Filled.Satellite else Icons.Filled.Map,
+              contentDescription = stringResource(R.string.switch_map_type)
+            )
+          }
         }
       }
     }
@@ -465,83 +471,89 @@ fun MapScreenMain(
         .zIndex(1f)
         .padding(0.dp, topPadding + 8.dp, 0.dp, 8.dp),
     ) {
-      Column {
-        // Search bar text field with dropdown button
-        Row(
-          modifier = Modifier
-            .padding(horizontal = 16.dp)
-            .clip(CircleShape)
-            .border(1.dp, searchBarOutline, CircleShape)
-            .shadow(elevation = 16.dp, shape = CircleShape)
-        ) {
-          LocationSearchBar(
+      AnimatedVisibility(
+        visible = isMapLoaded,
+        enter = fadeIn(animationSpec = tween(durationMillis = 200)),
+        exit = fadeOut(animationSpec = tween(durationMillis = 200))
+      ) {
+        Column {
+          // Search bar text field with dropdown button
+          Row(
             modifier = Modifier
-              .weight(1f)
-              .focusRequester(focusRequester)
-              .onFocusChanged {
-                if (it.isFocused) {
-                  resultsShown = true
-                }
-              },
-            input = searchInputState,
-            callback = {
+              .padding(horizontal = 16.dp)
+              .clip(CircleShape)
+              .border(1.dp, searchBarOutline, CircleShape)
+              .shadow(elevation = 16.dp, shape = CircleShape)
+          ) {
+            LocationSearchBar(
+              modifier = Modifier
+                .weight(1f)
+                .focusRequester(focusRequester)
+                .onFocusChanged {
+                  if (it.isFocused) {
+                    resultsShown = true
+                  }
+                },
+              input = searchInputState,
+              callback = {
+                removeFocusFromSearchBar()
+                animateCamera(cameraPositionState, it)
+              }, clearFocus = {
+                removeFocusFromSearchBar()
+              })
+            DropdownInfoButton(navController) { removeFocusFromSearchBar() }
+          }
+
+          // List of results for a search query.
+          // Shown, if the focus is on the search bar.
+          AnimatedVisibility(
+            visible = resultsShown
+          ) {
+            SearchResultList(searchInputState, geoficationViewModel, searchGlobally = { query ->
+              searchLocation(query, context, callback = {
+                removeFocusFromSearchBar()
+                animateCamera(cameraPositionState, it)
+              }, clearFocus = {
+                removeFocusFromSearchBar()
+              })
+            }, goToLocation = { lat, lng, radius ->
               removeFocusFromSearchBar()
-              animateCamera(cameraPositionState, it)
-            }, clearFocus = {
-              removeFocusFromSearchBar()
+              animateCameraToGeofence(cameraPositionState, lat, lng, radius)
             })
-          DropdownInfoButton(navController) { removeFocusFromSearchBar() }
-        }
+          }
 
-        // List of results for a search query.
-        // Shown, if the focus is on the search bar.
-        AnimatedVisibility(
-          visible = resultsShown
-        ) {
-          SearchResultList(searchInputState, geoficationViewModel, searchGlobally = { query ->
-            searchLocation(query, context, callback = {
-              removeFocusFromSearchBar()
-              animateCamera(cameraPositionState, it)
-            }, clearFocus = {
-              removeFocusFromSearchBar()
-            })
-          }, goToLocation = { lat, lng, radius ->
-            removeFocusFromSearchBar()
-            animateCameraToGeofence(cameraPositionState, lat, lng, radius)
-          })
-        }
+          // Geofication Chips below the search bar. They
+          // are only visible if no search results are shown.
+          AnimatedVisibility(
+            visible = !resultsShown
+          ) {
+            Column {
+              GeoficationsChipList(
+                geoficationsArray,
+                geofencesArray,
+                currentLocation,
+                cameraPositionState
+              )
+              if (geoficationsArray.none {
+                  it.active
+                }) {
+                Spacer(Modifier.height(8.dp))
+              }
 
-        // Geofication Chips below the search bar. They
-        // are only visible if no search results are shown.
-        AnimatedVisibility(
-          visible = !resultsShown
-        ) {
-          Column {
-            GeoficationsChipList(
-              geoficationsArray,
-              geofencesArray,
-              currentLocation,
-              cameraPositionState
-            )
-            if (geoficationsArray.none {
-                it.active
-              }) {
-              Spacer(Modifier.height(8.dp))
-            }
-
-            AnimatedVisibility(
-              visible = cameraPositionState.position.bearing != 0f,
-              enter = fadeIn(animationSpec = tween(durationMillis = 200)),
-              exit = fadeOut(animationSpec = tween(durationMillis = 200))
-            ) {
-              Row {
-                Spacer(Modifier.width(16.dp))
-                Compass(
-                  Modifier
-                    .size(32.dp), cameraPositionState
-                ) {
-                  val currPos = cameraPositionState.position
-                  animateCamera(cameraPositionState, currPos.target, currPos.zoom, currPos.tilt)
+              AnimatedVisibility(
+                visible = cameraPositionState.position.bearing != 0f,
+                enter = fadeIn(animationSpec = tween(durationMillis = 200)),
+                exit = fadeOut(animationSpec = tween(durationMillis = 200))
+              ) {
+                Row {
+                  Spacer(Modifier.width(16.dp))
+                  Compass(
+                    Modifier
+                      .size(32.dp), cameraPositionState
+                  ) {
+                    val currPos = cameraPositionState.position
+                    animateCamera(cameraPositionState, currPos.target, currPos.zoom, currPos.tilt)
+                  }
                 }
               }
             }
