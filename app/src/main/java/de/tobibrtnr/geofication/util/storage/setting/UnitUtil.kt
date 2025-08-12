@@ -4,6 +4,7 @@ import de.tobibrtnr.geofication.util.misc.ServiceProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.util.Locale
 
 class UnitUtil {
@@ -16,15 +17,19 @@ class UnitUtil {
     // check by locale if the current country uses m or ft.
     fun init() {
       CoroutineScope(SupervisorJob()).launch {
-        currentUnit = try {
+        currentUnit = runBlocking {
           val db = ServiceProvider.database()
           val setDao = db.settingsDao()
-          setDao.getSetting("unit")[0].toInt() != 0
-        } catch (e: NullPointerException) {
-          val locale = Locale.getDefault()
-          val imperialCountries = setOf("US", "LR", "MM")
+          val byteArray = setDao.getSetting("unit")
 
-          !imperialCountries.contains(locale.country)
+          if (byteArray != null) {
+            byteArray[0].toInt() != 0
+          } else {
+            val locale = Locale.getDefault()
+            val imperialCountries = setOf("US", "LR", "MM")
+
+            !imperialCountries.contains(locale.country)
+          }
         }
       }
     }

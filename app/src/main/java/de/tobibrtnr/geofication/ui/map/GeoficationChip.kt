@@ -27,7 +27,8 @@ fun GeoficationChip(geofence: Geofence, geofication: Geofication, meterText: Str
       Text(
         "${
           geofication.message.take(15).trim()
-        }${if (geofication.message.length > 15) "..." else ""} | $meterText"
+        }${if (geofication.message.length > 15) "..." else ""} | $meterText",
+        color = MaterialTheme.colorScheme.onPrimaryContainer
       )
     },
     leadingIcon = {
