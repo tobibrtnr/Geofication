@@ -4,6 +4,7 @@ import de.tobibrtnr.geofication.util.misc.ServiceProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class SettingsUtil {
   companion object {
@@ -19,29 +20,36 @@ class SettingsUtil {
         val setDao = db.settingsDao()
 
         // Set theme mode setting
-        themeMode = try {
-          String(setDao.getSetting("themeMode"))
-        } catch (e: NullPointerException) {
-          // Default setting: Use device theme
-          "auto"
+        themeMode = runBlocking {
+          val byteArray = setDao.getSetting("themeMode")
+
+          if (byteArray != null) {
+            String(byteArray)
+          } else {
+            "auto"
+          }
         }
 
         // Set power saving popup setting
-        powerPopup = try {
+        powerPopup = runBlocking {
           val byteArray = setDao.getSetting("powerPopup")
-          byteArray.isNotEmpty() && byteArray[0] == 1.toByte()
-        } catch (e: NullPointerException) {
-          // Default setting: Show popup on startup
-          true
+
+          if (byteArray != null) {
+            byteArray.isNotEmpty() && byteArray[0] == 1.toByte()
+          } else {
+            true
+          }
         }
 
         // Set if this is the first startup of the app
-        firstStartup = try {
+        firstStartup = runBlocking {
           val byteArray = setDao.getSetting("firstStartup")
-          byteArray.isNotEmpty() && byteArray[0] == 1.toByte()
-        } catch (e: NullPointerException) {
-          // Default: yes
-          true
+
+          if (byteArray != null) {
+            byteArray.isNotEmpty() && byteArray[0] == 1.toByte()
+          } else {
+            true
+          }
         }
       }
     }
@@ -53,7 +61,7 @@ class SettingsUtil {
 
     // Set theme mode setting
     fun setThemeMode(new: String) {
-      themeMode = new;
+      themeMode = new
       CoroutineScope(SupervisorJob()).launch {
         val db = ServiceProvider.database()
         val setDao = db.settingsDao()
@@ -69,7 +77,7 @@ class SettingsUtil {
 
     // Set power popup setting
     fun setPowerPopup(new: Boolean) {
-      powerPopup = new;
+      powerPopup = new
       CoroutineScope(SupervisorJob()).launch {
         val db = ServiceProvider.database()
         val setDao = db.settingsDao()
@@ -85,7 +93,7 @@ class SettingsUtil {
 
     // Set first startup setting
     fun setFirstStartup(new: Boolean) {
-      firstStartup = new;
+      firstStartup = new
       CoroutineScope(SupervisorJob()).launch {
         val db = ServiceProvider.database()
         val setDao = db.settingsDao()

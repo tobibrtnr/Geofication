@@ -19,14 +19,16 @@ class LocaleUtil {
     // at "if (languageCodes.contains(localeStrings[0])) {"
     @SuppressWarnings("kotlin:S2175")
     fun init(context: Context) {
-      runBlocking {
-        currentLocale = try {
-          val db = ServiceProvider.database()
-          val setDao = db.settingsDao()
-          val curLoc = setDao.getSetting("locale").toString(Charset.defaultCharset())
+      currentLocale = runBlocking {
+        val db = ServiceProvider.database()
+        val setDao = db.settingsDao()
+        val curLocBytes = setDao.getSetting("locale")
+
+        if (curLocBytes != null) {
+          val curLoc = curLocBytes.toString(Charset.defaultCharset())
           setLocale(curLoc)
           curLoc
-        } catch (e: NullPointerException) {
+        } else {
           // Locale not set, use auto language or english as fallback.
           val languageCodes by lazy { context.resources.getStringArray(R.array.language_codes) }
           val localeStrings = Locale.getDefault().language.split("[-_]+")

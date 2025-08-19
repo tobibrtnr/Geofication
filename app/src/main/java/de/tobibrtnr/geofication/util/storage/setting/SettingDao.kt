@@ -11,7 +11,7 @@ interface SettingsDao {
   suspend fun setSetting(setting: Setting)
 
   @Query("SELECT value FROM setting WHERE `key` = :name")
-  suspend fun getSetting(name: String): ByteArray
+  suspend fun getSetting(name: String): ByteArray?
 
   @Query("DELETE from setting")
   suspend fun resetSettings()
